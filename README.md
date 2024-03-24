@@ -23,7 +23,7 @@
 ### Prerequisites
 
 - Go 1.21+
-- Node.js 14+
+- Node.js 20+
 - MySQL or PostgreSQL
 - Docker (optional)
 
