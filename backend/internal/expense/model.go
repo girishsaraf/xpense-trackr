@@ -1,6 +1,6 @@
 // expense.go
 
-package models
+package expense
 
 import "time"
 
