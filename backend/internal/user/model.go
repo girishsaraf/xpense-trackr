@@ -1,6 +1,6 @@
 // user.go
 
-package models
+package user
 
 type User struct {
 	ID           int    `json:"id"`
