@@ -7,9 +7,11 @@ USE xpense_trackr_db;
 -- Create users table
 CREATE TABLE users (
                        id INT AUTO_INCREMENT PRIMARY KEY,
-                       username VARCHAR(50) UNIQUE NOT NULL,
-                       password VARCHAR(255) NOT NULL
+                       username VARCHAR(255) NOT NULL,
+                       email VARCHAR(255) NOT NULL,
+                       password_hash VARCHAR(255) NOT NULL
 );
+
 
 -- Create categories table
 CREATE TABLE categories (
@@ -23,10 +25,12 @@ CREATE TABLE expenses (
                           user_id INT NOT NULL,
                           category_id INT NOT NULL,
                           amount DECIMAL(10, 2) NOT NULL,
+                          description VARCHAR(255) NOT NULL,
                           date DATE NOT NULL,
                           FOREIGN KEY (user_id) REFERENCES users(id),
                           FOREIGN KEY (category_id) REFERENCES categories(id)
 );
+
 
 -- Create budgets table
 CREATE TABLE budgets (
@@ -50,6 +54,14 @@ INSERT INTO users (username, email, password_hash) VALUES
        ('user8', 'user8@example.com', 'hashed_password_8'),
        ('user9', 'user9@example.com', 'hashed_password_9'),
        ('user10', 'user10@example.com', 'hashed_password_10');
+
+
+INSERT INTO categories (name) VALUES
+      ('Food'),
+      ('Transportation'),
+      ('Utilities'),
+      ('Entertainment'),
+      ('Healthcare');
 
 INSERT INTO expenses (user_id, category_id, amount, description, date) VALUES
 -- Expenses for user1
@@ -121,13 +133,6 @@ INSERT INTO expenses (user_id, category_id, amount, description, date) VALUES
 (10, 3, 38.00, 'Expense description 3 for user10', '2024-03-03'),
 (10, 4, 16.00, 'Expense description 4 for user10', '2024-03-04'),
 (10, 5, 33.00, 'Expense description 5 for user10', '2024-03-05');
-
-INSERT INTO categories (name) VALUES
-      ('Food'),
-      ('Transportation'),
-      ('Utilities'),
-      ('Entertainment'),
-      ('Healthcare');
 
 INSERT INTO budgets (user_id, category_id, amount) VALUES
        (1, 1, 500), -- Budget for Food
