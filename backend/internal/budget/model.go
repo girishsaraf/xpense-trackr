@@ -1,6 +1,6 @@
 // budget.go
 
-package models
+package budget
 
 type Budget struct {
 	ID         int     `json:"id"`
