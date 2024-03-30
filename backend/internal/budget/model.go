@@ -9,9 +9,9 @@ import (
 
 var db *gorm.DB
 
-// SetDB sets the db object for the category package.
-func SetDB(database *gorm.DB) {
-	db = database
+// SetDB sets the db object for the budget package.
+func SetDB(databaseConfig *gorm.DB) {
+	db = databaseConfig
 }
 
 // ErrRecordNotFound is an error indicating that a record was not found.
