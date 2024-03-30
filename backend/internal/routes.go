@@ -5,6 +5,7 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/category"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/expense"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/user"
+	"github.com/gorilla/mux"
 )
 
 // SetRoutes initializes the routes for the API endpoints.
