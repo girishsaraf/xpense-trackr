@@ -9,13 +9,6 @@ import (
 
 // LoadDatabaseConfig loads the database configuration from environment variables
 func LoadDatabaseConfig() DatabaseConfig {
-	//return DatabaseConfig{
-	//	Host:     "127.0.0.1",
-	//	Port:     "3306",
-	//	User:     "root",
-	//	Password: "root_password",
-	//	Name:     "xpense_trackr_db",
-	//}
 	return DatabaseConfig{
 		Host:     os.Getenv("DB_HOST"),
 		Port:     os.Getenv("DB_PORT"),
