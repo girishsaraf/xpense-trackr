@@ -63,3 +63,18 @@
    ```
 
 7. After following these steps, you can open your web browser and navigate to http://localhost:3000 to access the xpense-trackr application.
+
+
+**Docker Steps**
+
+- For main Dockerfile - to start Go backend and also mysql inside the container
+
+
+
+- For mysql Dockerfile - just to run mysql in Docker
+
+`docker build -t mysql-local .`
+
+`docker run -d -p 3306:3306 --name mysql-local-container mysql-local`
+
+
