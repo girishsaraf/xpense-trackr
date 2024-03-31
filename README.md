@@ -67,14 +67,15 @@
 
 **Docker Steps**
 
-- For main Dockerfile - to start Go backend and also mysql inside the container
+- For main Dockerfile - to start both MySQL and Backend container
 
+Go to the main root directory. Run the following commands:
+```
+docker-compose up --build
+docker-compose up
+```
 
+The build command can throw an error in the xpt-backend container, but that would not cause any issues. The second command will start a backend instance with dummy data given in mysql/init.sql on port 8080 in localhost
 
-- For mysql Dockerfile - just to run mysql in Docker
-
-`docker build -t mysql-local .`
-
-`docker run -d -p 3306:3306 --name mysql-local-container mysql-local`
 
 
