@@ -39,32 +39,7 @@
    ```
     cd xpense-trackr
    ```
-
-3. Install backend dependencies:
-   ```
-    go mod tidy
-   ```
-
-4. Install frontend dependencies:
-   ```
-   cd frontend
-   npm install
-   ```
-
-5. Start the backend server:
-   ```
-    go run main.go
-   ```
-
-6. Start the frontend development server:
-   ```
-   cd frontend
-   npm start
-   ```
-
-7. After following these steps, you can open your web browser and navigate to http://localhost:3000 to access the xpense-trackr application.
-
-
+   
 **Docker Steps**
 
 - For main Dockerfile - to start both MySQL and Backend container
