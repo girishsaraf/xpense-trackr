@@ -2,7 +2,7 @@
 FROM mysql:latest
 
 # Copy the SQL script to the docker-entrypoint-initdb.d directory
-COPY backend/database/init.sql /docker-entrypoint-initdb.d/
+COPY init.sql /docker-entrypoint-initdb.d/
 
 # Set environment variables
 ENV MYSQL_ROOT_PASSWORD=root_password
