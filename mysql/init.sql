@@ -1,3 +1,4 @@
+DROP DATABASE xpense_trackr_db;
 -- Create database
 CREATE DATABASE xpense_trackr_db;
 

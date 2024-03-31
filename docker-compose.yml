@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  mysql:
+    container_name: mysql-container
+    build: ./mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: xpense_trackr_db
+      MYSQL_USER: username
+      MYSQL_PASSWORD: password
+    networks:
+      - xpt-network
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u root -p${MYSQL_ROOT_PASSWORD}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  backend:
+    container_name: xpt-backend-container
+    build: ./backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - xpt-network
+networks:
+  xpt-network:
