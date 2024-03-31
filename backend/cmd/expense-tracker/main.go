@@ -14,8 +14,8 @@ import (
 
 func main() {
 
-	// Setting Environment Variables - Will be replaced with Dockerfile changes in the future
-	if err := os.Setenv("DB_HOST", "127.0.0.1"); err != nil {
+	// Setting Environment Variables - Will be replaced with Dockerfile.mysql changes in the future
+	if err := os.Setenv("DB_HOST", "mysql-container"); err != nil {
 		// Handle error
 		log.Fatalf("Error setting DB_HOST environment variable: %v", err)
 	}
