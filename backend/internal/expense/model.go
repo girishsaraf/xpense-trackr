@@ -20,9 +20,9 @@ var ErrRecordNotFound = gorm.ErrRecordNotFound
 // Expense represents the expense model.
 type Expense struct {
 	ID          uint    `gorm:"primaryKey" json:"id"`
-	UserID      uint    `json:"user_id"`
-	CategoryID  uint    `json:"category_id"`
-	Amount      float64 `json:"amount"`
+	UserID      uint    `json:"user_id,string"`
+	CategoryID  uint    `json:"category_id,string"`
+	Amount      float64 `json:"amount,string,omitempty"`
 	Description string  `json:"description"`
 	Date        string  `json:"date"`
 }
