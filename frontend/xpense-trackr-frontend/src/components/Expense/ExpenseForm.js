@@ -7,8 +7,11 @@ import './ExpenseForm.css';
 
 const ExpenseForm = () => {
     const [formData, setFormData] = useState({
-        title: '',
+        description: '',
         amount: '',
+        date: '',
+        category_id: '',
+        user_id: '',
     });
 
     const handleSubmit = async event => {
@@ -17,15 +20,22 @@ const ExpenseForm = () => {
         try {
             await axios.post(`${backendUrl}/api/expenses`, formData);
             alert('Expense added successfully');
-            setFormData({
-                title: '',
-                amount: '',
-            });
+            clearFormData();
         } catch (error) {
             console.error('Error adding expense:', error);
             alert('Error adding expense. Please try again.');
         }
     };
+
+    const clearFormData = () => {
+        setFormData({
+            description: '',
+            amount: '',
+            date: '',
+            category_id: '',
+            user_id: '',
+        });
+    }
 
     const handleInputChange = event => {
         setFormData({
@@ -39,12 +49,22 @@ const ExpenseForm = () => {
             <h2>Add Expense</h2>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="title">Title:</label>
+                    <label htmlFor="user_id">User:</label>
+                    <input
+                        type="number"
+                        id="user_id"
+                        name="user_id"
+                        value={formData.user_id}
+                        onChange={handleInputChange}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="description">Description:</label>
                     <input
                         type="text"
-                        id="title"
-                        name="title"
-                        value={formData.title}
+                        id="description"
+                        name="description"
+                        value={formData.description}
                         onChange={handleInputChange}
                     />
                 </div>
@@ -58,7 +78,28 @@ const ExpenseForm = () => {
                         onChange={handleInputChange}
                     />
                 </div>
+                <div>
+                    <label htmlFor="category">Category:</label>
+                    <input
+                        type="text"
+                        id="category_id"
+                        name="category_id"
+                        value={formData.category_id}
+                        onChange={handleInputChange}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="date">Date:</label>
+                    <input
+                        type="date"
+                        id="date"
+                        name="date"
+                        value={formData.date}
+                        onChange={handleInputChange}
+                    />
+                </div>
                 <button type="submit">Add Expense</button>
+                <button type="cancel" onClick={clearFormData}>Cancel</button>
             </form>
         </div>
     );

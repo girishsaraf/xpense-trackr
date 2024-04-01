@@ -36,3 +36,43 @@
     transform: rotate(360deg);
   }
 }
+
+/* Add this CSS to your main CSS file or create a new CSS file for your tabs */
+
+.horizontal-tabs {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+}
+
+.horizontal-tabs li {
+  margin-right: 20px; /* Adjust spacing between tabs */
+}
+
+.horizontal-tabs li:last-child {
+  margin-right: 0; /* Remove margin from last tab */
+}
+
+.horizontal-tabs li a {
+  text-decoration: none;
+  color: #333; /* Default color for tab text */
+  padding: 10px 15px; /* Adjust padding to increase clickable area */
+  border-bottom: 2px solid transparent; /* Add bottom border for tab indicator */
+  transition: border-color 0.3s ease; /* Smooth transition for tab indicator */
+}
+
+.horizontal-tabs li a:hover {
+  color: #007bff; /* Change color on hover */
+}
+
+.horizontal-tabs li a.active-tab {
+  border-color: #007bff; /* Color for active tab indicator */
+}
+
+h1 {
+  font-size: 36px; /* Adjust font size as needed */
+  color: #005b96; /* Xpense-Trackr brand color */
+  margin-top: 20px; /* Add some top margin for spacing */
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1); /* Add a subtle text shadow */
+}

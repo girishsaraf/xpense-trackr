@@ -8,6 +8,10 @@ import './ExpenseList.css';
 
 const ExpenseList = () => {
     const [expenses, setExpenses] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [currentExpense, setCurrentExpense] = useState(null);
+    const [editedAmount, setEditedAmount] = useState(0);
+    const [editedDate, setEditedDate] = useState('');
 
     useEffect(() => {
         fetchExpenses();
@@ -22,22 +26,40 @@ const ExpenseList = () => {
         }
     };
 
-    const handleEditExpense = async (expenseId) => {
+    const handleSubmitEdit = async () => {
         try {
             // Fetch the expense data for the selected expenseId
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/expenses/${expenseId}`);
+            const expenseId = currentExpense.id;
+            const response = await axios.get(`${backendUrl}/api/expenses/${expenseId}`);
             const expenseData = response.data;
+
+            // Update the expense data with edited amount and date
+            expenseData.date = editedDate.toString();
+            expenseData.amount = editedAmount.toString();
 
             // Call the PUT endpoint to update the expense
             await axios.put(`${backendUrl}/api/expenses/${expenseId}`, expenseData);
             alert('Expense updated successfully');
 
             // Optionally, fetch the list of expenses to update the UI
-            await fetchExpenses();
+            fetchExpenses();
         } catch (error) {
             console.error('Error updating expense:', error);
             alert('Error updating expense. Please try again.');
         }
+        setShowModal(false);
+    };
+
+
+    const handleOpenModal = (expense) => {
+        setCurrentExpense(expense);
+        setEditedAmount(expense.amount);
+        setEditedDate(expense.date);
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
     };
 
     const handleDeleteExpense = async (expenseId) => {
@@ -73,13 +95,40 @@ const ExpenseList = () => {
                 </tr>
                 </thead>
                 <tbody>
+                {showModal && (
+                    <div className="modal">
+                        <div className="modal-content">
+                            <h2>Edit Expense</h2>
+                            <div>
+                                <label htmlFor="edited-amount">Amount:</label>
+                                <input
+                                    type="number"
+                                    id="edited-amount"
+                                    value={editedAmount}
+                                    onChange={(e) => setEditedAmount(e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="edited-date">Date:</label>
+                                <input
+                                    type="date"
+                                    id="edited-date"
+                                    value={editedDate}
+                                    onChange={(e) => setEditedDate(e.target.value)}
+                                />
+                            </div>
+                            <button onClick={handleSubmitEdit}>Submit</button>
+                            <button onClick={handleCloseModal}>Cancel</button>
+                        </div>
+                    </div>
+                )}
                 {expenses.map(expense => (
                     <tr key={expense.id}>
                         <td>{expense.description}</td>
                         <td>{expense.amount}</td>
                         <td>{formatDate(expense.date)}</td>
                         <td>
-                            <button className="button-common" onClick={() => handleEditExpense(expense.id)}>Edit</button>
+                            <button className="button-common" onClick={() => handleOpenModal(expense)}>Edit</button>
                         </td>
                         <td>
                             <button className="button-common" onClick={() => handleDeleteExpense(expense.id)}>Delete</button>

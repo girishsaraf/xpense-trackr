@@ -1,22 +1,23 @@
 /* src/components/Expense/ExpenseList.css */
 
 .expense-list-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
 }
 
 .expense-list-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
+    padding: 20px;
+    border-bottom: 1px solid #e6e6e6;
 }
 
 .expense-list-header h2 {
     margin: 0;
+    font-size: 24px;
+    color: #333;
 }
 
 .expense-list-content {
@@ -29,15 +30,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
+    padding: 20px;
+    border-bottom: 1px solid #e6e6e6;
 }
 
 .button-common {
     padding: 12px 20px;
     font-size: 16px;
-    background-color: #007bff;
+    background-color: #66a3d2; /* Subtle shade of orange */
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -46,7 +46,7 @@
 }
 
 .button-common:hover {
-    background-color: #0056b3;
+    background-color: #005b96; /* Darker shade of orange on hover */
 }
 
 .expense-list-table {
@@ -56,11 +56,12 @@
 
 .expense-list-table th,
 .expense-list-table td {
-    border: 1px solid #ccc;
-    padding: 8px;
+    border: 1px solid #e6e6e6;
+    padding: 12px;
 }
 
 .expense-list-table th {
-    background-color: #f2f2f2;
+    background-color: #f9f9f9;
+    font-weight: bold;
     text-align: left;
 }
