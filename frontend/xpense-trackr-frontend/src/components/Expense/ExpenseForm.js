@@ -4,8 +4,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import backendUrl from "../../config";
 import './ExpenseForm.css';
+import { useNavigate } from 'react-router-dom';
+
 
 const ExpenseForm = () => {
+
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
         description: '',
         amount: '',
@@ -21,6 +26,8 @@ const ExpenseForm = () => {
             await axios.post(`${backendUrl}/api/expenses`, formData);
             alert('Expense added successfully');
             clearFormData();
+
+            navigate('/expenses');
         } catch (error) {
             console.error('Error adding expense:', error);
             alert('Error adding expense. Please try again.');

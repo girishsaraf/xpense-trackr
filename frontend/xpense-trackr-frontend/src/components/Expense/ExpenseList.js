@@ -5,6 +5,7 @@ import axios from 'axios';
 import backendUrl from "../../config";
 import {Link} from "react-router-dom";
 import './ExpenseList.css';
+import Pagination from "../Pagination/Pagination";
 
 const ExpenseList = () => {
     const [expenses, setExpenses] = useState([]);
@@ -12,6 +13,17 @@ const ExpenseList = () => {
     const [currentExpense, setCurrentExpense] = useState(null);
     const [editedAmount, setEditedAmount] = useState(0);
     const [editedDate, setEditedDate] = useState('');
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [expensesPerPage] = useState(10); // Number of expenses per page
+
+    // Calculate the indexes of the expenses to display on the current page
+    const indexOfLastExpense = currentPage * expensesPerPage;
+    const indexOfFirstExpense = indexOfLastExpense - expensesPerPage;
+    const currentExpenses = expenses.slice(indexOfFirstExpense, indexOfLastExpense);
+
+    // Logic for changing the current page
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     useEffect(() => {
         fetchExpenses();
@@ -122,7 +134,7 @@ const ExpenseList = () => {
                         </div>
                     </div>
                 )}
-                {expenses.map(expense => (
+                {currentExpenses.map(expense => (
                     <tr key={expense.id}>
                         <td>{expense.description}</td>
                         <td>{expense.amount}</td>
@@ -135,9 +147,16 @@ const ExpenseList = () => {
                         </td>
                     </tr>
                 ))}
+                <Pagination
+                    currentPage={currentPage}
+                    itemsPerPage={expensesPerPage}
+                    totalItems={expenses.length}
+                    paginate={paginate}
+                />
                 </tbody>
             </table>
         </div>
+
     );
 };
 

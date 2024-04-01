@@ -4,6 +4,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import ExpenseList from './components/Expense/ExpenseList';
 import './App.css';
+import ExpenseForm from "./components/Expense/ExpenseForm";
 
 function App() {
     return (
@@ -20,6 +21,7 @@ function App() {
                 </nav>
                 <Routes>
                     <Route path="/expenses" element={<ExpenseList />} />
+                    <Route path="/expenses/new" element={<ExpenseForm />} />
                     {/*<Route path="/categories" element={<CategoryList />} />*/}
                     {/*<Route path="/budgets" element={<BudgetList />} />*/}
                     {/*<Route path="/trends" element={<TrendsPage />} />*/}
