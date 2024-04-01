@@ -32,11 +32,16 @@ const ExpenseList = () => {
     const fetchExpenses = async () => {
         try {
             const response = await axios.get(`${backendUrl}/api/expenses`);
-            setExpenses(response.data);
+
+            // Sort expenses by date parameter in descending order
+            const sortedExpenses = response.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            setExpenses(sortedExpenses);
         } catch (error) {
             console.error('Error fetching expenses:', error);
         }
     };
+
 
     const handleSubmitEdit = async () => {
         try {
