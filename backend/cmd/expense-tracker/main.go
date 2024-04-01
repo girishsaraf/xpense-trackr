@@ -7,6 +7,7 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/category"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/expense"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 	"os"
@@ -44,7 +45,9 @@ func main() {
 
 	// Creating API routes and starting server on 8080
 	router := mux.NewRouter()
+	c := cors.AllowAll()
+	handler := c.Handler(router)
 	internal.SetRoutes(router)
 	log.Println("Server listening on port 8080...")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8080", handler))
 }
