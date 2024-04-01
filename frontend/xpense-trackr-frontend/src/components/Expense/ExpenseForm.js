@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import backendUrl from "../../config";
+import './ExpenseForm.css';
 
 const ExpenseForm = () => {
     const [formData, setFormData] = useState({
@@ -34,7 +35,7 @@ const ExpenseForm = () => {
     };
 
     return (
-        <div>
+        <div className="expense-form-container">
             <h2>Add Expense</h2>
             <form onSubmit={handleSubmit}>
                 <div>

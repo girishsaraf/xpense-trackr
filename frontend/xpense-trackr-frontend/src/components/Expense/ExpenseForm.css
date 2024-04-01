@@ -1,0 +1,54 @@
+/* ExpenseForm.css */
+
+.expense-form-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.expense-form-container h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+.expense-form-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.expense-form-container form div {
+    margin-bottom: 20px;
+}
+
+.expense-form-container form label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.expense-form-container form input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.expense-form-container form button {
+    padding: 12px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.expense-form-container form button:hover {
+    background-color: #0056b3;
+}
