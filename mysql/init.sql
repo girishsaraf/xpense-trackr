@@ -45,16 +45,17 @@ CREATE TABLE budgets (
 
 
 INSERT INTO users (username, email, password_hash) VALUES
-       ('user1', 'user1@example.com', 'hashed_password_1'),
-       ('user2', 'user2@example.com', 'hashed_password_2'),
-       ('user3', 'user3@example.com', 'hashed_password_3'),
-       ('user4', 'user4@example.com', 'hashed_password_4'),
-       ('user5', 'user5@example.com', 'hashed_password_5'),
-       ('user6', 'user6@example.com', 'hashed_password_6'),
-       ('user7', 'user7@example.com', 'hashed_password_7'),
-       ('user8', 'user8@example.com', 'hashed_password_8'),
-       ('user9', 'user9@example.com', 'hashed_password_9'),
-       ('user10', 'user10@example.com', 'hashed_password_10');
+       ('JohnDoe', 'john.doe@example.com', 'hashed_password_1'),
+       ('JaneSmith', 'jane.smith@example.com', 'hashed_password_2'),
+       ('AliceJohnson', 'alice.johnson@example.com', 'hashed_password_3'),
+       ('BobBrown', 'bob.brown@example.com', 'hashed_password_4'),
+       ('EmilyJones', 'emily.jones@example.com', 'hashed_password_5'),
+       ('MichaelDavis', 'michael.davis@example.com', 'hashed_password_6'),
+       ('SophiaWilson', 'sophia.wilson@example.com', 'hashed_password_7'),
+       ('DavidMartinez', 'david.martinez@example.com', 'hashed_password_8'),
+       ('OliviaTaylor', 'olivia.taylor@example.com', 'hashed_password_9'),
+       ('WilliamAnderson', 'william.anderson@example.com', 'hashed_password_10');
+
 
 
 INSERT INTO categories (name) VALUES
@@ -66,74 +67,75 @@ INSERT INTO categories (name) VALUES
 
 INSERT INTO expenses (user_id, category_id, amount, description, date) VALUES
 -- Expenses for user1
-(1, 1, 50.00, 'Expense description 1 for user1', '2024-03-01'),
-(1, 2, 30.00, 'Expense description 2 for user1', '2024-03-02'),
-(1, 3, 20.00, 'Expense description 3 for user1', '2024-03-03'),
-(1, 4, 10.00, 'Expense description 4 for user1', '2024-03-04'),
-(1, 5, 25.00, 'Expense description 5 for user1', '2024-03-05'),
+(1, 1, 50.00, 'Gourmet Coffee and Croissants', '2024-03-01'),
+(1, 2, 30.00, 'Tech Gadgets Purchase', '2024-03-02'),
+(1, 3, 20.00, 'Art Supplies for Creative Project', '2024-03-03'),
+(1, 4, 10.00, 'Outdoor Adventure Gear', '2024-03-04'),
+(1, 5, 25.00, 'Bookstore Splurge', '2024-03-05'),
 
 -- Expenses for user2
-(2, 1, 40.00, 'Expense description 1 for user2', '2024-03-01'),
-(2, 2, 35.00, 'Expense description 2 for user2', '2024-03-02'),
-(2, 3, 15.00, 'Expense description 3 for user2', '2024-03-03'),
-(2, 4, 22.00, 'Expense description 4 for user2', '2024-03-04'),
-(2, 5, 18.00, 'Expense description 5 for user2', '2024-03-05'),
+(2, 1, 40.00, 'Vintage Vinyl Records', '2024-03-01'),
+(2, 2, 35.00, 'Fitness Class Membership', '2024-03-02'),
+(2, 3, 15.00, 'Sustainable Fashion Finds', '2024-03-03'),
+(2, 4, 22.00, 'Home Decor Refresh', '2024-03-04'),
+(2, 5, 18.00, 'Culinary Experiment Ingredients', '2024-03-05'),
 
 -- Expenses for user3
-(3, 1, 60.00, 'Expense description 1 for user3', '2024-03-01'),
-(3, 2, 45.00, 'Expense description 2 for user3', '2024-03-02'),
-(3, 3, 12.00, 'Expense description 3 for user3', '2024-03-03'),
-(3, 4, 28.00, 'Expense description 4 for user3', '2024-03-04'),
-(3, 5, 30.00, 'Expense description 5 for user3', '2024-03-05'),
+(3, 1, 60.00, 'Farmers Market Bounty', '2024-03-01'),
+(3, 2, 45.00, 'DIY Home Improvement Supplies', '2024-03-02'),
+(3, 3, 12.00, 'Music Festival Tickets', '2024-03-03'),
+(3, 4, 28.00, 'Pet Accessories Splurge', '2024-03-04'),
+(3, 5, 30.00, 'Local Artisan Crafts', '2024-03-05'),
 
 -- Expenses for user4
-(4, 1, 55.00, 'Expense description 1 for user4', '2024-03-01'),
-(4, 2, 20.00, 'Expense description 2 for user4', '2024-03-02'),
-(4, 3, 28.00, 'Expense description 3 for user4', '2024-03-03'),
-(4, 4, 14.00, 'Expense description 4 for user4', '2024-03-04'),
-(4, 5, 37.00, 'Expense description 5 for user4', '2024-03-05'),
+(4, 1, 55.00, 'Weekend Getaway Expenses', '2024-03-01'),
+(4, 2, 20.00, 'Gardening Supplies', '2024-03-02'),
+(4, 3, 28.00, 'Concert Tickets', '2024-03-03'),
+(4, 4, 14.00, 'Yoga Retreat Booking', '2024-03-04'),
+(4, 5, 37.00, 'Plant-Based Cooking Class', '2024-03-05'),
 
 -- Expenses for user5
-(5, 1, 70.00, 'Expense description 1 for user5', '2024-03-01'),
-(5, 2, 32.00, 'Expense description 2 for user5', '2024-03-02'),
-(5, 3, 25.00, 'Expense description 3 for user5', '2024-03-03'),
-(5, 4, 18.00, 'Expense description 4 for user5', '2024-03-04'),
-(5, 5, 40.00, 'Expense description 5 for user5', '2024-03-05'),
+(5, 1, 70.00, 'New Running Shoes', '2024-03-01'),
+(5, 2, 32.00, 'Tech Conference Pass', '2024-03-02'),
+(5, 3, 25.00, 'Picnic Supplies', '2024-03-03'),
+(5, 4, 18.00, 'Personal Development Books', '2024-03-04'),
+(5, 5, 40.00, 'Beach Day Essentials', '2024-03-05'),
 
 -- Expenses for user6
-(6, 1, 45.00, 'Expense description 1 for user6', '2024-03-01'),
-(6, 2, 27.00, 'Expense description 2 for user6', '2024-03-02'),
-(6, 3, 35.00, 'Expense description 3 for user6', '2024-03-03'),
-(6, 4, 22.00, 'Expense description 4 for user6', '2024-03-04'),
-(6, 5, 19.00, 'Expense description 5 for user6', '2024-03-05'),
+(6, 1, 45.00, 'Artisanal Cheese Collection', '2024-03-01'),
+(6, 2, 27.00, 'Skiing Equipment Rental', '2024-03-02'),
+(6, 3, 35.00, 'Pottery Class Registration', '2024-03-03'),
+(6, 4, 22.00, 'Healthy Meal Delivery Subscription', '2024-03-04'),
+(6, 5, 19.00, 'Vintage Bookstore Finds', '2024-03-05'),
 
 -- Expenses for user7
-(7, 1, 52.00, 'Expense description 1 for user7', '2024-03-01'),
-(7, 2, 40.00, 'Expense description 2 for user7', '2024-03-02'),
-(7, 3, 18.00, 'Expense description 3 for user7', '2024-03-03'),
-(7, 4, 30.00, 'Expense description 4 for user7', '2024-03-04'),
-(7, 5, 24.00, 'Expense description 5 for user7', '2024-03-05'),
+(7, 1, 52.00, 'Wine Tasting Tour', '2024-03-01'),
+(7, 2, 40.00, 'Rock Climbing Gear', '2024-03-02'),
+(7, 3, 18.00, 'Coffee Brewing Workshop', '2024-03-03'),
+(7, 4, 30.00, 'Home Office Upgrades', '2024-03-04'),
+(7, 5, 24.00, 'Hiking Essentials', '2024-03-05'),
 
 -- Expenses for user8
-(8, 1, 48.00, 'Expense description 1 for user8', '2024-03-01'),
-(8, 2, 22.00, 'Expense description 2 for user8', '2024-03-02'),
-(8, 3, 30.00, 'Expense description 3 for user8', '2024-03-03'),
-(8, 4, 35.00, 'Expense description 4 for user8', '2024-03-04'),
-(8, 5, 21.00, 'Expense description 5 for user8', '2024-03-05'),
+(8, 1, 48.00, 'Cooking Masterclass', '2024-03-01'),
+(8, 2, 22.00, 'Home Brewing Kit', '2024-03-02'),
+(8, 3, 30.00, 'Gym Membership Renewal', '2024-03-03'),
+(8, 4, 35.00, 'DIY Home Renovation Materials', '2024-03-04'),
+(8, 5, 21.00, 'Local Farmers Market Splurge', '2024-03-05'),
 
 -- Expenses for user9
-(9, 1, 65.00, 'Expense description 1 for user9', '2024-03-01'),
-(9, 2, 18.00, 'Expense description 2 for user9', '2024-03-02'),
-(9, 3, 22.00, 'Expense description 3 for user9', '2024-03-03'),
-(9, 4, 40.00, 'Expense description 4 for user9', '2024-03-04'),
-(9, 5, 29.00, 'Expense description 5 for user9', '2024-03-05'),
+(9, 1, 65.00, 'Travel Photography Workshop', '2024-03-01'),
+(9, 2, 18.00, 'Plant-Based Cooking Class', '2024-03-02'),
+(9, 3, 22.00, 'Mindfulness Meditation Retreat', '2024-03-03'),
+(9, 4, 40.00, 'Art Supplies for Creative Project', '2024-03-04'),
+(9, 5, 29.00, 'Local Brewery Tour', '2024-03-05'),
 
 -- Expenses for user10
-(10, 1, 58.00, 'Expense description 1 for user10', '2024-03-01'),
-(10, 2, 24.00, 'Expense description 2 for user10', '2024-03-02'),
-(10, 3, 38.00, 'Expense description 3 for user10', '2024-03-03'),
-(10, 4, 16.00, 'Expense description 4 for user10', '2024-03-04'),
-(10, 5, 33.00, 'Expense description 5 for user10', '2024-03-05');
+(10, 1, 58.00, 'Vintage Clothing Haul', '2024-03-01'),
+(10, 2, 24.00, 'Outdoor Adventure Gear', '2024-03-02'),
+(10, 3, 38.00, 'Concert Tickets', '2024-03-03'),
+(10, 4, 16.00, 'Cooking Masterclass', '2024-03-04'),
+(10, 5, 33.00, 'Gourmet Food Delivery', '2024-03-05');
+
 
 INSERT INTO budgets (user_id, category_id, amount) VALUES
        (1, 1, 500), -- Budget for Food
