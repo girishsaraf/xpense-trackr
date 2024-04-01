@@ -61,7 +61,7 @@ const ExpenseList = () => {
             <div className="expense-list-header">
                 <h2>Expense List</h2>
                 {/* Add button to navigate to ExpenseForm page */}
-                <Link to="/expenses/new" className="add-expense-button">Add New Expense</Link>
+                <Link to="/expenses/new" className="button-common">Add New Expense</Link>
             </div>
             <table className="expense-list-table">
                 <thead>
@@ -79,10 +79,10 @@ const ExpenseList = () => {
                         <td>{expense.amount}</td>
                         <td>{formatDate(expense.date)}</td>
                         <td>
-                            <button onClick={() => handleEditExpense(expense.id)}>Edit</button>
+                            <button className="button-common" onClick={() => handleEditExpense(expense.id)}>Edit</button>
                         </td>
                         <td>
-                            <button onClick={() => handleDeleteExpense(expense.id)}>Delete</button>
+                            <button className="button-common" onClick={() => handleDeleteExpense(expense.id)}>Delete</button>
                         </td>
                     </tr>
                 ))}
