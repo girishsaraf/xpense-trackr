@@ -8,7 +8,7 @@ import './ExpenseList.css';
 import Pagination from "../Pagination/Pagination";
 // import {FaPlus} from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faEdit, faPlus, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
+import {faEdit, faPlus, faTag, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 
 
 const ExpenseList = () => {
@@ -118,7 +118,7 @@ const ExpenseList = () => {
             <div className="expense-list-header">
                 <h2>Recent Expense Overview</h2>
                 {/* Add button to navigate to ExpenseForm page */}
-                <Link to="/expenses/new" className="button-common">
+                <Link to="/expenses/new" className="button-common-add">
                     <FontAwesomeIcon icon={faPlus} style={{ marginRight: '5px' }} /> Add New Expense
                 </Link>
             </div>
@@ -190,7 +190,7 @@ const ExpenseList = () => {
                         <td>{formatDate(expense.date)}</td>
                         <td>
                             <div className="category-tag">
-                                <span className="tag-icon">•</span> {getCategoryNameById(expense.category_id)}
+                                <FontAwesomeIcon icon={faTag} /> {getCategoryNameById(expense.category_id)}
                             </div>
                         </td>
                         <td>

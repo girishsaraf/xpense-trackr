@@ -58,37 +58,40 @@
   text-align: center;
 }
 
-/* Add this CSS to your main CSS file or create a new CSS file for your tabs */
+nav {
+  background-color: #f5f5f5; /* Lighter background color */
+  border-bottom: 2px solid #ccc; /* Lighter bottom border */
+  margin-bottom: 20px; /* Add some bottom margin */
+  border-radius: 10px; /* Rounded corners */
+  overflow: hidden; /* Ensure rounded corners are applied */
+}
 
 .horizontal-tabs {
-  list-style-type: none;
+  list-style-type: none; /* Remove default list style */
   padding: 0;
   margin: 0;
-  display: flex;
+  display: flex; /* Display tabs horizontally */
 }
 
 .horizontal-tabs li {
-  margin-right: 20px; /* Adjust spacing between tabs */
-}
-
-.horizontal-tabs li:last-child {
-  margin-right: 0; /* Remove margin from last tab */
+  margin-right: 0; /* Remove default right margin */
 }
 
 .horizontal-tabs li a {
+  display: block;
+  padding: 10px 20px; /* Add padding to each tab */
   text-decoration: none;
-  color: #333; /* Default color for tab text */
-  padding: 10px 15px; /* Adjust padding to increase clickable area */
-  border-bottom: 2px solid transparent; /* Add bottom border for tab indicator */
-  transition: border-color 0.3s ease; /* Smooth transition for tab indicator */
+  color: #666; /* Text color */
+  transition: background-color 0.3s ease; /* Smooth transition for background color */
 }
 
 .horizontal-tabs li a:hover {
-  color: #007bff; /* Change color on hover */
+  background-color: #e0e0e0; /* Hover background color */
 }
 
-.horizontal-tabs li a.active-tab {
-  border-color: #007bff; /* Color for active tab indicator */
+.active-tab a {
+  background-color: #007bff; /* Active tab background color */
+  color: #fff; /* Text color for active tab */
 }
 
 h1 {

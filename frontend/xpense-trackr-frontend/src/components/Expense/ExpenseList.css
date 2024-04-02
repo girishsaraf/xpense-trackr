@@ -34,20 +34,24 @@
     border-bottom: 1px solid #e6e6e6;
 }
 
-.button-common {
+.button-common-add {
     padding: 6px 10px;
     font-size: 16px;
-    background-color: #66a3d2; /* Subtle shade of orange */
+    background-color: #007bff; /* Subtle shade of orange */
     color: #fff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    text-decoration: None;
+    text-decoration: none;
+    position: fixed;
+    top: 30px;
+    right: 150px;
 }
 
-.button-common:hover {
-    background-color: #005b96; /* Darker shade of orange on hover */
+
+.button-common-add:hover {
+    background-color: #0056b3; /* Darker shade of orange on hover */
 }
 
 .expense-list-table {
@@ -65,7 +69,7 @@
     padding: 10px;
     background-color: #f2f2f2;
     font-weight: bold;
-    text-align: left;
+    text-align: center;
 }
 
 

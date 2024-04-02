@@ -7,7 +7,7 @@ import {Link} from "react-router-dom";
 import './InvestmentList.css';
 import Pagination from "../Pagination/Pagination";
 import {FaPlus} from 'react-icons/fa';
-import {faEdit, faTrashAlt} from "@fortawesome/free-solid-svg-icons";
+import {faEdit, faTag, faTrashAlt} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const InvestmentList = () => {
@@ -105,7 +105,7 @@ const InvestmentList = () => {
             <div className="investment-list-header">
                 <h2>Recent Investment Overview</h2>
                 {/* Add button to navigate to InvestmentForm page */}
-                <Link to="/investments/new" className="button-common">
+                <Link to="/investments/new" className="button-common-add">
                     <FaPlus style={{marginRight: '5px'}}/> Add New Investment
                 </Link>
             </div>
@@ -161,7 +161,7 @@ const InvestmentList = () => {
                         <td>{formatDate(expense.date)}</td>
                         <td>
                             <div className="type-tag">
-                                <span className="tag-icon">•</span> {expense.investment_type}
+                                <FontAwesomeIcon icon={faTag} /> {expense.investment_type}
                             </div>
                         </td>
                         <td>

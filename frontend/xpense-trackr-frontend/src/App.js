@@ -1,18 +1,23 @@
 // src/App.js
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
+import {BrowserRouter as Router, Routes, Route, NavLink, Link} from 'react-router-dom';
 import ExpenseList from './components/Expense/ExpenseList';
 import './App.css';
 import ExpenseForm from "./components/Expense/ExpenseForm";
 import InvestmentList from "./components/Investment/InvestmentList";
 import InvestmentForm from "./components/Investment/InvestmentForm"
+import { faThumbtack} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import Homepage from "./components/Homepage/Homepage";
 
 function App() {
     return (
         <Router>
             <div className="xpense-trackr-main">
-                <h1>Xpense-Trackr</h1>
+                <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <h1><FontAwesomeIcon icon={faThumbtack}/> Expense Tracker</h1>
+                </Link>
                 <nav>
                     <ul className="horizontal-tabs">
                         <li><NavLink to="/expenses" activeClassName="active-tab">Expense</NavLink></li>
@@ -23,10 +28,11 @@ function App() {
                     </ul>
                 </nav>
                 <Routes>
-                    <Route path="/expenses" element={<ExpenseList />} />
-                    <Route path="/expenses/new" element={<ExpenseForm />} />
-                    <Route path="/investments" element={<InvestmentList />} />
-                    <Route path="/investments/new" element={<InvestmentForm />} />
+                    <Route path="/" element={<Homepage/>}/>
+                    <Route path="/expenses" element={<ExpenseList/>}/>
+                    <Route path="/expenses/new" element={<ExpenseForm/>}/>
+                    <Route path="/investments" element={<InvestmentList/>}/>
+                    <Route path="/investments/new" element={<InvestmentForm/>}/>
                     {/*<Route path="/categories" element={<CategoryList />} />*/}
                     {/*<Route path="/budgets" element={<BudgetList />} />*/}
                     {/*<Route path="/trends" element={<TrendsPage />} />*/}
