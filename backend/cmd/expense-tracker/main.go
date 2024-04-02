@@ -6,6 +6,7 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/budget"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/category"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/expense"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"log"
@@ -42,6 +43,7 @@ func main() {
 	budget.SetDB(db)
 	expense.SetDB(db)
 	category.SetDB(db)
+	investments.SetDB(db)
 
 	// Creating API routes and starting server on 8080
 	router := mux.NewRouter()
