@@ -42,6 +42,7 @@ const ExpenseForm = () => {
             category_id: '',
             user_id: '',
         });
+        navigate('/expenses');
     }
 
     const handleInputChange = event => {

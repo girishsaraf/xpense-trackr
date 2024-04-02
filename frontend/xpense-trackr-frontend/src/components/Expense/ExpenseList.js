@@ -1,21 +1,28 @@
 // src/components/Expense/ExpenseList.js
 
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import backendUrl from "../../config";
 import {Link} from "react-router-dom";
 import './ExpenseList.css';
 import Pagination from "../Pagination/Pagination";
+// import {FaPlus} from 'react-icons/fa';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faEdit, faPlus, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
+
 
 const ExpenseList = () => {
     const [expenses, setExpenses] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [currentExpense, setCurrentExpense] = useState(null);
     const [editedAmount, setEditedAmount] = useState(0);
     const [editedDate, setEditedDate] = useState('');
+    const [editedDescription, setEditedDescription] = useState('');
+    const [editedCategory, setEditedCategory] = useState('');
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [expensesPerPage] = useState(10); // Number of expenses per page
+    const [expensesPerPage] = useState(15); // Number of expenses per page
 
     // Calculate the indexes of the expenses to display on the current page
     const indexOfLastExpense = currentPage * expensesPerPage;
@@ -35,11 +42,18 @@ const ExpenseList = () => {
 
             // Sort expenses by date parameter in descending order
             const sortedExpenses = response.data.sort((a, b) => new Date(b.date) - new Date(a.date));
-
             setExpenses(sortedExpenses);
+
+            const responseCategories = await axios.get(`${backendUrl}/api/categories`);
+            setCategories(responseCategories.data);
         } catch (error) {
             console.error('Error fetching expenses:', error);
         }
+    };
+
+    const getCategoryNameById = (categoryId) => {
+        const category = categories.find(cat => cat.id === +categoryId);
+        return category ? category.name : 'Unknown Category';
     };
 
 
@@ -51,8 +65,10 @@ const ExpenseList = () => {
             const expenseData = response.data;
 
             // Update the expense data with edited amount and date
-            expenseData.date = editedDate.toString();
+            expenseData.date = editedDate.split("T")[0];
             expenseData.amount = editedAmount.toString();
+            expenseData.description = editedDescription.toString();
+            expenseData.category_id = editedCategory.toString();
 
             // Call the PUT endpoint to update the expense
             await axios.put(`${backendUrl}/api/expenses/${expenseId}`, expenseData);
@@ -72,6 +88,8 @@ const ExpenseList = () => {
         setCurrentExpense(expense);
         setEditedAmount(expense.amount);
         setEditedDate(expense.date);
+        setEditedDescription(expense.description);
+        setEditedCategory(expense.category_id);
         setShowModal(true);
     };
 
@@ -98,9 +116,11 @@ const ExpenseList = () => {
     return (
         <div className="expense-list-container">
             <div className="expense-list-header">
-                <h2>Expense List</h2>
+                <h2>Recent Expense Overview</h2>
                 {/* Add button to navigate to ExpenseForm page */}
-                <Link to="/expenses/new" className="button-common">Add New Expense</Link>
+                <Link to="/expenses/new" className="button-common">
+                    <FontAwesomeIcon icon={faPlus} style={{ marginRight: '5px' }} /> Add New Expense
+                </Link>
             </div>
             <table className="expense-list-table">
                 <thead>
@@ -108,6 +128,7 @@ const ExpenseList = () => {
                     <th>Description</th>
                     <th>Amount</th>
                     <th>Date</th>
+                    <th>Category</th>
                     <th colSpan="2">Action</th>
                 </tr>
                 </thead>
@@ -116,6 +137,15 @@ const ExpenseList = () => {
                     <div className="modal">
                         <div className="modal-content">
                             <h2>Edit Expense</h2>
+                            <div>
+                                <label htmlFor="edited-description">Description:</label>
+                                <input
+                                    type="text"
+                                    id="edited-description"
+                                    value={editedDescription}
+                                    onChange={(e) => setEditedDescription(e.target.value)}
+                                />
+                            </div>
                             <div>
                                 <label htmlFor="edited-amount">Amount:</label>
                                 <input
@@ -134,32 +164,51 @@ const ExpenseList = () => {
                                     onChange={(e) => setEditedDate(e.target.value)}
                                 />
                             </div>
+                            <div>
+                                <label htmlFor="edited-category">Category:</label>
+                                <select
+                                    id="edited-category"
+                                    value={editedCategory}
+                                    onChange={(e) => setEditedCategory(e.target.value)}
+                                >
+                                    {categories.map(category => (
+                                        <option key={category.id} value={category.id}>
+                                            {category.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                             <button onClick={handleSubmitEdit}>Submit</button>
                             <button onClick={handleCloseModal}>Cancel</button>
                         </div>
                     </div>
                 )}
                 {currentExpenses.map(expense => (
-                    <tr key={expense.id}>
+                    <tr key={expense.id} className={`category-${getCategoryNameById(expense.category_id).toLowerCase()}`}>
                         <td>{expense.description}</td>
-                        <td>{expense.amount}</td>
+                        <td>${expense.amount}</td>
                         <td>{formatDate(expense.date)}</td>
                         <td>
-                            <button className="button-common" onClick={() => handleOpenModal(expense)}>Edit</button>
+                            <div className="category-tag">
+                                <span className="tag-icon">•</span> {getCategoryNameById(expense.category_id)}
+                            </div>
                         </td>
                         <td>
-                            <button className="button-common" onClick={() => handleDeleteExpense(expense.id)}>Delete</button>
+                            <button className="button-common" onClick={() => handleOpenModal(expense)}><FontAwesomeIcon icon={faEdit} /> Edit</button>
+                        </td>
+                        <td>
+                            <button className="button-common" onClick={() => handleDeleteExpense(expense.id)}><FontAwesomeIcon icon={faTrashAlt} /> Delete</button>
                         </td>
                     </tr>
                 ))}
-                <Pagination
-                    currentPage={currentPage}
-                    itemsPerPage={expensesPerPage}
-                    totalItems={expenses.length}
-                    paginate={paginate}
-                />
                 </tbody>
             </table>
+            <Pagination
+                currentPage={currentPage}
+                itemsPerPage={expensesPerPage}
+                totalItems={expenses.length}
+                paginate={paginate}
+            />
         </div>
 
     );
