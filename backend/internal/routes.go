@@ -4,6 +4,7 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/budget"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/category"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/expense"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/user"
 	"github.com/gorilla/mux"
 )
@@ -38,4 +39,12 @@ func SetRoutes(router *mux.Router) {
 	budgetRouter.HandleFunc("/{id}", budget.GetBudgetByIDHandler).Methods("GET")
 	budgetRouter.HandleFunc("/{id}", budget.UpdateBudgetHandler).Methods("PUT")
 	budgetRouter.HandleFunc("/{id}", budget.DeleteBudgetHandler).Methods("DELETE")
+
+	// Investment Management
+	investmentRouter := router.PathPrefix("/api/investments").Subrouter()
+	investmentRouter.HandleFunc("", investments.GetAllInvestmentsHandler).Methods("GET")
+	investmentRouter.HandleFunc("", investments.CreateInvestmentHandler).Methods("POST")
+	investmentRouter.HandleFunc("/{id}", investments.GetInvestmentByIDHandler).Methods("GET")
+	investmentRouter.HandleFunc("/{id}", investments.UpdateInvestmentHandler).Methods("PUT")
+	investmentRouter.HandleFunc("/{id}", investments.DeleteInvestmentHandler).Methods("DELETE")
 }

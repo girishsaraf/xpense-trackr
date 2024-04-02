@@ -20,7 +20,6 @@ var ErrRecordNotFound = errors.New("record not found")
 // Budget represents the budget model.
 type Budget struct {
 	ID         uint    `gorm:"primaryKey" json:"id"`
-	UserID     uint    `json:"user_id"`
 	CategoryID uint    `json:"category_id"`
 	Amount     float64 `json:"amount"`
 }
