@@ -4,7 +4,7 @@ import './Homepage.css';
 import backendUrl from "../../config";
 import 'chartjs-adapter-moment';
 
-const Graph = () => {
+const InvestmentGraph = () => {
     const chartContainer = useRef(null);
     const chartInstance = useRef(null);
     const [investmentData, setInvestmentData] = useState([]);
@@ -33,7 +33,7 @@ const Graph = () => {
             const ctx = chartContainer.current.getContext('2d');
 
             // Fixed colors for the graphs
-            const colors = ['#FF5733', '#33FFB8', '#337BFF', '#F0FF33', '#D933FF', '#33FF33'];
+            const colors = ['#FFA280', '#80FFD6', '#80A4FF', '#FFF380', '#D980FF', '#80FF80'];
 
             // Create datasets for each investment type
             const datasets = {};
@@ -43,7 +43,7 @@ const Graph = () => {
                         label: investment.investment_type,
                         data: [],
                         borderColor: colors[index % colors.length], // Use fixed colors for each dataset
-                        borderWidth: 4, // Thicker lines
+                        borderWidth: 3, // Thicker lines
                     };
                 }
                 datasets[investment.investment_type].data.push({ x: investment.date, y: investment.amount });
@@ -97,4 +97,4 @@ const Graph = () => {
     return <canvas ref={chartContainer} className="graph-canvas" />;
 };
 
-export default Graph;
+export default InvestmentGraph;
