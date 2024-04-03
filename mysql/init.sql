@@ -42,31 +42,60 @@ CREATE TABLE budgets (id INT AUTO_INCREMENT PRIMARY KEY,
                          FOREIGN KEY (category_id) REFERENCES categories(id));
 
 -- Investments for the past 6 months
+-- Insert query for 'stocks'
 INSERT INTO investments (amount, investment_type, date) VALUES
-(1000.00, 'stocks', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(500.50, '401k', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(1500.25, 'mutual_funds', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(2000.75, 'real_estate', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(3000.00, 'savings', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(750.20, 'bonds', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(1200.00, 'stocks', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(800.75, '401k', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(2500.50, 'mutual_funds', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(1800.25, 'real_estate', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(5000.00, 'savings', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(1000.20, 'bonds', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(1500.00, 'stocks', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(600.75, '401k', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(2000.50, 'mutual_funds', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(3500.25, 'real_estate', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(4000.00, 'savings', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(950.20, 'bonds', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(1800.00, 'stocks', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(700.75, '401k', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(3000.50, 'mutual_funds', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(2200.25, 'real_estate', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(6000.00, 'savings', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(850.20, 'bonds', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY));
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', '2024-03-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', '2024-02-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', '2024-01-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', '2023-12-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', '2023-11-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', '2023-10-01');
+
+-- Insert query for '401k'
+INSERT INTO investments (amount, investment_type, date) VALUES
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', '2024-03-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', '2024-02-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', '2024-01-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', '2023-12-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', '2023-11-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', '2023-10-01');
+
+-- Insert query for 'mutual_funds'
+INSERT INTO investments (amount, investment_type, date) VALUES
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', '2024-03-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', '2024-02-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', '2024-01-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', '2023-12-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', '2023-11-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', '2023-10-01');
+
+-- Insert query for 'real_estate'
+INSERT INTO investments (amount, investment_type, date) VALUES
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', '2024-03-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', '2024-02-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', '2024-01-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', '2023-12-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', '2023-11-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', '2023-10-01');
+
+-- Insert query for 'savings'
+INSERT INTO investments (amount, investment_type, date) VALUES
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', '2024-03-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', '2024-02-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', '2024-01-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', '2023-12-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', '2023-11-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', '2023-10-01');
+
+-- Insert query for 'bonds'
+INSERT INTO investments (amount, investment_type, date) VALUES
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', '2024-03-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', '2024-02-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', '2024-01-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', '2023-12-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', '2023-11-01'),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', '2023-10-01');
+
 
 INSERT INTO categories (name) VALUES
 ('Food'),
@@ -75,58 +104,51 @@ INSERT INTO categories (name) VALUES
 ('Entertainment'),
 ('Healthcare');
 
--- Expenses for the past 6 months
+-- Insert query for 'Food'
 INSERT INTO expenses (category_id, amount, description, date) VALUES
-(1, 50.00, 'Farmers Market Goodies', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(2, 30.00, 'City Bus Commute', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(3, 20.00, 'Energy Saver Gadgets', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(4, 10.00, 'Blockbuster Movie Night', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(5, 25.00, 'Holistic Healing Session', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(1, 40.00, 'Epicurean Adventure', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(2, 35.00, 'Ride-Hailing Journey', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(3, 15.00, 'Hydroelectricity Bill', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(4, 22.00, 'Concert Under the Stars', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(5, 18.00, 'Pharmacy Essentials', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(1, 60.00, 'Fresh Produce Haul', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(2, 45.00, 'Train Adventure', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(3, 12.00, 'Gas Utility Bill', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(4, 28.00, 'Theme Park Escapade', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(5, 30.00, 'Oral Hygiene Visit', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(1, 55.00, 'Health Food Splurge', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(2, 20.00, 'Public Transit Fare', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(3, 28.00, 'Electricity Renewal', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(4, 14.00, 'Big Screen Thrills', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(5, 37.00, 'Medical Check-Up', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(1, 70.00, 'Fine Dining Experience', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(2, 32.00, 'Taxi Joyride', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(3, 25.00, 'Water Utility Bill', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(4, 18.00, 'Live Concert Extravaganza', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(5, 40.00, 'Pharmaceutical Supplies', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(1, 45.00, 'Organic Food Selection', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(2, 27.00, 'City Train Journey', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(3, 35.00, 'Gasoline Refill', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(4, 22.00, 'Theme Park Fun', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(5, 19.00, 'Dental Appointment', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(1, 52.00, 'Fresh Market Finds', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(2, 40.00, 'Public Bus Ride', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(3, 18.00, 'Power Utility Bill', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(4, 30.00, 'Blockbuster Cinema Experience', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(5, 24.00, 'Health Check-Up', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(1, 48.00, 'Farm-to-Table Feast', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(2, 22.00, 'Urban Taxi Ride', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(3, 30.00, 'Water Supply Bill', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(4, 35.00, 'Live Music Concert Tickets', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(5, 21.00, 'Medicinal Prescriptions', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(1, 65.00, 'Grocery Shopping Extravaganza', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(2, 18.00, 'Metro Train Ride', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(3, 22.00, 'Utility Gas Bill', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(4, 40.00, 'Theme Park Passes', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(5, 29.00, 'Teeth Cleaning Session', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(1, 58.00, 'Healthy Grocery Haul', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(2, 24.00, 'City Bus Pass', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(3, 38.00, 'Electricity Service Fee', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(4, 16.00, 'Cinematic Experience', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY)),
-(5, 33.00, 'Physician Appointment', DATE_SUB(CURRENT_DATE(), INTERVAL FLOOR(RAND() * 180) DAY));
+      (1, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Groceries', '2024-03-01'),
+      (1, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Dining out', '2024-02-01'),
+      (1, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Food delivery', '2024-01-01'),
+      (1, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Home cooking', '2023-12-01'),
+      (1, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Snacks', '2023-11-01'),
+      (1, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Restaurant', '2023-10-01');
+
+-- Insert query for 'Transportation'
+INSERT INTO expenses (category_id, amount, description, date) VALUES
+      (2, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Gasoline', '2024-03-01'),
+      (2, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Public transportation', '2024-02-01'),
+      (2, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Taxi', '2024-01-01'),
+      (2, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Ride-sharing', '2023-12-01'),
+      (2, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Car maintenance', '2023-11-01'),
+      (2, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Parking fees', '2023-10-01');
+
+-- Insert query for 'Utilities'
+INSERT INTO expenses (category_id, amount, description, date) VALUES
+      (3, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Electricity', '2024-03-01'),
+      (3, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Water', '2024-02-01'),
+      (3, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Internet', '2024-01-01'),
+      (3, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Phone bill', '2023-12-01'),
+      (3, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Gas', '2023-11-01'),
+      (3, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Trash collection', '2023-10-01');
+
+-- Insert query for 'Entertainment'
+INSERT INTO expenses (category_id, amount, description, date) VALUES
+      (4, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Movie tickets', '2024-03-01'),
+      (4, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Concert', '2024-02-01'),
+      (4, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Video games', '2024-01-01'),
+      (4, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Books', '2023-12-01'),
+      (4, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Streaming service', '2023-11-01'),
+      (4, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Board games', '2023-10-01');
+
+-- Insert query for 'Healthcare'
+INSERT INTO expenses (category_id, amount, description, date) VALUES
+      (5, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Medications', '2024-03-01'),
+      (5, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Doctor visit', '2024-02-01'),
+      (5, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Health insurance', '2024-01-01'),
+      (5, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Dental care', '2023-12-01'),
+      (5, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Gym membership', '2023-11-01'),
+      (5, FLOOR(RAND() * (250 - 10 + 1)) + 10, 'Prescription glasses', '2023-10-01');
+
 
 INSERT INTO budgets (category_id, amount) VALUES
 (1, 1500.00), -- Food
