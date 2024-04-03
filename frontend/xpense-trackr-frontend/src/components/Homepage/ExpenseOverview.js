@@ -42,14 +42,14 @@ const ExpenseOverview = () => {
     return (
         <div className="expense-overview">
             <h2>Expense Overview</h2>
-            <ul className="overview-list">
+            <div className="overview-container">
                 {expenseData.map((expense, index) => (
-                    <li key={index} className="overview-item">
+                    <div key={index} className="overview-box">
                         <span className="category">{expense.category}: </span>
                         <span className="amount">${expense.totalAmount}</span>
-                    </li>
+                    </div>
                 ))}
-            </ul>
+            </div>
         </div>
     );
 }

@@ -1,66 +1,62 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto'; // Import Chart.js
-import './Homepage.css';
 import backendUrl from "../../config";
 import 'chartjs-adapter-moment';
 
 const InvestmentGraph = () => {
-    const chartContainer = useRef(null);
-    const chartInstance = useRef(null);
-    const [investmentData, setInvestmentData] = useState([]);
+    const [graphData, setGraphData] = useState(null);
+    const [lastMonths, setLastMonths] = useState(6); // Default is last 6 months
+    const chartRef = useRef(null);
+    const [chartInstance, setChartInstance] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch investment data from API
-                const response = await fetch(`${backendUrl}/api/investments`);
+                const response = await fetch(`${backendUrl}/api/investments/cumulative?lastMonths=${lastMonths}`);
                 const data = await response.json();
-                setInvestmentData(data);
+                const datasets = {};
+
+                const colors = ['#FFA280', '#80FFD6', '#80A4FF', '#FFF380', '#D980FF', '#33FF33'];
+
+                // Group data by investment type
+                data.forEach((item, index) => {
+                    if (!datasets[item.type]) {
+                        datasets[item.type] = { label: item.type, data: [], borderColor: colors[index % colors.length] };
+                    }
+                    datasets[item.type].data.push({ x: item.month, y: item.amount });
+                });
+
+                // Prepare data for Chart.js
+                const chartData = {
+                    labels: [...new Set(data.map(item => item.month))],
+                    datasets: Object.values(datasets),
+                };
+
+                setGraphData(chartData);
             } catch (error) {
-                console.error('Error fetching investment data:', error);
+                console.error('Error fetching data:', error);
             }
         };
 
         fetchData();
-    }, []);
+    }, [lastMonths]);
 
     useEffect(() => {
-        if (chartContainer.current && investmentData.length > 0) {
-            // Sort investment data by date
-            const sortedData = investmentData.slice().sort((a, b) => new Date(a.date) - new Date(b.date));
-
-            // Create the chart context
-            const ctx = chartContainer.current.getContext('2d');
-
-            // Fixed colors for the graphs
-            const colors = ['#FFA280', '#80FFD6', '#80A4FF', '#FFF380', '#D980FF', '#80FF80'];
-
-            // Create datasets for each investment type
-            const datasets = {};
-            sortedData.forEach((investment, index) => {
-                if (!datasets[investment.investment_type]) {
-                    datasets[investment.investment_type] = {
-                        label: investment.investment_type,
-                        data: [],
-                        borderColor: colors[index % colors.length], // Use fixed colors for each dataset
-                        borderWidth: 3, // Thicker lines
-                    };
-                }
-                datasets[investment.investment_type].data.push({ x: investment.date, y: investment.amount });
-            });
-
-            // Define chart configuration
-            const config = {
+        // Destroy the existing chart instance before rendering a new one
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+        if (graphData && chartRef.current) {
+            const ctx = chartRef.current.getContext('2d');
+            const newChartInstance = new Chart(ctx, {
                 type: 'line',
-                data: {
-                    datasets: Object.values(datasets),
-                },
+                data: graphData,
                 options: {
                     scales: {
                         x: {
                             type: 'time',
                             time: {
-                                unit: 'month', // Adjust time unit as needed
+                                unit: 'month',
                             },
                         },
                         y: {
@@ -70,31 +66,26 @@ const InvestmentGraph = () => {
                             },
                         },
                     },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            labels: {
-                                boxWidth: 20, // Adjust legend box width
-                                padding: 20, // Add padding between legend items
-                            },
-                        },
-                    },
                 },
-            };
-
-            // Create the chart instance
-            chartInstance.current = new Chart(ctx, config);
+            });
+            setChartInstance(newChartInstance);
         }
+    }, [graphData]);
 
-        // Cleanup function
-        return () => {
-            if (chartInstance.current) {
-                chartInstance.current.destroy(); // Destroy the chart instance on unmount
-            }
-        };
-    }, [investmentData]);
+    const handleButtonClick = (months) => {
+        setLastMonths(months+1);
+    };
 
-    return <canvas ref={chartContainer} className="graph-canvas" />;
+    return (
+        <div className="investment-graph">
+            <div className="buttons-container">
+                <button onClick={() => handleButtonClick(2)}>2 Months</button>
+                <button onClick={() => handleButtonClick(4)}>4 Months</button>
+                <button onClick={() => handleButtonClick(6)}>6 Months</button>
+            </div>
+            <canvas ref={chartRef}></canvas>
+        </div>
+    );
 };
 
 export default InvestmentGraph;

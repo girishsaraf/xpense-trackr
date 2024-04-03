@@ -32,16 +32,16 @@ const InvestmentOverview = () => {
     }, []);
 
     return (
-        <div className="expense-overview">
+        <div className="investment-overview">
             <h2>Investment Overview</h2>
-            <ul className="overview-list">
-                {investmentData.map((expense, index) => (
-                    <li key={index} className="overview-item">
-                        <span className="type">{expense.type}: </span>
-                        <span className="amount">${expense.totalAmount}</span>
-                    </li>
+            <div className="overview-container">
+                {investmentData.map((investment, index) => (
+                    <div key={index} className="overview-box">
+                        <span className="type">{investment.type}: </span>
+                        <span className="amount">${investment.totalAmount}</span>
+                    </div>
                 ))}
-            </ul>
+            </div>
         </div>
     );
 }

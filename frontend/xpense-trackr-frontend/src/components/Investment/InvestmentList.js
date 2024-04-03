@@ -95,6 +95,25 @@ const InvestmentList = () => {
         }
     };
 
+    const getTypeName = (type) => {
+        switch (type.toLowerCase()) {
+            case 'stocks':
+                return 'Stocks';
+            case '401k':
+                return '401(k)';
+            case 'mutual_funds':
+                return 'Mutual Funds';
+            case 'real_estate':
+                return 'Real Estate';
+            case 'savings':
+                return 'Savings';
+            case 'bonds':
+                return 'Bonds';
+            default:
+                return type;
+        }
+    };
+
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'short', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('en-US', options);
@@ -122,7 +141,7 @@ const InvestmentList = () => {
                 {showInvModal && (
                     <div className="modal">
                         <div className="modal-content">
-                            <h2>Edit Expense</h2>
+                            <h2>Edit Investment</h2>
                             <div>
                                 <label htmlFor="edited-date">Date:</label>
                                 <input
@@ -143,32 +162,38 @@ const InvestmentList = () => {
                             </div>
                             <div>
                                 <label htmlFor="edited-type">Type:</label>
-                                <input
-                                    type="text"
+                                <select
                                     id="edited-type"
                                     value={editedType}
                                     onChange={(e) => setEditedType(e.target.value)}
-                                />
+                                >
+                                    <option value="stocks">Stocks</option>
+                                    <option value="401k">401(k)</option>
+                                    <option value="mutual_funds">Mutual Funds</option>
+                                    <option value="real_estate">Real Estate</option>
+                                    <option value="savings">Savings</option>
+                                    <option value="bonds">Bonds</option>
+                                </select>
                             </div>
                             <button onClick={handleSubmitEdit}>Submit</button>
                             <button onClick={handleCloseModal}>Cancel</button>
                         </div>
                     </div>
                 )}
-                {currentInvestments.map(expense => (
-                    <tr key={expense.id} className={`type-${expense.investment_type.toLowerCase()}`}>
-                        <td>${expense.amount}</td>
-                        <td>{formatDate(expense.date)}</td>
+                {currentInvestments.map(investment => (
+                    <tr key={investment.id}>
+                        <td>${investment.amount}</td>
+                        <td>{formatDate(investment.date)}</td>
                         <td>
-                            <div className="type-tag">
-                                <FontAwesomeIcon icon={faTag} /> {expense.investment_type}
+                            <div className={`type-tag type-${investment.investment_type.toLowerCase()}`}>
+                                <FontAwesomeIcon icon={faTag}/> {getTypeName(investment.investment_type)}
                             </div>
                         </td>
                         <td>
-                            <button className="button-common" onClick={() => handleOpenModal(expense)}><FontAwesomeIcon icon={faEdit} /> Edit</button>
+                            <button className="button-common" onClick={() => handleOpenModal(investment)}><FontAwesomeIcon icon={faEdit} /></button>
                         </td>
                         <td>
-                            <button className="button-common" onClick={() => handleDeleteInvestment(expense.id)}><FontAwesomeIcon icon={faTrashAlt} /> Delete</button>
+                            <button className="button-common" onClick={() => handleDeleteInvestment(investment.id)}><FontAwesomeIcon icon={faTrashAlt} /></button>
                         </td>
                     </tr>
                 ))}

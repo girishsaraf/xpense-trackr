@@ -37,7 +37,7 @@
 .button-common-add {
     padding: 6px 10px;
     font-size: 16px;
-    background-color: #007bff; /* Subtle shade of orange */
+    background-color: #007bff;
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -61,15 +61,21 @@
 
 .investment-list-table td {
     border: 1px solid #ccc;
-    padding: 3px 10px; /* Increased padding for better readability */
+    padding: 5px; /* Adjusted padding for cells */
+    background-color: #f2f2f2; /* Subtle grey background color for table rows */
 }
 
 .investment-list-table th {
     border: 1px solid #ccc;
     padding: 10px;
-    background-color: #f2f2f2;
+    background-color: #333; /* Dark background color for table header */
+    color: #fff; /* White text color for table header */
     font-weight: bold;
     text-align: center;
+}
+
+.investment-list-table tr:hover td {
+    background-color: #dcdcdc; /* Darker background color on hover */
 }
 
 
@@ -145,7 +151,6 @@
     display: inline-block;
     padding: 3px 8px;
     border-radius: 15px;
-    background-color: #e0e0e0;
     font-size: 14px;
     font-weight: bold;
 }
@@ -168,15 +173,16 @@ tr.type-mutual_funds { background-color: #c5e1a5; }
 /* ExpenseButtons.module.css */
 
 .button-common {
-    padding: 12px 20px;
+    padding: 6px 10px;
     font-size: 16px;
-    background-color: #007bff;
+    background-color: #666; /* Subtle shade of grey */
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 20px; /* Rounded corners */
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+
 
 .button-common:hover {
     background-color: #0056b3;

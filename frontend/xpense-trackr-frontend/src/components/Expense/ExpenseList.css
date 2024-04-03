@@ -59,18 +59,26 @@
     border-collapse: collapse;
 }
 
-.expense-list-table td {
-    border: 1px solid #ccc;
-    padding: 3px 10px; /* Increased padding for better readability */
-}
-
 .expense-list-table th {
     border: 1px solid #ccc;
     padding: 10px;
-    background-color: #f2f2f2;
+    background-color: #333; /* Dark background color for table header */
+    color: #fff; /* White text color for table header */
     font-weight: bold;
     text-align: center;
 }
+
+.expense-list-table td {
+    border: 1px solid #ccc;
+    padding: 5px; /* Adjusted padding for cells */
+    background-color: #f2f2f2; /* Subtle grey background color for table rows */
+}
+
+.expense-list-table tr:hover td {
+    background-color: #dcdcdc; /* Darker background color on hover */
+}
+
+
 
 
 /* Modal Styles */
@@ -139,12 +147,19 @@
 .category-healthcare { background-color: #f48fb1; }
 /* Add more categories as needed */
 
+/* Define colors for different categories */
+.category-food { background-color: #ffe0b2; }
+.category-transportation { background-color: #b2ebf2; }
+.category-utilities { background-color: #b2dfdb; }
+.category-entertainment { background-color: #ffcc80; }
+.category-healthcare { background-color: #f48fb1; }
+/* Add more categories as needed */
+
 /* Tag Styles */
 .category-tag {
     display: inline-block;
     padding: 3px 8px;
     border-radius: 15px;
-    background-color: #e0e0e0;
     font-size: 14px;
     font-weight: bold;
 }
@@ -166,12 +181,12 @@ tr.category-healthcare { background-color: #f48fb1; }
 /* ExpenseButtons.module.css */
 
 .button-common {
-    padding: 12px 20px;
+    padding: 6px 10px;
     font-size: 16px;
-    background-color: #007bff;
+    background-color: #666; /* Subtle shade of grey */
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 20px; /* Rounded corners */
     cursor: pointer;
     transition: background-color 0.3s ease;
 }

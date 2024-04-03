@@ -184,20 +184,20 @@ const ExpenseList = () => {
                     </div>
                 )}
                 {currentExpenses.map(expense => (
-                    <tr key={expense.id} className={`category-${getCategoryNameById(expense.category_id).toLowerCase()}`}>
+                    <tr key={expense.id}>
                         <td>{expense.description}</td>
                         <td>${expense.amount}</td>
                         <td>{formatDate(expense.date)}</td>
                         <td>
-                            <div className="category-tag">
+                            <div className={`category-tag category-${getCategoryNameById(expense.category_id).toLowerCase()}`}>
                                 <FontAwesomeIcon icon={faTag} /> {getCategoryNameById(expense.category_id)}
                             </div>
                         </td>
                         <td>
-                            <button className="button-common" onClick={() => handleOpenModal(expense)}><FontAwesomeIcon icon={faEdit} /> Edit</button>
+                            <button className="button-common" onClick={() => handleOpenModal(expense)}><FontAwesomeIcon icon={faEdit} /></button>
                         </td>
                         <td>
-                            <button className="button-common" onClick={() => handleDeleteExpense(expense.id)}><FontAwesomeIcon icon={faTrashAlt} /> Delete</button>
+                            <button className="button-common" onClick={() => handleDeleteExpense(expense.id)}><FontAwesomeIcon icon={faTrashAlt} /></button>
                         </td>
                     </tr>
                 ))}

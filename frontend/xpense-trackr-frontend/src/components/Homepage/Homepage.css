@@ -1,60 +1,39 @@
-/*.homepage {*/
-/*    padding: 20px;*/
-/*}*/
-
-.homepage h1 {
-    font-size: 24px;
+.toggle-buttons {
     margin-bottom: 20px;
 }
 
-/*.overview-section {*/
-/*    display: flex;*/
-/*    justify-content: space-between;*/
-/*    margin-bottom: 20px;*/
-/*}*/
+.toggle-button {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
 
-/*.graph-section {*/
-/*    margin-top: 20px;*/
-/*}*/
+.toggle-button.active {
+    background-color: #007bff;
+    color: #fff;
+}
 
-.expense-overview {
+.graph-title {
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.legend {
+    /* Styles for legend */
+}
+
+
+.expense-overview, .investment-overview {
     background-color: #e2e6ea;
     padding: 20px; /* Add some padding */
     border-radius: 10px; /* Rounded corners */
 }
 
-.expense-overview h2 {
-    color: #005b96; /* Dark blue heading color */
-    font-size: 24px; /* Larger font size */
-    margin-bottom: 10px; /* Add some bottom margin */
-}
-
-.overview-list {
-    list-style-type: none; /* Remove default list styles */
-    padding: 0; /* Remove default padding */
-}
-
-.overview-item {
-    margin-bottom: 10px; /* Add some bottom margin between items */
-}
-
-.category {
-    font-weight: bold; /* Make category bold */
-    color: #333; /* Dark text color */
-}
-
-.amount {
-    color: #007bff; /* Blue color for amount */
-}
-
-.type {
-    font-weight: bold;
-    color: #333; /* Dark text color */
-}
-
 .graph-canvas {
     width: 100%;
-    height: 400px; /* Adjust height as needed */
+    height: 600px; /* Adjust height as needed */
 }
 
 .homepage {
@@ -63,12 +42,17 @@
     align-items: center;
 }
 
+.homepage h1 {
+    font-size: 25px;
+}
+
 .overview-section {
     display: flex;
     justify-content: space-between;
-    width: 100%;
-    margin-bottom: 20px;
+    width: 80%;
+    margin: 0 auto 20px;
 }
+
 
 .graph-section {
     display: flex;
@@ -77,7 +61,7 @@
 }
 
 .graph-container {
-    width: 48%; /* Adjust as needed */
+    width: 100%; /* Adjust as needed */
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 20px;
@@ -91,8 +75,169 @@
     margin-top: 10px;
 }
 
+/* Legend container */
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+}
+
+/* Legend item */
+.chart-legend-item {
+    display: flex;
+    align-items: center;
+    margin-right: 20px; /* Adjust spacing between legend items */
+}
+
+/* Legend color box */
+.chart-legend-color {
+    width: 12px;
+    height: 12px;
+    margin-right: 5px; /* Adjust spacing between color box and label */
+}
+
+/* Legend label */
+.chart-legend-label {
+    font-size: 14px;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    color: #333; /* Adjust text color */
+    cursor: pointer;
+}
+
+/* Active legend label */
+.chart-legend-label.active {
+    text-decoration: none; /* Remove strikethrough */
+}
+
+
+
 .graph-title {
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 10px;
+}
+
+
+/*New flow here*/
+
+.investment-overview {
+    margin-top: 10px;
+    padding: 5px;
+}
+
+.investment-overview h2 {
+    font-size: 20px;
+    color: #005b96;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.overview-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.overview-box {
+    width: 160px;
+    padding: 10px;
+    margin: 0 10px 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.overview-box .type {
+    font-weight: bold;
+}
+
+.overview-box .amount {
+    float: right;
+    color: #333;
+}
+
+.expense-overview {
+    margin-top: 10px;
+    padding: 5px;
+}
+
+.expense-overview h2 {
+    font-size: 20px;
+    color: #005b96;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.overview-box .category {
+    font-weight: bold;
+}
+
+/* Toggle button */
+
+/* Toggle container */
+.toggle-container {
+    display: flex;
+    /*align-items: center;*/
+    /*justify-content: space-between;*/
+    width: 300px; /* Adjust width as needed */
+    background-color: #e0e0e0; /* Gray background color */
+    border-radius: 20px; /* Rounded corners */
+    padding: 5px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Toggle button */
+.toggle-button {
+    padding: 10px 20px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    color: #666; /* Gray text color */
+    font-size: 18px; /* Adjust font size */
+    font-weight: bold; /* Bold font weight */
+    border-radius: 20px; /* Rounded corners */
+}
+
+/* Active toggle button */
+.toggle-button.active {
+    background-color: #bbdefb; /* Light blue background color */
+    color: #1565c0; /* Darker blue text color */
+}
+
+/* Toggle switch */
+.toggle-switch {
+    width: 50px; /* Adjust width as needed */
+    height: 100%;
+    background-color: #ccc; /* Light gray background color */
+    border-radius: 20px; /* Rounded corners */
+    cursor: pointer;
+}
+
+
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.buttons-container button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.buttons-container button.active {
+    background-color: #0056b3;
+}
+
+.buttons-container button:hover {
+    background-color: #0056b3;
 }

@@ -1,36 +1,62 @@
-import React from 'react';
-import ExpenseOverview from './ExpenseOverview';
-import InvestmentOverview from './InvestmentOverview';
-import InvestmentGraph from './InvestmentGraph';
-import './Homepage.css';
+import ExpenseOverview from "./ExpenseOverview";
+import InvestmentOverview from "./InvestmentOverview";
 import ExpenseGraph from "./ExpenseGraph";
+import InvestmentGraph from "./InvestmentGraph";
+import {useState} from "react"; // Import your CSS file
 
 const Homepage = () => {
+    const [activeView, setActiveView] = useState('expense'); // Default to expense view
+
+    const toggleView = (view) => {
+        setActiveView(view);
+    };
+
     return (
         <div className="homepage">
             <h1>Welcome to Your Financial Overview</h1>
+            <div className="toggle-container">
+                <button
+                    className={`toggle-button ${activeView === 'expense' ? 'active' : ''}`}
+                    onClick={() => toggleView('expense')}
+                >
+                    Expenses
+                </button>
+                <div className="toggle-switch"
+                     onClick={() => toggleView(activeView === 'expense' ? 'investment' : 'expense')}></div>
+                <button
+                    className={`toggle-button ${activeView === 'investment' ? 'active' : ''}`}
+                    onClick={() => toggleView('investment')}
+                >
+                    Investments
+                </button>
+            </div>
+
             <div className="overview-section">
-                <ExpenseOverview />
-                <InvestmentOverview />
+                {activeView === 'expense' && <ExpenseOverview/>}
+                {activeView === 'investment' && <InvestmentOverview/>}
             </div>
             <div className="graph-section">
-                <div className="graph-container">
-                    <h2 className="graph-title">Expense Graph</h2>
-                    <ExpenseGraph />
-                    <div className="legend">
-                        {/* Legend for Expense Graph */}
+                {activeView === 'expense' && (
+                    <div className="graph-container">
+                        <h2 className="graph-title">Expense Graph</h2>
+                        <ExpenseGraph/>
+                        <div className="legend">
+                            {/* Legend for Expense Graph */}
+                        </div>
                     </div>
-                </div>
-                <div className="graph-container">
-                    <h2 className="graph-title">Investment Graph</h2>
-                    <InvestmentGraph />
-                    <div className="legend">
-                        {/* Legend for Investment Graph */}
+                )}
+                {activeView === 'investment' && (
+                    <div className="graph-container">
+                        <h2 className="graph-title">Investment Graph</h2>
+                        <InvestmentGraph/>
+                        <div className="legend">
+                            {/* Legend for Investment Graph */}
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );
-}
+};
 
 export default Homepage;
