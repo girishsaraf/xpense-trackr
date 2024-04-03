@@ -20,9 +20,10 @@ func SetRoutes(router *mux.Router) {
 	expenseRouter := router.PathPrefix("/api/expenses").Subrouter()
 	expenseRouter.HandleFunc("", expense.GetAllExpensesHandler).Methods("GET")
 	expenseRouter.HandleFunc("", expense.CreateExpenseHandler).Methods("POST")
-	expenseRouter.HandleFunc("/{id}", expense.GetExpenseByIDHandler).Methods("GET")
-	expenseRouter.HandleFunc("/{id}", expense.UpdateExpenseHandler).Methods("PUT")
-	expenseRouter.HandleFunc("/{id}", expense.DeleteExpenseHandler).Methods("DELETE")
+	expenseRouter.HandleFunc("/{id:[0-9]+}", expense.GetExpenseByIDHandler).Methods("GET")
+	expenseRouter.HandleFunc("/{id:[0-9]+}", expense.UpdateExpenseHandler).Methods("PUT")
+	expenseRouter.HandleFunc("/{id:[0-9]+}", expense.DeleteExpenseHandler).Methods("DELETE")
+	expenseRouter.HandleFunc("/cumulative", expense.CumulativeExpensesByMonthHandler).Methods("GET")
 
 	// Category Management
 	categoryRouter := router.PathPrefix("/api/categories").Subrouter()
@@ -44,7 +45,8 @@ func SetRoutes(router *mux.Router) {
 	investmentRouter := router.PathPrefix("/api/investments").Subrouter()
 	investmentRouter.HandleFunc("", investments.GetAllInvestmentsHandler).Methods("GET")
 	investmentRouter.HandleFunc("", investments.CreateInvestmentHandler).Methods("POST")
-	investmentRouter.HandleFunc("/{id}", investments.GetInvestmentByIDHandler).Methods("GET")
-	investmentRouter.HandleFunc("/{id}", investments.UpdateInvestmentHandler).Methods("PUT")
-	investmentRouter.HandleFunc("/{id}", investments.DeleteInvestmentHandler).Methods("DELETE")
+	investmentRouter.HandleFunc("/{id:[0-9]+}", investments.GetInvestmentByIDHandler).Methods("GET")
+	investmentRouter.HandleFunc("/{id:[0-9]+}", investments.UpdateInvestmentHandler).Methods("PUT")
+	investmentRouter.HandleFunc("/{id:[0-9]+}", investments.DeleteInvestmentHandler).Methods("DELETE")
+	investmentRouter.HandleFunc("/cumulative", investments.CumulativeInvestmentsByMonthHandler).Methods("GET")
 }

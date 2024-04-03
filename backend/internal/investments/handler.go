@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 // GetAllInvestmentsHandler handles the request to retrieve all Investments.
@@ -79,6 +80,50 @@ func DeleteInvestmentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+// CumulativeInvestmentsByMonthHandler handles the request to get cumulative investments by month.
+func CumulativeInvestmentsByMonthHandler(w http.ResponseWriter, r *http.Request) {
+	lastMonthsStr := r.URL.Query().Get("lastMonths")
+	lastMonths, err := strconv.Atoi(lastMonthsStr)
+	if err != nil || lastMonths < 1 {
+		http.Error(w, "Invalid value for lastMonths", http.StatusBadRequest)
+		return
+	}
+
+	var cumulativeInvestments []struct {
+		Month  string  `json:"month"`
+		Type   string  `json:"type"`
+		Amount float64 `json:"amount"`
+	}
+
+	// Calculate start date based on lastMonths
+	startDate := time.Now().AddDate(0, -lastMonths, 0)
+
+	// Query to get cumulative investments grouped by month
+	query := db.Model(&Investment{}).
+		Select("DATE_FORMAT(date, '%Y-%m') AS month, investment_type AS type, SUM(amount) AS amount").
+		Where("date >= ?", startDate).
+		Group("month, type").
+		Order("month ASC").
+		Scan(&cumulativeInvestments)
+
+	err = query.Error
+	if err != nil {
+		http.Error(w, "Failed to retrieve cumulative investments", http.StatusInternalServerError)
+		return
+	}
+
+	// Calculate cumulative expenses
+	cumulativeAmount := make(map[string]float64)
+	for i := range cumulativeInvestments {
+		category := cumulativeInvestments[i].Type
+		amount := cumulativeInvestments[i].Amount
+		cumulativeAmount[category] += amount
+		cumulativeInvestments[i].Amount = cumulativeAmount[category]
+	}
+
+	respondWithJSON(w, cumulativeInvestments)
 }
 
 // respondWithJSON writes a JSON response with the given data.
