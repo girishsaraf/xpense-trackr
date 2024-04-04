@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto'; // Import Chart.js
-import backendUrl from "../../config";
+import backendUrl from "../../../config";
 import 'chartjs-adapter-moment';
+import './InvestmentHome.css';
 
 const InvestmentGraph = () => {
     const [graphData, setGraphData] = useState(null);

@@ -7,7 +7,7 @@ import {Link} from "react-router-dom";
 import './InvestmentList.css';
 import Pagination from "../Pagination/Pagination";
 import {FaPlus} from 'react-icons/fa';
-import {faEdit, faTag, faTrashAlt} from "@fortawesome/free-solid-svg-icons";
+import {faEdit, faPlus, faTag, faTrashAlt} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const InvestmentList = () => {
@@ -125,15 +125,15 @@ const InvestmentList = () => {
                 <h2>Recent Investment Overview</h2>
                 {/* Add button to navigate to InvestmentForm page */}
                 <Link to="/investments/new" className="button-common-add">
-                    <FaPlus style={{marginRight: '5px'}}/> Add New Investment
+                    <FontAwesomeIcon icon={faPlus} style={{ marginRight: '5px' }} /> Add New
                 </Link>
             </div>
             <table className="investment-list-table">
                 <thead>
                 <tr>
+                    <th>Investment Type</th>
                     <th>Amount</th>
                     <th>Date</th>
-                    <th>Investment Type</th>
                     <th colSpan="2">Action</th>
                 </tr>
                 </thead>
@@ -182,18 +182,20 @@ const InvestmentList = () => {
                 )}
                 {currentInvestments.map(investment => (
                     <tr key={investment.id}>
-                        <td>${investment.amount}</td>
-                        <td>{formatDate(investment.date)}</td>
                         <td>
                             <div className={`type-tag type-${investment.investment_type.toLowerCase()}`}>
                                 <FontAwesomeIcon icon={faTag}/> {getTypeName(investment.investment_type)}
                             </div>
                         </td>
+                        <td>${investment.amount}</td>
+                        <td>{formatDate(investment.date)}</td>
                         <td>
-                            <button className="button-common" onClick={() => handleOpenModal(investment)}><FontAwesomeIcon icon={faEdit} /></button>
+                            <button className="button-common" onClick={() => handleOpenModal(investment)}>
+                                <FontAwesomeIcon icon={faEdit}/></button>
                         </td>
                         <td>
-                            <button className="button-common" onClick={() => handleDeleteInvestment(investment.id)}><FontAwesomeIcon icon={faTrashAlt} /></button>
+                            <button className="button-common" onClick={() => handleDeleteInvestment(investment.id)}>
+                                <FontAwesomeIcon icon={faTrashAlt}/></button>
                         </td>
                     </tr>
                 ))}

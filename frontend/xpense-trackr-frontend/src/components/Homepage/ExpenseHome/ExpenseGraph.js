@@ -1,7 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import Chart from 'chart.js/auto'; // Import Chart.js
-import backendUrl from "../../config";
+import backendUrl from "../../../config";
 import 'chartjs-adapter-moment';
+import './ExpenseHome.css';
 
 const ExpenseGraph = () => {
     const [graphData, setGraphData] = useState(null);

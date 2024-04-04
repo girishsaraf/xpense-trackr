@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import backendUrl from "../../config";
+import backendUrl from "../../../config";
 import axios from "axios";
-import './Homepage.css';
+import './ExpenseHome.css';
 
 const ExpenseOverview = () => {
     const [expenseData, setExpenseData] = useState([]);

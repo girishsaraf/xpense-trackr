@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
-import backendUrl from "../../config";
-import './Homepage.css';
+import backendUrl from "../../../config";
+import './InvestmentHome.css';
 
 const InvestmentOverview = () => {
     const [investmentData, setInvestmentData] = useState([]);

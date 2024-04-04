@@ -37,7 +37,7 @@
 .button-common-add {
     padding: 6px 10px;
     font-size: 16px;
-    background-color: #007bff;
+    background-color: #666;
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -45,8 +45,8 @@
     transition: background-color 0.3s ease;
     text-decoration: none;
     position: fixed;
-    top: 30px;
-    right: 150px;
+    top: 8.5%;
+    right: 24%;
 }
 
 
@@ -181,8 +181,9 @@ tr.type-mutual_funds { background-color: #c5e1a5; }
     border-radius: 20px; /* Rounded corners */
     cursor: pointer;
     transition: background-color 0.3s ease;
+    display: block; /* Make the button a block-level element */
+    margin: 0 auto; /* Center the button horizontally */
 }
-
 
 .button-common:hover {
     background-color: #0056b3;

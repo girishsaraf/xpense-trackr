@@ -56,7 +56,7 @@ const ExpenseForm = () => {
         <div className="expense-form-container">
             <h2>Add Expense</h2>
             <form onSubmit={handleSubmit}>
-                <div>
+                <div className="input-container">
                     <label htmlFor="user_id">User:</label>
                     <input
                         type="number"
@@ -66,7 +66,7 @@ const ExpenseForm = () => {
                         onChange={handleInputChange}
                     />
                 </div>
-                <div>
+                <div className="input-container">
                     <label htmlFor="description">Description:</label>
                     <input
                         type="text"
@@ -76,7 +76,7 @@ const ExpenseForm = () => {
                         onChange={handleInputChange}
                     />
                 </div>
-                <div>
+                <div className="input-container">
                     <label htmlFor="amount">Amount:</label>
                     <input
                         type="number"
@@ -86,7 +86,7 @@ const ExpenseForm = () => {
                         onChange={handleInputChange}
                     />
                 </div>
-                <div>
+                <div className="input-container">
                     <label htmlFor="category">Category:</label>
                     <input
                         type="text"
@@ -96,7 +96,7 @@ const ExpenseForm = () => {
                         onChange={handleInputChange}
                     />
                 </div>
-                <div>
+                <div className="input-container">
                     <label htmlFor="date">Date:</label>
                     <input
                         type="date"
@@ -106,11 +106,14 @@ const ExpenseForm = () => {
                         onChange={handleInputChange}
                     />
                 </div>
-                <button type="submit">Add Expense</button>
-                <button type="cancel" onClick={clearFormData}>Cancel</button>
+                <div className="buttons-container">
+                    <button type="submit">Add</button>
+                    <button type="button" onClick={clearFormData}>Cancel</button>
+                </div>
             </form>
         </div>
     );
+
 };
 
 export default ExpenseForm;

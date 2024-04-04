@@ -52,17 +52,22 @@ const InvestmentForm = () => {
         <div className="expense-form-container">
             <h2>Add New Investment</h2>
             <form onSubmit={handleSubmit}>
-                <div>
+                <div className="input-container">
                     <label htmlFor="type">Investment Type:</label>
-                    <input
-                        type="text"
+                    <select
                         id="type"
-                        name="type"
                         value={formData.type}
                         onChange={handleInputChange}
-                    />
+                    >
+                        <option value="stocks">Stocks</option>
+                        <option value="401k">401(k)</option>
+                        <option value="mutual_funds">Mutual Funds</option>
+                        <option value="real_estate">Real Estate</option>
+                        <option value="savings">Savings</option>
+                        <option value="bonds">Bonds</option>
+                    </select>
                 </div>
-                <div>
+                <div className="input-container">
                     <label htmlFor="amount">Amount:</label>
                     <input
                         type="number"
@@ -72,7 +77,7 @@ const InvestmentForm = () => {
                         onChange={handleInputChange}
                     />
                 </div>
-                <div>
+                <div className="input-container">
                     <label htmlFor="date">Date:</label>
                     <input
                         type="date"
@@ -82,8 +87,10 @@ const InvestmentForm = () => {
                         onChange={handleInputChange}
                     />
                 </div>
-                <button type="submit">Add Expense</button>
-                <button type="cancel" onClick={clearFormData}>Cancel</button>
+                <div className="buttons-container">
+                    <button type="submit">Add</button>
+                    <button type="cancel" onClick={clearFormData}>Cancel</button>
+                </div>
             </form>
         </div>
     );

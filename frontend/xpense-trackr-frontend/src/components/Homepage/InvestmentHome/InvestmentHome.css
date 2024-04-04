@@ -1,0 +1,11 @@
+.investment-overview {
+    margin-top: 10px;
+    padding: 5px;
+}
+
+.investment-overview h2 {
+    font-size: 20px;
+    color: #005b96;
+    margin-bottom: 10px;
+    text-align: center;
+}

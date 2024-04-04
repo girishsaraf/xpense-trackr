@@ -6,7 +6,6 @@ import backendUrl from "../../config";
 import {Link} from "react-router-dom";
 import './ExpenseList.css';
 import Pagination from "../Pagination/Pagination";
-// import {FaPlus} from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faEdit, faPlus, faTag, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 
@@ -119,16 +118,16 @@ const ExpenseList = () => {
                 <h2>Recent Expense Overview</h2>
                 {/* Add button to navigate to ExpenseForm page */}
                 <Link to="/expenses/new" className="button-common-add">
-                    <FontAwesomeIcon icon={faPlus} style={{ marginRight: '5px' }} /> Add New Expense
+                    <FontAwesomeIcon icon={faPlus} style={{ marginRight: '5px' }} /> Add New
                 </Link>
             </div>
             <table className="expense-list-table">
                 <thead>
                 <tr>
+                    <th>Category</th>
                     <th>Description</th>
                     <th>Amount</th>
                     <th>Date</th>
-                    <th>Category</th>
                     <th colSpan="2">Action</th>
                 </tr>
                 </thead>
@@ -185,19 +184,22 @@ const ExpenseList = () => {
                 )}
                 {currentExpenses.map(expense => (
                     <tr key={expense.id}>
+                        <td>
+                            <div
+                                className={`category-tag category-${getCategoryNameById(expense.category_id).toLowerCase()}`}>
+                                <FontAwesomeIcon icon={faTag}/> {getCategoryNameById(expense.category_id)}
+                            </div>
+                        </td>
                         <td>{expense.description}</td>
                         <td>${expense.amount}</td>
                         <td>{formatDate(expense.date)}</td>
                         <td>
-                            <div className={`category-tag category-${getCategoryNameById(expense.category_id).toLowerCase()}`}>
-                                <FontAwesomeIcon icon={faTag} /> {getCategoryNameById(expense.category_id)}
-                            </div>
+                            <button className="button-common" onClick={() => handleOpenModal(expense)}><FontAwesomeIcon
+                                icon={faEdit}/></button>
                         </td>
                         <td>
-                            <button className="button-common" onClick={() => handleOpenModal(expense)}><FontAwesomeIcon icon={faEdit} /></button>
-                        </td>
-                        <td>
-                            <button className="button-common" onClick={() => handleDeleteExpense(expense.id)}><FontAwesomeIcon icon={faTrashAlt} /></button>
+                            <button className="button-common" onClick={() => handleDeleteExpense(expense.id)}>
+                                <FontAwesomeIcon icon={faTrashAlt}/></button>
                         </td>
                     </tr>
                 ))}

@@ -158,18 +158,6 @@
     color: #333;
 }
 
-.expense-overview {
-    margin-top: 10px;
-    padding: 5px;
-}
-
-.expense-overview h2 {
-    font-size: 20px;
-    color: #005b96;
-    margin-bottom: 10px;
-    text-align: center;
-}
-
 .overview-box .category {
     font-weight: bold;
 }
@@ -179,8 +167,6 @@
 /* Toggle container */
 .toggle-container {
     display: flex;
-    /*align-items: center;*/
-    /*justify-content: space-between;*/
     width: 300px; /* Adjust width as needed */
     background-color: #e0e0e0; /* Gray background color */
     border-radius: 20px; /* Rounded corners */
@@ -216,28 +202,32 @@
     cursor: pointer;
 }
 
-
 .buttons-container {
     display: flex;
-    justify-content: center;
     margin-bottom: 20px;
 }
 
 .buttons-container button {
-    padding: 10px 20px;
+    padding: 12px 24px;
     margin: 0 10px;
     border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: #fff;
+    border-radius: 25px;
+    background-color: #bbdefb;
+    color: black;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.3s;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .buttons-container button.active {
-    background-color: #0056b3;
+    background-color: #1565c0;
+    transform: translateY(-2px);
 }
 
 .buttons-container button:hover {
-    background-color: #0056b3;
+    background-color: #1565c0;
+    transform: translateY(-1px);
 }
+

@@ -1,8 +1,9 @@
-import ExpenseOverview from "./ExpenseOverview";
-import InvestmentOverview from "./InvestmentOverview";
-import ExpenseGraph from "./ExpenseGraph";
-import InvestmentGraph from "./InvestmentGraph";
+import ExpenseOverview from "./ExpenseHome/ExpenseOverview";
+import InvestmentOverview from "./InvestmentHome/InvestmentOverview";
+import ExpenseGraph from "./ExpenseHome/ExpenseGraph";
+import InvestmentGraph from "./InvestmentHome/InvestmentGraph";
 import {useState} from "react"; // Import your CSS file
+import './Homepage.css';
 
 const Homepage = () => {
     const [activeView, setActiveView] = useState('expense'); // Default to expense view
@@ -14,7 +15,7 @@ const Homepage = () => {
     return (
         <div className="homepage">
             <h1>Welcome to Your Financial Overview</h1>
-            <div className="toggle-container">
+            <div className="toggle-container" onClick={() => toggleView(activeView === 'expense' ? 'investment' : 'expense')}>
                 <button
                     className={`toggle-button ${activeView === 'expense' ? 'active' : ''}`}
                     onClick={() => toggleView('expense')}

@@ -14,6 +14,7 @@
     margin-bottom: 20px;
     font-size: 24px;
     color: #333;
+    text-align: center; /* Center the heading */
 }
 
 .expense-form-container form {
@@ -31,22 +32,46 @@
     color: #333;
 }
 
-.expense-form-container form input {
+.expense-form-container form input,
+.expense-form-container form select {
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
+.expense-form-container form .input-container {
+    display: flex;
+    align-items: center;
+}
+
+.expense-form-container form .input-container label {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.expense-form-container form .input-container input,
+.expense-form-container form .input-container select {
+    flex: 2;
+}
+
+.expense-form-container form .button-container {
+    display: flex;
+    justify-content: center; /* Center the buttons */
+}
+
 .expense-form-container form button {
-    padding: 12px 20px;
-    font-size: 16px;
+    padding: 10px 50px;
     background-color: #007bff;
     color: #fff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+}
+
+.expense-form-container form button:last-child {
+    margin-right: 0;
 }
 
 .expense-form-container form button:hover {
