@@ -11,14 +11,15 @@ type RecurringExpense struct {
 	Description string    `json:"description"`
 	StartDate   time.Time `json:"start_date"`
 	EndDate     time.Time `json:"end_date"`
-	RecurType   string    `json:"recur_type"`
+	Frequency   string    `json:"frequency"`
 }
 
 type RecurringInvestment struct {
 	ID             uint      `gorm:"primaryKey" json:"id"`
 	Amount         float64   `json:"amount"`
 	InvestmentType string    `json:"investment_type"`
+	Description    string    `json:"description"`
 	StartDate      time.Time `json:"start_date"`
 	EndDate        time.Time `json:"end_date"`
-	RecurType      string    `json:"recur_type"`
+	Frequency      string    `json:"frequency"`
 }

@@ -84,36 +84,78 @@ func getRecurringInvestmentsForDate(date time.Time) ([]RecurringInvestment, erro
 	return recurringInvestments, nil
 }
 
+func checkIfExpenseOrInvestmentIsDue(frequency string, lastRunDate time.Time) bool {
+	switch frequency {
+	case "daily":
+		// Check if last run date is before today
+		return lastRunDate.Before(time.Now().Truncate(24 * time.Hour))
+	case "weekly":
+		// Check if last run date is before the start of this week
+		startOfWeek := time.Now().Truncate(24 * 7 * time.Hour)
+		return lastRunDate.Before(startOfWeek)
+	case "biweekly":
+		// Check if last run date is before the start of this biweekly
+		startOfBiweekly := time.Now().Truncate(24 * 14 * time.Hour)
+		return lastRunDate.Before(startOfBiweekly)
+	case "monthly":
+		// Check if last run date is before the start of this month
+		startOfMonth := time.Now().Truncate(24 * 30 * time.Hour) // Approximation for a month
+		return lastRunDate.Before(startOfMonth)
+	default:
+		// Unsupported frequency
+		return false
+	}
+}
+
 func getCurrDayMonth() string {
 	today := time.Now()
 	return "-" + today.Format("DD/MM")
 }
 
 func insertExpense(currExpense RecurringExpense) error {
-	// Insert expense into the Expense table
-	newExpense := expense.Expense{
-		CategoryID:  currExpense.CategoryID,
-		Amount:      currExpense.Amount,
-		Description: currExpense.Description + getCurrDayMonth(),
-		Date:        time.Now().String(),
-	}
-	err := db.Create(&newExpense).Error
-	if err != nil {
-		return err
+	if checkIfExpenseOrInvestmentIsDue(currExpense.Frequency, currExpense.StartDate) {
+		// Insert expense into the Expense table
+		newExpense := expense.Expense{
+			CategoryID:  currExpense.CategoryID,
+			Amount:      currExpense.Amount,
+			Description: currExpense.Description + getCurrDayMonth(),
+			Date:        time.Now().String(),
+		}
+		err := db.Create(&newExpense).Error
+		if err != nil {
+			return err
+		}
+
+		// Update the recurring expense's start date to today's date
+		currExpense.StartDate = time.Now()
+		err = db.Save(&currExpense).Error
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
 func insertInvestment(investment RecurringInvestment) error {
-	// Insert investment into the Investment table
-	newInvestment := investments.Investment{
-		Amount:         investment.Amount,
-		InvestmentType: investment.InvestmentType,
-		Date:           time.Now().String(),
-	}
-	err := db.Create(&newInvestment).Error
-	if err != nil {
-		return err
+
+	if checkIfExpenseOrInvestmentIsDue(investment.Frequency, investment.StartDate) {
+		// Insert investment into the Investment table
+		newInvestment := investments.Investment{
+			Amount:         investment.Amount,
+			InvestmentType: investment.InvestmentType,
+			Date:           time.Now().String(),
+		}
+		err := db.Create(&newInvestment).Error
+		if err != nil {
+			return err
+		}
+
+		// Update the recurring expense's start date to today's date
+		investment.StartDate = time.Now()
+		err = db.Save(&investment).Error
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
