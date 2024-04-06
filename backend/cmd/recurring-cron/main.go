@@ -40,13 +40,13 @@ func main() {
 	cronInstance := cron.New()
 
 	// Add a scheduled task to handle recurring expenses
-	_, err := cronInstance.AddFunc("@every 24h", recurring.HandleRecurringExpense)
+	_, err := cronInstance.AddFunc("@every 12h", recurring.HandleRecurringExpense)
 	if err != nil {
 		log.Fatal("Error adding recurring expenses task:", err)
 	}
 
 	// Add a scheduled task to handle recurring investments
-	_, err = cronInstance.AddFunc("@every 24h", recurring.HandleRecurringInvestment)
+	_, err = cronInstance.AddFunc("@every 12h", recurring.HandleRecurringInvestment)
 	if err != nil {
 		log.Fatal("Error adding recurring investments task:", err)
 	}
