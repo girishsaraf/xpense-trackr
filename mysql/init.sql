@@ -156,3 +156,41 @@ INSERT INTO budgets (category_id, amount) VALUES
 (3, 200.00),  -- Utilities
 (4, 300.00),  -- Entertainment
 (5, 1000.00); -- Healthcare
+
+
+-- Recurring expenses and investments
+
+CREATE TABLE recurring_expense (
+    id SERIAL PRIMARY KEY,
+    description TEXT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    frequency VARCHAR(20) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE,
+    category_id INT NOT NULL CHECK (category_id BETWEEN 1 AND 5) -- Add category_id column
+);
+
+CREATE TABLE recurring_investment (
+    id SERIAL PRIMARY KEY,
+    description TEXT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    frequency VARCHAR(20) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE,
+    type ENUM('stocks', '401k', 'mutual_funds', 'real_estate', 'savings', 'bonds') NOT NULL -- Add type column
+);
+
+INSERT INTO recurring_expense (description, amount, frequency, start_date, end_date, category_id)
+VALUES
+    ('Internet Subscription', 49.99, 'monthly', '2024-04-01', NULL, 1),
+    ('Gym Membership', 29.99, 'monthly', '2024-04-01', NULL, 2),
+    ('Mobile Phone Plan', 59.99, 'monthly', '2024-04-01', NULL, 3),
+    ('Scoop to Work', 6.99, 'daily', '2024-04-01', NULL, 3);
+
+INSERT INTO recurring_investment (description, amount, frequency, start_date, end_date, type)
+VALUES
+    ('401(k) Contribution', 500.00, 'monthly', '2024-04-01', NULL, '401k'),
+    ('Mutual Funds Investment', 1000.00, 'monthly', '2024-04-01', NULL, 'mutual_funds'),
+    ('Stocks Investment', 1500.00, 'monthly', '2024-04-01', NULL, 'stocks');
+
+
