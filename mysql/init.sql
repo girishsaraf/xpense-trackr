@@ -44,57 +44,58 @@ CREATE TABLE budgets (id INT AUTO_INCREMENT PRIMARY KEY,
 -- Investments for the past 6 months
 -- Insert query for 'stocks'
 INSERT INTO investments (amount, investment_type, date) VALUES
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', '2024-03-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', '2024-02-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', '2024-01-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', '2023-12-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', '2023-11-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', '2023-10-01');
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 0 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 2 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 4 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'stocks', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 5 MONTH), '%Y-%m-01'));
 
 -- Insert query for '401k'
 INSERT INTO investments (amount, investment_type, date) VALUES
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', '2024-03-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', '2024-02-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', '2024-01-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', '2023-12-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', '2023-11-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', '2023-10-01');
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 0 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 2 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 4 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, '401k', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 5 MONTH), '%Y-%m-01'));
 
 -- Insert query for 'mutual_funds'
 INSERT INTO investments (amount, investment_type, date) VALUES
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', '2024-03-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', '2024-02-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', '2024-01-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', '2023-12-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', '2023-11-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', '2023-10-01');
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 0 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 2 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 4 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'mutual_funds', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 5 MONTH), '%Y-%m-01'));
 
 -- Insert query for 'real_estate'
 INSERT INTO investments (amount, investment_type, date) VALUES
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', '2024-03-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', '2024-02-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', '2024-01-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', '2023-12-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', '2023-11-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', '2023-10-01');
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 0 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 2 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 4 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'real_estate', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 5 MONTH), '%Y-%m-01'));
 
 -- Insert query for 'savings'
 INSERT INTO investments (amount, investment_type, date) VALUES
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', '2024-03-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', '2024-02-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', '2024-01-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', '2023-12-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', '2023-11-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', '2023-10-01');
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 0 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 2 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 4 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'savings', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 5 MONTH), '%Y-%m-01'));
 
 -- Insert query for 'bonds'
 INSERT INTO investments (amount, investment_type, date) VALUES
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', '2024-03-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', '2024-02-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', '2024-01-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', '2023-12-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', '2023-11-01'),
-    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', '2023-10-01');
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 0 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 2 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 4 MONTH), '%Y-%m-01')),
+    (FLOOR(RAND() * (500 - 10 + 1)) + 10, 'bonds', DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 5 MONTH), '%Y-%m-01'));
+
 
 
 INSERT INTO categories (name) VALUES
