@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/girishsaraf/xpense-trackr/backend/config"
-	"github.com/girishsaraf/xpense-trackr/backend/recurring"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/recurring"
 	"github.com/robfig/cron/v3"
 	"log"
 	"os"
