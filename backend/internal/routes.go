@@ -5,6 +5,7 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/category"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/expense"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/recurring"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/user"
 	"github.com/gorilla/mux"
 )
@@ -49,4 +50,18 @@ func SetRoutes(router *mux.Router) {
 	investmentRouter.HandleFunc("/{id:[0-9]+}", investments.UpdateInvestmentHandler).Methods("PUT")
 	investmentRouter.HandleFunc("/{id:[0-9]+}", investments.DeleteInvestmentHandler).Methods("DELETE")
 	investmentRouter.HandleFunc("/cumulative", investments.CumulativeInvestmentsByMonthHandler).Methods("GET")
+
+	// Recurring Entry Management
+	recurringRouter := router.PathPrefix("/api/recurring").Subrouter()
+	recurringRouter.HandleFunc("/expenses", recurring.GetAllRecurringExpensesHandler).Methods("GET")
+	recurringRouter.HandleFunc("/expenses", recurring.CreateRecurringExpenseHandler).Methods("POST")
+	recurringRouter.HandleFunc("/expenses/{id:[0-9]+}", recurring.GetRecurringExpenseByIDHandler).Methods("GET")
+	recurringRouter.HandleFunc("/expenses/{id:[0-9]+}", recurring.UpdateRecurringExpenseHandler).Methods("PUT")
+	recurringRouter.HandleFunc("/expenses/{id:[0-9]+}", recurring.DeleteRecurringExpenseHandler).Methods("DELETE")
+
+	recurringRouter.HandleFunc("/investments", recurring.GetAllRecurringInvestmentsHandler).Methods("GET")
+	recurringRouter.HandleFunc("/investments", recurring.CreateRecurringInvestmentHandler).Methods("POST")
+	recurringRouter.HandleFunc("/investments/{id:[0-9]+}", recurring.GetRecurringInvestmentByIDHandler).Methods("GET")
+	recurringRouter.HandleFunc("/investments/{id:[0-9]+}", recurring.UpdateRecurringInvestmentHandler).Methods("PUT")
+	recurringRouter.HandleFunc("/investments/{id:[0-9]+}", recurring.DeleteRecurringInvestmentHandler).Methods("DELETE")
 }
