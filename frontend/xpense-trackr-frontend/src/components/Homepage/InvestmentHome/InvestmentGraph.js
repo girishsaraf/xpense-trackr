@@ -10,6 +10,25 @@ const InvestmentGraph = () => {
     const chartRef = useRef(null);
     const [chartInstance, setChartInstance] = useState(null);
 
+    const getTypeName = (type) => {
+        switch (type.toLowerCase()) {
+            case 'stocks':
+                return 'Stocks';
+            case '401k':
+                return '401(k)';
+            case 'mutual_funds':
+                return 'Mutual Funds';
+            case 'real_estate':
+                return 'Real Estate';
+            case 'savings':
+                return 'Savings';
+            case 'bonds':
+                return 'Bonds';
+            default:
+                return type;
+        }
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -21,10 +40,10 @@ const InvestmentGraph = () => {
 
                 // Group data by investment type
                 data.forEach((item, index) => {
-                    if (!datasets[item.type]) {
-                        datasets[item.type] = { label: item.type, data: [], borderColor: colors[index % colors.length] };
+                    if (!datasets[getTypeName(item.type)]) {
+                        datasets[getTypeName(item.type)] = { label: getTypeName(item.type), data: [], borderColor: colors[index % colors.length] };
                     }
-                    datasets[item.type].data.push({ x: item.month, y: item.amount });
+                    datasets[getTypeName(item.type)].data.push({ x: item.month, y: item.amount });
                 });
 
                 // Prepare data for Chart.js

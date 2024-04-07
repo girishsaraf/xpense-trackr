@@ -3,12 +3,19 @@ import Chart from 'chart.js/auto'; // Import Chart.js
 import backendUrl from "../../../config";
 import 'chartjs-adapter-moment';
 import './ExpenseHome.css';
+import axios from "axios";
 
 const ExpenseGraph = () => {
     const [graphData, setGraphData] = useState(null);
     const [lastMonths, setLastMonths] = useState(6); // Default is last 6 months
     const chartRef = useRef(null);
     const [chartInstance, setChartInstance] = useState(null);
+    const [categories, setCategories] = useState([]);
+
+    const getCategoryNameById = (categoryId) => {
+        const category = categories.find(cat => cat.id === +categoryId);
+        return category ? category.name : 'Unknown Category';
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -17,14 +24,17 @@ const ExpenseGraph = () => {
                 const data = await response.json();
                 const datasets = {};
 
+                const responseCategories = await axios.get(`${backendUrl}/api/categories`);
+                setCategories(responseCategories.data);
+
                 const colors = ['#FFA280', '#80FFD6', '#80A4FF', '#FFF380', '#D980FF', '#33FF33'];
 
                 // Group data by investment type
                 data.forEach((item, index) => {
-                    if (!datasets[item.category]) {
-                        datasets[item.category] = { label: item.category, data: [], borderColor: colors[index % colors.length] };
+                    if (!datasets[getCategoryNameById(item.category)]) {
+                        datasets[getCategoryNameById(item.category)] = { label: getCategoryNameById(item.category), data: [], borderColor: colors[index % colors.length] };
                     }
-                    datasets[item.category].data.push({ x: item.month, y: item.amount });
+                    datasets[getCategoryNameById(item.category)].data.push({ x: item.month, y: item.amount });
                 });
 
                 // Prepare data for Chart.js
