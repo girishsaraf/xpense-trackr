@@ -36,8 +36,8 @@ func FetchRecurringExpense() error {
 	}
 
 	// Insert recurring expenses into the database
-	for _, expense := range recurringExpenses {
-		err := insertExpense(expense)
+	for _, pendingExpense := range recurringExpenses {
+		err := insertExpense(pendingExpense)
 		if err != nil {
 			return err
 		}
