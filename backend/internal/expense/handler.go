@@ -5,6 +5,7 @@ package expense
 import (
 	"encoding/json"
 	"errors"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/category"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -130,6 +131,24 @@ func CumulativeExpensesByMonthHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Fetch categories
+	var categories []struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+	}
+
+	err = db.Model(&category.Category{}).Select("id, name").Find(&categories).Error
+	if err != nil {
+		http.Error(w, "Failed to retrieve categories", http.StatusInternalServerError)
+		return
+	}
+
+	// Create a map for category ID to name mapping
+	categoryMap := make(map[int]string)
+	for _, categoryVal := range categories {
+		categoryMap[categoryVal.ID] = categoryVal.Name
+	}
+
 	var cumulativeExpenses []struct {
 		Month    string  `json:"month"`
 		Category string  `json:"category"`
@@ -155,11 +174,18 @@ func CumulativeExpensesByMonthHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Calculate cumulative expenses
 	cumulativeAmount := make(map[string]float64)
+
 	for i := range cumulativeExpenses {
-		category := cumulativeExpenses[i].Category
+		categoryId, _ := strconv.Atoi(cumulativeExpenses[i].Category)
+		categoryName := categoryMap[categoryId]
+		cumulativeExpenses[i].Category = categoryName
+	}
+
+	for i := range cumulativeExpenses {
+		categoryName := cumulativeExpenses[i].Category
 		amount := cumulativeExpenses[i].Amount
-		cumulativeAmount[category] += amount
-		cumulativeExpenses[i].Amount = cumulativeAmount[category]
+		cumulativeAmount[categoryName] += amount
+		cumulativeExpenses[i].Amount = cumulativeAmount[categoryName]
 	}
 	// Send the response
 	w.Header().Set("Content-Type", "application/json")
