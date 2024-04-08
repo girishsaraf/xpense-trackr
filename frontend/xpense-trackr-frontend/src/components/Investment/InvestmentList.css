@@ -44,14 +44,11 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
     text-decoration: none;
-    position: fixed;
-    top: 8.5%;
-    right: 24%;
 }
 
 
 .button-common-add:hover {
-    background-color: #0056b3; /* Darker shade of orange on hover */
+    background-color: #0056b3;
 }
 
 .investment-list-table {
@@ -61,25 +58,23 @@
 
 .investment-list-table td {
     border: 1px solid #ccc;
-    padding: 5px; /* Adjusted padding for cells */
-    background-color: #f2f2f2; /* Subtle grey background color for table rows */
+    padding: 5px;
+    background-color: #f2f2f2;
 }
 
 .investment-list-table th {
     border: 1px solid #ccc;
     padding: 10px;
-    background-color: #333; /* Dark background color for table header */
-    color: #fff; /* White text color for table header */
+    background-color: #333;
+    color: #fff;
     font-weight: bold;
     text-align: center;
 }
 
 .investment-list-table tr:hover td {
-    background-color: #dcdcdc; /* Darker background color on hover */
+    background-color: #dcdcdc;
 }
 
-
-/* Modal Styles */
 .modal {
     position: fixed;
     top: 0;
@@ -111,7 +106,7 @@
 
 .modal-content input,
 .modal-content select {
-    width: calc(100% - 10px); /* Adjusted width to accommodate padding */
+    width: calc(100% - 10px);
     padding: 8px;
     margin-bottom: 10px;
     border: 1px solid #ccc;

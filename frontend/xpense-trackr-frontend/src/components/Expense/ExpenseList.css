@@ -1,5 +1,3 @@
-/* src/components/Expense/ExpenseList.css */
-
 .expense-list-container {
     width: 100%;
     max-width: 80%;
@@ -37,21 +35,18 @@
 .button-common-add {
     padding: 6px 10px;
     font-size: 16px;
-    background-color: #666; /* Subtle shade of orange */
+    background-color: #666;
     color: #fff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
     text-decoration: none;
-    position: fixed;
-    top: 8.5%;
-    right: 24%;
 }
 
 
 .button-common-add:hover {
-    background-color: #0056b3; /* Darker shade of orange on hover */
+    background-color: #0056b3;
 }
 
 .expense-list-table {
@@ -62,26 +57,22 @@
 .expense-list-table th {
     border: 1px solid #ccc;
     padding: 10px;
-    background-color: #333; /* Dark background color for table header */
-    color: #fff; /* White text color for table header */
+    background-color: #333;
+    color: #fff;
     font-weight: bold;
     text-align: center;
 }
 
 .expense-list-table td {
     border: 1px solid #ccc;
-    padding: 5px; /* Adjusted padding for cells */
-    background-color: #f2f2f2; /* Subtle grey background color for table rows */
+    padding: 5px;
+    background-color: #f2f2f2;
 }
 
 .expense-list-table tr:hover td {
-    background-color: #dcdcdc; /* Darker background color on hover */
+    background-color: #dcdcdc;
 }
 
-
-
-
-/* Modal Styles */
 .modal {
     position: fixed;
     top: 0;
@@ -113,7 +104,7 @@
 
 .modal-content input,
 .modal-content select {
-    width: calc(100% - 10px); /* Adjusted width to accommodate padding */
+    width: calc(100% - 10px);
     padding: 8px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
