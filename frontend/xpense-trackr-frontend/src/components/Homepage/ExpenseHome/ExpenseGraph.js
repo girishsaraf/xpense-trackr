@@ -3,14 +3,12 @@ import Chart from 'chart.js/auto'; // Import Chart.js
 import backendUrl from "../../../config";
 import 'chartjs-adapter-moment';
 import './ExpenseHome.css';
-import axios from "axios";
 
 const ExpenseGraph = () => {
     const [graphData, setGraphData] = useState(null);
     const [lastMonths, setLastMonths] = useState(6); // Default is last 6 months
     const chartRef = useRef(null);
     const [chartInstance, setChartInstance] = useState(null);
-    const [categories, setCategories] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
