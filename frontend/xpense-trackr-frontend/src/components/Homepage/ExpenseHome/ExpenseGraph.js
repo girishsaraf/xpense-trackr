@@ -12,34 +12,25 @@ const ExpenseGraph = () => {
     const [chartInstance, setChartInstance] = useState(null);
     const [categories, setCategories] = useState([]);
 
-    const getCategoryNameById = (categoryId) => {
-        const category = categories.find(cat => cat.id === +categoryId);
-        return category ? category.name : 'Unknown Category';
-    };
-
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`${backendUrl}/api/expenses/cumulative?lastMonths=${lastMonths}`);
-                const data = await response.json();
+                const [expensesResponse] = await Promise.all([
+                    fetch(`${backendUrl}/api/expenses/cumulative?lastMonths=${lastMonths}`)
+                ]);
+
+                const expensesData = await expensesResponse.json();
+
                 const datasets = {};
-
-                const responseCategories = await axios.get(`${backendUrl}/api/categories`);
-                setCategories(responseCategories.data);
-
                 const colors = ['#FFA280', '#80FFD6', '#80A4FF', '#FFF380', '#D980FF', '#33FF33'];
 
-                // Group data by investment type
-                data.forEach((item, index) => {
-                    if (!datasets[getCategoryNameById(item.category)]) {
-                        datasets[getCategoryNameById(item.category)] = { label: getCategoryNameById(item.category), data: [], borderColor: colors[index % colors.length] };
-                    }
-                    datasets[getCategoryNameById(item.category)].data.push({ x: item.month, y: item.amount });
+                expensesData.forEach((item, index) => {
+                    datasets[item.category] = datasets[item.category] || { label: item.category, data: [], borderColor: colors[index % colors.length] };
+                    datasets[item.category].data.push({ x: item.month, y: item.amount });
                 });
 
-                // Prepare data for Chart.js
                 const chartData = {
-                    labels: [...new Set(data.map(item => item.month))],
+                    labels: [...new Set(expensesData.map(item => item.month))],
                     datasets: Object.values(datasets),
                 };
 
@@ -51,6 +42,7 @@ const ExpenseGraph = () => {
 
         fetchData();
     }, [lastMonths]);
+
 
     useEffect(() => {
         // Destroy the existing chart instance before rendering a new one

@@ -1,0 +1,25 @@
+.notification {
+    position: fixed;
+    top: 50px; /* Adjust as needed */
+    right: 20px; /* Adjust as needed */
+    padding: 10px;
+    border-radius: 5px;
+    transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+    transform: translateX(100%);
+    visibility: hidden;
+}
+
+.notification.show {
+    visibility: visible;
+    transform: translateX(0);
+}
+
+.success {
+    background-color: lightgreen;
+    border: 1px solid darkgreen;
+}
+
+.error {
+    background-color: lightcoral;
+    border: 1px solid darkred;
+}
