@@ -6,7 +6,6 @@ import backendUrl from "../../config";
 import {Link} from "react-router-dom";
 import './InvestmentList.css';
 import Pagination from "../Pagination/Pagination";
-import {FaPlus} from 'react-icons/fa';
 import {faEdit, faPlus, faTag, faTrashAlt} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
