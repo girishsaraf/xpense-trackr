@@ -1,24 +1,34 @@
 import { useCallback, useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
 import axios from 'axios';
 import backendUrl from '../../config';
 import { formatAmountMinor } from '../../utils/money';
+import type {
+    CashflowReport,
+    FinancialInsightsReport,
+    NetWorthHistoryReport,
+    NetWorthReport,
+} from '../../types/finance';
 import '../Ledger/LedgerPage.css';
 import './ReportsPage.css';
 
-const dateText = (date) => (
+const dateText = (date: Date): string => (
     `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 );
 
 const ReportsPage = () => {
     const now = new Date();
-    const [range, setRange] = useState({
+    const [range, setRange] = useState<{
+        from: string;
+        to: string;
+    }>({
         from: dateText(new Date(now.getFullYear(), now.getMonth(), 1)),
         to: dateText(now),
     });
-    const [report, setReport] = useState(null);
-    const [insights, setInsights] = useState(null);
-    const [netWorth, setNetWorth] = useState(null);
-    const [netWorthHistory, setNetWorthHistory] = useState(null);
+    const [report, setReport] = useState<CashflowReport | null>(null);
+    const [insights, setInsights] = useState<FinancialInsightsReport | null>(null);
+    const [netWorth, setNetWorth] = useState<NetWorthReport | null>(null);
+    const [netWorthHistory, setNetWorthHistory] = useState<NetWorthHistoryReport | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -27,17 +37,17 @@ const ReportsPage = () => {
         try {
             const query = `from=${encodeURIComponent(range.from)}&to=${encodeURIComponent(range.to)}`;
             const [cashflowResponse, insightsResponse, netWorthResponse, historyResponse] = await Promise.all([
-                axios.get(`${backendUrl}/api/reports/cashflow?${query}`),
-                axios.get(`${backendUrl}/api/reports/insights?${query}`),
-                axios.get(`${backendUrl}/api/net-worth`),
-                axios.get(`${backendUrl}/api/net-worth/history?months=12`),
+                axios.get<CashflowReport>(`${backendUrl}/api/reports/cashflow?${query}`),
+                axios.get<FinancialInsightsReport>(`${backendUrl}/api/reports/insights?${query}`),
+                axios.get<NetWorthReport>(`${backendUrl}/api/net-worth`),
+                axios.get<NetWorthHistoryReport>(`${backendUrl}/api/net-worth/history?months=12`),
             ]);
             setReport(cashflowResponse.data);
             setInsights(insightsResponse.data);
             setNetWorth(netWorthResponse.data);
             setNetWorthHistory(historyResponse.data);
         } catch (requestError) {
-            setError(requestError.response?.data || 'Unable to load your reports.');
+            setError(errorMessage(requestError, 'Unable to load your reports.'));
         } finally {
             setLoading(false);
         }
@@ -105,7 +115,7 @@ const ReportsPage = () => {
                     </div>
                     <a className="report-export-link" href={exportURL}>Download CSV</a>
                 </div>
-                <form className="report-range-form" onSubmit={(event) => { event.preventDefault(); refresh(); }}>
+                <form className="report-range-form" onSubmit={(event: FormEvent<HTMLFormElement>) => { event.preventDefault(); refresh(); }}>
                     <label>
                         From
                         <input type="date" value={range.from} onChange={(event) => setRange({ ...range, from: event.target.value })} required />
@@ -228,6 +238,13 @@ const ReportsPage = () => {
             </section>
         </main>
     );
+};
+
+const errorMessage = (error: unknown, fallback: string): string => {
+    if (axios.isAxiosError(error) && typeof error.response?.data === 'string') {
+        return error.response.data;
+    }
+    return fallback;
 };
 
 export default ReportsPage;

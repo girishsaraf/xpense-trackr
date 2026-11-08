@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { FormEvent } from 'react';
 import axios from 'axios';
 import backendUrl from '../../config';
 import { formatAmountMinor, parseAmountMinor } from '../../utils/money';
@@ -6,7 +7,48 @@ import { supportedCurrencies } from '../../utils/currencies';
 import '../Ledger/LedgerPage.css';
 import './PortfolioPage.css';
 
-const assetClasses = [
+type AssetClass = 'equity' | 'fixed_income' | 'cash' | 'real_estate' | 'commodity' | 'crypto' | 'other';
+
+type PortfolioHolding = {
+    id: number;
+    name: string;
+    ticker: string;
+    asset_class: AssetClass;
+    currency: string;
+    quantity: string;
+    cost_basis_minor: number;
+    latest_value_minor: number;
+    valuation_date: string;
+    valuation_source: string;
+    has_valuation: boolean;
+};
+
+type HoldingValuation = {
+    id: number;
+    date: string;
+    source: string;
+    value_minor: number;
+};
+
+type HoldingForm = {
+    name: string;
+    ticker: string;
+    asset_class: AssetClass;
+    currency: string;
+    quantity: string;
+    cost_basis: string;
+    value: string;
+    date: string;
+    source: string;
+};
+
+type ValuationDraft = {
+    value: string;
+    date: string;
+    source: string;
+};
+
+const assetClasses: Array<[AssetClass, string]> = [
     ['equity', 'Stocks / equity'],
     ['fixed_income', 'Bonds / fixed income'],
     ['cash', 'Cash equivalents'],
@@ -16,17 +58,19 @@ const assetClasses = [
     ['other', 'Other'],
 ];
 
+const isAssetClass = (value: string): value is AssetClass => assetClasses.some(([assetClass]) => assetClass === value);
+
 const localDate = () => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 };
 
-const minorToInput = (amountMinor, currency) => {
+const minorToInput = (amountMinor: number, currency: string): string => {
     const digits = new Intl.NumberFormat('en-US', { style: 'currency', currency }).resolvedOptions().maximumFractionDigits;
     return (amountMinor / (10 ** digits)).toFixed(digits);
 };
 
-const emptyForm = () => ({
+const emptyForm = (): HoldingForm => ({
     name: '',
     ticker: '',
     asset_class: 'equity',
@@ -39,11 +83,11 @@ const emptyForm = () => ({
 });
 
 const PortfolioPage = () => {
-    const [holdings, setHoldings] = useState([]);
-    const [form, setForm] = useState(emptyForm);
-    const [valuationDrafts, setValuationDrafts] = useState({});
-    const [history, setHistory] = useState({});
-    const [expanded, setExpanded] = useState({});
+    const [holdings, setHoldings] = useState<PortfolioHolding[]>([]);
+    const [form, setForm] = useState<HoldingForm>(emptyForm);
+    const [valuationDrafts, setValuationDrafts] = useState<Record<number, ValuationDraft>>({});
+    const [history, setHistory] = useState<Record<number, HoldingValuation[] | undefined>>({});
+    const [expanded, setExpanded] = useState<Record<number, boolean>>({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [notice, setNotice] = useState('');
@@ -51,7 +95,7 @@ const PortfolioPage = () => {
     const refresh = useCallback(async () => {
         setError('');
         try {
-            const response = await axios.get(`${backendUrl}/api/portfolio/holdings`);
+            const response = await axios.get<PortfolioHolding[]>(`${backendUrl}/api/portfolio/holdings`);
             setHoldings(response.data || []);
         } catch (requestError) {
             console.error('Error loading portfolio holdings:', requestError);
@@ -66,8 +110,8 @@ const PortfolioPage = () => {
     }, [refresh]);
 
     const totals = useMemo(() => {
-        const byCurrency = new Map();
-        const byClass = new Map();
+        const byCurrency = new Map<string, number>();
+        const byClass = new Map<string, number>();
         holdings.filter((holding) => holding.has_valuation).forEach((holding) => {
             const currencyTotal = byCurrency.get(holding.currency) || 0;
             byCurrency.set(holding.currency, currencyTotal + holding.latest_value_minor);
@@ -78,7 +122,7 @@ const PortfolioPage = () => {
         return { byCurrency, byClass };
     }, [holdings]);
 
-    const addHolding = async (event) => {
+    const addHolding = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const costBasisMinor = parseAmountMinor(form.cost_basis, form.currency);
         const valueMinor = parseAmountMinor(form.value, form.currency);
@@ -105,11 +149,11 @@ const PortfolioPage = () => {
             await refresh();
         } catch (requestError) {
             console.error('Error creating portfolio holding:', requestError);
-            setError(requestError.response?.data || 'Unable to add this holding.');
+            setError(errorMessage(requestError, 'Unable to add this holding.'));
         }
     };
 
-    const addValuation = async (event, holding) => {
+    const addValuation = async (event: FormEvent<HTMLFormElement>, holding: PortfolioHolding) => {
         event.preventDefault();
         const draft = valuationDrafts[holding.id] || {};
         const valueMinor = parseAmountMinor(draft.value ?? '', holding.currency);
@@ -129,11 +173,11 @@ const PortfolioPage = () => {
             await refresh();
         } catch (requestError) {
             console.error('Error adding portfolio valuation:', requestError);
-            setError(requestError.response?.data || 'Unable to add this valuation.');
+            setError(errorMessage(requestError, 'Unable to add this valuation.'));
         }
     };
 
-    const toggleHistory = async (holding) => {
+    const toggleHistory = async (holding: PortfolioHolding) => {
         if (expanded[holding.id]) {
             setExpanded((current) => ({ ...current, [holding.id]: false }));
             return;
@@ -141,7 +185,7 @@ const PortfolioPage = () => {
         setExpanded((current) => ({ ...current, [holding.id]: true }));
         if (history[holding.id]) return;
         try {
-            const response = await axios.get(`${backendUrl}/api/portfolio/holdings/${holding.id}/valuations`);
+            const response = await axios.get<HoldingValuation[]>(`${backendUrl}/api/portfolio/holdings/${holding.id}/valuations`);
             setHistory((current) => ({ ...current, [holding.id]: response.data || [] }));
         } catch (requestError) {
             console.error('Error loading portfolio valuation history:', requestError);
@@ -150,7 +194,7 @@ const PortfolioPage = () => {
         }
     };
 
-    const deleteHolding = async (holding) => {
+    const deleteHolding = async (holding: PortfolioHolding) => {
         if (!window.confirm(`Delete ${holding.name} and its valuation history?`)) return;
         try {
             await axios.delete(`${backendUrl}/api/portfolio/holdings/${holding.id}`);
@@ -158,7 +202,7 @@ const PortfolioPage = () => {
             await refresh();
         } catch (requestError) {
             console.error('Error deleting portfolio holding:', requestError);
-            setError(requestError.response?.data || 'Unable to delete this holding.');
+            setError(errorMessage(requestError, 'Unable to delete this holding.'));
         }
     };
 
@@ -217,11 +261,14 @@ const PortfolioPage = () => {
                     <div><p className="eyebrow">MANUAL PORTFOLIO ENTRY</p><h2 id="add-holding-heading">Add a holding</h2></div>
                 </div>
                 <form className="portfolio-form" onSubmit={addHolding}>
-                    <label>Name<input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} maxLength="120" required /></label>
-                    <label>Symbol<input value={form.ticker} onChange={(event) => setForm({ ...form, ticker: event.target.value })} maxLength="16" placeholder="Optional" /></label>
+                    <label>Name<input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} maxLength={120} required /></label>
+                    <label>Symbol<input value={form.ticker} onChange={(event) => setForm({ ...form, ticker: event.target.value })} maxLength={16} placeholder="Optional" /></label>
                     <label>
                         Asset class
-                        <select value={form.asset_class} onChange={(event) => setForm({ ...form, asset_class: event.target.value })}>
+                        <select value={form.asset_class} onChange={(event) => {
+                            const assetClass = event.target.value;
+                            if (isAssetClass(assetClass)) setForm({ ...form, asset_class: assetClass });
+                        }}>
                             {assetClasses.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                         </select>
                     </label>
@@ -234,7 +281,7 @@ const PortfolioPage = () => {
                     <label>Cost basis ({form.currency})<input type="number" min="0" step="any" value={form.cost_basis} onChange={(event) => setForm({ ...form, cost_basis: event.target.value })} required /></label>
                     <label>Current value ({form.currency})<input type="number" min="0" step="any" value={form.value} onChange={(event) => setForm({ ...form, value: event.target.value })} required /></label>
                     <label>Valuation date<input type="date" value={form.date} onChange={(event) => setForm({ ...form, date: event.target.value })} required /></label>
-                    <label>Value source<input value={form.source} onChange={(event) => setForm({ ...form, source: event.target.value })} maxLength="100" placeholder="Manual estimate, statement…" /></label>
+                    <label>Value source<input value={form.source} onChange={(event) => setForm({ ...form, source: event.target.value })} maxLength={100} placeholder="Manual estimate, statement…" /></label>
                     <button className="ledger-primary-button" type="submit">Add holding</button>
                 </form>
             </section>
@@ -276,7 +323,7 @@ const PortfolioPage = () => {
                                             <input type="number" min="0" step="any" value={draft.value} onChange={(event) => setValuationDrafts((current) => ({ ...current, [holding.id]: { ...draft, value: event.target.value } }))} required />
                                         </label>
                                         <label>Date<input type="date" value={draft.date} onChange={(event) => setValuationDrafts((current) => ({ ...current, [holding.id]: { ...draft, date: event.target.value } }))} required /></label>
-                                        <label>Source<input value={draft.source} onChange={(event) => setValuationDrafts((current) => ({ ...current, [holding.id]: { ...draft, source: event.target.value } }))} maxLength="100" /></label>
+                                        <label>Source<input value={draft.source} onChange={(event) => setValuationDrafts((current) => ({ ...current, [holding.id]: { ...draft, source: event.target.value } }))} maxLength={100} /></label>
                                         <button className="ledger-primary-button" type="submit">Add valuation</button>
                                     </form>
                                     <div className="portfolio-holding-actions">
@@ -302,6 +349,13 @@ const PortfolioPage = () => {
             </section>
         </main>
     );
+};
+
+const errorMessage = (error: unknown, fallback: string): string => {
+    if (axios.isAxiosError(error) && typeof error.response?.data === 'string') {
+        return error.response.data;
+    }
+    return fallback;
 };
 
 export default PortfolioPage;
