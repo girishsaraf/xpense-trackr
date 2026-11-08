@@ -1,0 +1,9 @@
+.git
+.idea
+**/node_modules
+**/build
+**/coverage
+**/.cache
+**/coverage.out
+**/*.log
+data

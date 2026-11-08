@@ -1,33 +1,25 @@
-version: '3'
-
 services:
-  mysql:
-    container_name: mysql-container
-    build: ./mysql
+  app:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
-      - "3306:3306"
+      - "127.0.0.1:${APP_PORT:-8080}:8080"
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: xpense_trackr_db
-      MYSQL_USER: username
-      MYSQL_PASSWORD: password
-    networks:
-      - xpt-network
+      APP_ADDR: ":8080"
+      DB_DRIVER: sqlite
+      DB_PATH: /data/xpense-trackr.db
+      APP_DATA_DIR: /data
+      WEB_DIR: /app/web
+    volumes:
+      - xpense-data:/data
     healthcheck:
-      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u root -p${MYSQL_ROOT_PASSWORD}" ]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/readyz >/dev/null || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
 
-  backend:
-    container_name: xpt-backend-container
-    build: ./backend
-    ports:
-      - "8080:8080"
-    depends_on:
-      mysql:
-        condition: service_healthy
-    networks:
-      - xpt-network
-networks:
-  xpt-network:
+volumes:
+  xpense-data:

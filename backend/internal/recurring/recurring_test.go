@@ -207,6 +207,9 @@ func TestFetchRecurringExpenseInsertsDueExpenses(t *testing.T) {
 	if err := FetchRecurringExpense(); err != nil {
 		t.Fatalf("FetchRecurringExpense() error = %v", err)
 	}
+	if err := FetchRecurringExpense(); err != nil {
+		t.Fatalf("second FetchRecurringExpense() error = %v", err)
+	}
 
 	var inserted []expense.Expense
 	if err := database.Find(&inserted).Error; err != nil {
@@ -256,6 +259,9 @@ func TestFetchRecurringInvestmentInsertsDueInvestments(t *testing.T) {
 
 	if err := FetchRecurringInvestment(); err != nil {
 		t.Fatalf("FetchRecurringInvestment() error = %v", err)
+	}
+	if err := FetchRecurringInvestment(); err != nil {
+		t.Fatalf("second FetchRecurringInvestment() error = %v", err)
 	}
 
 	var inserted []investments.Investment

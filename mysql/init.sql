@@ -1,6 +1,6 @@
-DROP DATABASE xpense_trackr_db;
--- Create database
-CREATE DATABASE xpense_trackr_db;
+-- Legacy demo fixture for disposable MySQL instances only.
+-- This file is not used by the local-first Docker Compose setup.
+CREATE DATABASE IF NOT EXISTS xpense_trackr_db;
 
 -- Use the database
 USE xpense_trackr_db;

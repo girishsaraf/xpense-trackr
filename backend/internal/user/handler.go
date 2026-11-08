@@ -4,6 +4,7 @@ package user
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/girishsaraf/xpense-trackr/backend/internal/auth"
@@ -34,6 +35,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// Authenticate user
 	token, err := auth.AuthenticateUser(loginRequest.Email, loginRequest.Password)
 	if err != nil {
+		if errors.Is(err, auth.ErrNotImplemented) {
+			http.Error(w, err.Error(), http.StatusNotImplemented)
+			return
+		}
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
@@ -56,6 +61,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	// Create new user account
 	if err := auth.RegisterUser(registerRequest.Username, registerRequest.Email, registerRequest.Password); err != nil {
+		if errors.Is(err, auth.ErrNotImplemented) {
+			http.Error(w, err.Error(), http.StatusNotImplemented)
+			return
+		}
 		http.Error(w, "Failed to create user account", http.StatusInternalServerError)
 		return
 	}

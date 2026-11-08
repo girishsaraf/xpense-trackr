@@ -130,3 +130,50 @@ jobs:
           name: frontend-coverage
           path: frontend/xpense-trackr-frontend/coverage/lcov.info
           if-no-files-found: ignore
+
+  local-compose-smoke:
+    name: Local Compose startup and persistence
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and start the local app
+        run: docker compose up --build -d
+
+      - name: Verify startup, ledger API, and persistent data
+        run: |
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8080/readyz >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            docker compose logs --no-color
+            exit 1
+          fi
+
+          test "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8080/)" = "200"
+          curl --silent --fail -X POST http://127.0.0.1:8080/api/v1/accounts \
+            -H 'Content-Type: application/json' \
+            -d '{"name":"CI checking","type":"checking","currency":"USD","opening_balance_minor":10000}'
+          curl --silent --fail -X POST http://127.0.0.1:8080/api/v1/transactions \
+            -H 'Content-Type: application/json' \
+            -d '{"account_id":1,"type":"expense","amount_minor":1234,"currency":"USD","date":"2026-11-08"}'
+          curl --silent --fail http://127.0.0.1:8080/api/v1/accounts | grep -q '"balance_minor":8766'
+          docker compose restart app
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8080/readyz >/dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          curl --silent --fail http://127.0.0.1:8080/api/v1/accounts | grep -q '"balance_minor":8766'
+
+      - name: Stop app and remove test data
+        if: always()
+        run: docker compose down --volumes

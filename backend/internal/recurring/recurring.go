@@ -1,10 +1,13 @@
 package recurring
 
 import (
+	"log"
+	"time"
+
 	"github.com/girishsaraf/xpense-trackr/backend/internal/expense"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
 	"gorm.io/gorm"
-	"time"
+	"gorm.io/gorm/clause"
 )
 
 var db *gorm.DB
@@ -15,16 +18,14 @@ func SetDB(databaseConfig *gorm.DB) {
 }
 
 func HandleRecurringExpense() {
-	err := FetchRecurringExpense()
-	if err != nil {
-		return
+	if err := FetchRecurringExpense(); err != nil {
+		log.Printf("process recurring expenses: %v", err)
 	}
 }
 
 func HandleRecurringInvestment() {
-	err := FetchRecurringInvestment()
-	if err != nil {
-		return
+	if err := FetchRecurringInvestment(); err != nil {
+		log.Printf("process recurring investments: %v", err)
 	}
 }
 
@@ -108,49 +109,52 @@ func getCurrDayMonth() string {
 }
 
 func insertExpense(currExpense RecurringExpense) error {
-	if checkIfExpenseOrInvestmentIsDue(currExpense.Frequency, currExpense.StartDate) {
+	return db.Transaction(func(tx *gorm.DB) error {
+		var current RecurringExpense
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&current, currExpense.ID).Error; err != nil {
+			return err
+		}
+		if !checkIfExpenseOrInvestmentIsDue(current.Frequency, current.StartDate) {
+			return nil
+		}
+
 		// Insert expense into the Expense table
 		newExpense := expense.Expense{
-			CategoryID:  currExpense.CategoryID,
-			Amount:      currExpense.Amount,
-			Description: currExpense.Description + getCurrDayMonth(),
+			CategoryID:  current.CategoryID,
+			Amount:      current.Amount,
+			Description: current.Description + getCurrDayMonth(),
 			Date:        time.Now().Format("2006-01-02"),
 		}
-		err := db.Create(&newExpense).Error
-		if err != nil {
+		if err := tx.Create(&newExpense).Error; err != nil {
 			return err
 		}
 
-		// Update the recurring expense's start date to today's date
-		currExpense.StartDate = time.Now()
-		err = db.Save(&currExpense).Error
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+		current.StartDate = time.Now()
+		return tx.Save(&current).Error
+	})
 }
 
 func insertInvestment(investment RecurringInvestment) error {
+	return db.Transaction(func(tx *gorm.DB) error {
+		var current RecurringInvestment
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).First(&current, investment.ID).Error; err != nil {
+			return err
+		}
+		if !checkIfExpenseOrInvestmentIsDue(current.Frequency, current.StartDate) {
+			return nil
+		}
 
-	if checkIfExpenseOrInvestmentIsDue(investment.Frequency, investment.StartDate) {
 		// Insert investment into the Investment table
 		newInvestment := investments.Investment{
-			Amount:         investment.Amount,
-			InvestmentType: investment.InvestmentType,
+			Amount:         current.Amount,
+			InvestmentType: current.InvestmentType,
 			Date:           time.Now().Format("2006-01-02"),
 		}
-		err := db.Create(&newInvestment).Error
-		if err != nil {
+		if err := tx.Create(&newInvestment).Error; err != nil {
 			return err
 		}
 
-		// Update the recurring expense's start date to today's date
-		investment.StartDate = time.Now()
-		err = db.Save(&investment).Error
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+		current.StartDate = time.Now()
+		return tx.Save(&current).Error
+	})
 }
