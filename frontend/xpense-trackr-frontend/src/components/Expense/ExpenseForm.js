@@ -119,7 +119,7 @@ const ExpenseForm = () => {
                         type="checkbox"
                         id="recurring"
                         name="recurring"
-                        value={formData.recurring}
+                        checked={formData.recurring}
                         onChange={handleInputChange}
                     />
                 </div>
@@ -130,9 +130,8 @@ const ExpenseForm = () => {
                             <input
                                 type="date"
                                 id="startDate"
-                                name="startDate"
+                                name="start_date"
                                 value={formData.start_date}
-                                defaultValue={formData.date}
                                 onChange={handleInputChange}
                             />
                         </div>
@@ -141,9 +140,8 @@ const ExpenseForm = () => {
                             <input
                                 type="date"
                                 id="endDate"
-                                name="endDate"
+                                name="end_date"
                                 value={formData.end_date}
-                                defaultValue={formData.date}
                                 onChange={handleInputChange}
                             />
                         </div>

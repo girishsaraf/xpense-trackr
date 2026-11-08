@@ -120,6 +120,48 @@ const InvestmentList = () => {
 
     return (
         <div className="investment-list-container">
+            {showInvModal && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <h2>Edit Investment</h2>
+                        <div>
+                            <label htmlFor="edited-date">Date:</label>
+                            <input
+                                type="date"
+                                id="edited-date"
+                                value={editedDate}
+                                onChange={(e) => setEditedDate(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="edited-amount">Amount:</label>
+                            <input
+                                type="number"
+                                id="edited-amount"
+                                value={editedAmount}
+                                onChange={(e) => setEditedAmount(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="edited-type">Type:</label>
+                            <select
+                                id="edited-type"
+                                value={editedType}
+                                onChange={(e) => setEditedType(e.target.value)}
+                            >
+                                <option value="stocks">Stocks</option>
+                                <option value="401k">401(k)</option>
+                                <option value="mutual_funds">Mutual Funds</option>
+                                <option value="real_estate">Real Estate</option>
+                                <option value="savings">Savings</option>
+                                <option value="bonds">Bonds</option>
+                            </select>
+                        </div>
+                        <button onClick={handleSubmitEdit}>Submit</button>
+                        <button onClick={handleCloseModal}>Cancel</button>
+                    </div>
+                </div>
+            )}
             <div className="investment-list-header">
                 <h2>Recent Investment Overview</h2>
                 {/* Add button to navigate to InvestmentForm page */}
@@ -137,48 +179,6 @@ const InvestmentList = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {showInvModal && (
-                    <div className="modal">
-                        <div className="modal-content">
-                            <h2>Edit Investment</h2>
-                            <div>
-                                <label htmlFor="edited-date">Date:</label>
-                                <input
-                                    type="date"
-                                    id="edited-date"
-                                    value={editedDate}
-                                    onChange={(e) => setEditedDate(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="edited-amount">Amount:</label>
-                                <input
-                                    type="number"
-                                    id="edited-amount"
-                                    value={editedAmount}
-                                    onChange={(e) => setEditedAmount(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="edited-type">Type:</label>
-                                <select
-                                    id="edited-type"
-                                    value={editedType}
-                                    onChange={(e) => setEditedType(e.target.value)}
-                                >
-                                    <option value="stocks">Stocks</option>
-                                    <option value="401k">401(k)</option>
-                                    <option value="mutual_funds">Mutual Funds</option>
-                                    <option value="real_estate">Real Estate</option>
-                                    <option value="savings">Savings</option>
-                                    <option value="bonds">Bonds</option>
-                                </select>
-                            </div>
-                            <button onClick={handleSubmitEdit}>Submit</button>
-                            <button onClick={handleCloseModal}>Cancel</button>
-                        </div>
-                    </div>
-                )}
                 {currentInvestments.map(investment => (
                     <tr key={investment.id}>
                         <td>
