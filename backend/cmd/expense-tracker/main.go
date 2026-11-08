@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -17,6 +18,7 @@ import (
 
 	"github.com/girishsaraf/xpense-trackr/backend/config"
 	"github.com/girishsaraf/xpense-trackr/backend/internal"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/backup"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/budget"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/category"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/expense"
@@ -34,9 +36,64 @@ import (
 )
 
 func main() {
-	if err := run(); err != nil {
+	var err error
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "backup":
+			err = runBackupCommand(os.Args[2:])
+		case "restore":
+			err = runRestoreCommand(os.Args[2:])
+		default:
+			err = fmt.Errorf("unknown command %q; use backup, restore, or start the server without a command", os.Args[1])
+		}
+	} else {
+		err = run()
+	}
+	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func runBackupCommand(args []string) error {
+	flags := flag.NewFlagSet("backup", flag.ContinueOnError)
+	output := flags.String("output", "", "destination ZIP archive")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	if *output == "" || flags.NArg() != 0 {
+		return errors.New("usage: xpense-trackr backup --output <archive.zip>")
+	}
+	database := config.LoadDatabaseConfig()
+	if database.Driver != "sqlite" {
+		return errors.New("backup currently supports SQLite databases only")
+	}
+	dataDir := envOrDefault("APP_DATA_DIR", "./data")
+	if err := backup.Create(database.Path, dataDir, *output); err != nil {
+		return fmt.Errorf("create backup: %w", err)
+	}
+	fmt.Printf("Backup saved to %s\n", *output)
+	return nil
+}
+
+func runRestoreCommand(args []string) error {
+	flags := flag.NewFlagSet("restore", flag.ContinueOnError)
+	input := flags.String("input", "", "source ZIP archive")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	if *input == "" || flags.NArg() != 0 {
+		return errors.New("usage: xpense-trackr restore --input <archive.zip>")
+	}
+	database := config.LoadDatabaseConfig()
+	if database.Driver != "sqlite" {
+		return errors.New("restore currently supports SQLite databases only")
+	}
+	dataDir := envOrDefault("APP_DATA_DIR", "./data")
+	if err := backup.Restore(*input, database.Path, dataDir); err != nil {
+		return fmt.Errorf("restore backup: %w", err)
+	}
+	fmt.Printf("Restored data from %s. The previous database and receipt files were preserved.\n", *input)
+	return nil
 }
 
 func run() error {

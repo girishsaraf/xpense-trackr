@@ -24,7 +24,11 @@ The API is available at the legacy `/api/...` paths. `/api/v1/...` currently ali
 
 Currencies are currently limited to the supported set shown in the account form, with 0-, 2-, or 3-digit minor-unit precision handled explicitly. Cross-currency transfers and exchange-rate conversion are not yet supported. Net-worth summaries are current snapshots only; historical valuation, securities holdings, and live market prices are not provided.
 
-Receipt metadata is stored in SQLite/MySQL; receipt content is stored in `APP_DATA_DIR/receipts` (default `./data/receipts`). Include both the database and this directory in a backup.
+Receipt metadata is stored in SQLite/MySQL; receipt content is stored in `APP_DATA_DIR/receipts` (default `./data/receipts`). The backup CLI includes both automatically for SQLite.
+
+## SQLite backup and restore CLI
+
+The app binary supports `backup --output <archive.zip>` and `restore --input <archive.zip>`. Backups use SQLite's online snapshot mechanism and include locally stored receipts. Restore validates the archive and database, then preserves the previous database and receipt directory before replacing them. Stop the server before restore. The commands currently require `DB_DRIVER=sqlite`.
 
 ## Existing feature APIs
 

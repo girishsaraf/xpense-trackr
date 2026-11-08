@@ -14,6 +14,26 @@ Open [http://localhost:8080](http://localhost:8080). The app binds to the local 
 
 Stop with `Ctrl+C`; run `docker compose down` to stop and remove the container. The named data volume is kept. **Do not run `docker compose down -v` unless you intend to delete the app's stored data.**
 
+## Back up and restore your data
+
+Backups include a consistent SQLite snapshot, receipt files, and a versioned manifest. Create a backup while the app is running, then copy it to a location outside the Docker volume:
+
+```sh
+docker compose exec app /app/xpense-trackr backup --output /data/xpense-backup.zip
+docker compose cp app:/data/xpense-backup.zip ./xpense-backup.zip
+```
+
+To restore, copy the archive into the volume, stop the app, and run the restore command. Restart the app afterward:
+
+```sh
+docker compose cp ./xpense-backup.zip app:/data/restore.zip
+docker compose stop app
+docker compose run --rm --no-deps app restore --input /data/restore.zip
+docker compose start app
+```
+
+Restore validates the archive and database before changing data. It preserves the pre-restore database in `/data/pre-restore-<timestamp>.zip` and existing receipts in a `receipts.pre-restore-<timestamp>` directory. Keep an additional copy of the backup outside the machine running Docker.
+
 ## Run the services separately for development
 
 Prerequisites: Go 1.27+ and Node.js 26+.
