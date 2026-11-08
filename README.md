@@ -69,6 +69,7 @@ The legacy `mysql/init.sql` file is not used by the local Compose setup. It cont
 - Local financial accounts and an exact-minor-unit transaction ledger for income, expenses, and same-currency transfers
 - Merchant categorization rules for new uncategorized transactions
 - Scheduled income and bills with daily balance projections; forecasts never write actual transactions
+- Bill reminders, exact-match price-change signals, and confirmable, idempotent payment/skip actions
 - Currency-separated cash-flow reports, CSV export, and local net-worth summaries
 - Savings-goal contributions with progress and monthly budget envelopes with optional rollover
 - CSV transaction import with row validation, duplicate detection, preview, and transactional commit

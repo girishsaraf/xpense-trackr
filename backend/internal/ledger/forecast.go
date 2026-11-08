@@ -7,24 +7,29 @@ import (
 	"strings"
 	"time"
 
+	"github.com/girishsaraf/xpense-trackr/backend/internal/category"
 	"gorm.io/gorm"
 )
 
 var ErrInvalidSchedule = errors.New("scheduled flow requires a valid account, label, type, positive amount, currency, date, and frequency")
+var ErrInvalidOccurrence = errors.New("occurrence must match the next scheduled date and use record or skip action")
+var ErrOccurrenceExists = errors.New("the scheduled occurrence was already processed with different details")
 
 type ScheduledFlow struct {
-	ID          uint      `gorm:"primaryKey" json:"id"`
-	AccountID   uint      `gorm:"not null;index" json:"account_id"`
-	Label       string    `gorm:"size:180;not null" json:"label"`
-	Type        string    `gorm:"size:16;not null" json:"type"`
-	AmountMinor int64     `gorm:"not null" json:"amount_minor"`
-	Currency    string    `gorm:"size:3;not null" json:"currency"`
-	Frequency   string    `gorm:"size:16;not null" json:"frequency"`
-	NextDate    string    `gorm:"size:10;not null;index" json:"next_date"`
-	EndDate     *string   `gorm:"size:10" json:"end_date,omitempty"`
-	Enabled     bool      `gorm:"not null;default:true" json:"enabled"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID           uint      `gorm:"primaryKey" json:"id"`
+	AccountID    uint      `gorm:"not null;index" json:"account_id"`
+	CategoryID   *uint     `json:"category_id,omitempty"`
+	Label        string    `gorm:"size:180;not null" json:"label"`
+	Type         string    `gorm:"size:16;not null" json:"type"`
+	AmountMinor  int64     `gorm:"not null" json:"amount_minor"`
+	Currency     string    `gorm:"size:3;not null" json:"currency"`
+	Frequency    string    `gorm:"size:16;not null" json:"frequency"`
+	NextDate     string    `gorm:"size:10;not null;index" json:"next_date"`
+	EndDate      *string   `gorm:"size:10" json:"end_date,omitempty"`
+	ReminderDays int       `gorm:"not null;default:3" json:"reminder_days"`
+	Enabled      bool      `gorm:"not null;default:true" json:"enabled"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 type ForecastPoint struct {
@@ -71,6 +76,9 @@ func CreateScheduledFlow(flow *ScheduledFlow) error {
 	if err := validateScheduledFlow(flow); err != nil {
 		return err
 	}
+	flow.ID = 0
+	flow.CreatedAt = time.Time{}
+	flow.UpdatedAt = time.Time{}
 	return db.Create(flow).Error
 }
 
@@ -84,7 +92,8 @@ func UpdateScheduledFlow(id int, updated *ScheduledFlow) error {
 			return err
 		}
 		return tx.Model(&existing).Select(
-			"AccountID", "Label", "Type", "AmountMinor", "Currency", "Frequency", "NextDate", "EndDate", "Enabled",
+			"AccountID", "CategoryID", "Label", "Type", "AmountMinor", "Currency", "Frequency", "NextDate", "EndDate",
+			"ReminderDays", "Enabled",
 		).Updates(updated).Error
 	})
 }
@@ -207,7 +216,9 @@ func validateScheduledFlow(flow *ScheduledFlow) error {
 	if flow.AccountID == 0 || flow.Label == "" || len(flow.Label) > 180 ||
 		(flow.Type != "income" && flow.Type != "expense") ||
 		flow.AmountMinor <= 0 || !currencyCodePattern.MatchString(flow.Currency) ||
-		(flow.Frequency != "once" && flow.Frequency != "weekly" && flow.Frequency != "biweekly" && flow.Frequency != "monthly" && flow.Frequency != "yearly") {
+		(flow.Frequency != "once" && flow.Frequency != "weekly" && flow.Frequency != "biweekly" && flow.Frequency != "monthly" && flow.Frequency != "yearly") ||
+		flow.ReminderDays < 0 || flow.ReminderDays > 30 ||
+		(flow.Type == "income" && flow.CategoryID != nil) {
 		return ErrInvalidSchedule
 	}
 	if _, err := time.Parse("2006-01-02", flow.NextDate); err != nil {
@@ -226,6 +237,15 @@ func validateScheduledFlow(flow *ScheduledFlow) error {
 	}
 	if account.Currency != flow.Currency {
 		return ErrInvalidSchedule
+	}
+	if flow.CategoryID != nil {
+		if flow.Type != "expense" {
+			return ErrInvalidSchedule
+		}
+		var existingCategory category.Category
+		if err := db.First(&existingCategory, *flow.CategoryID).Error; err != nil {
+			return fmt.Errorf("scheduled flow category: %w", err)
+		}
 	}
 	return nil
 }

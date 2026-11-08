@@ -12,7 +12,7 @@ import (
 
 func setupLedgerDB(t *testing.T) *gorm.DB {
 	t.Helper()
-	database := testutil.NewDB(t, &Account{}, &Transaction{}, &CategoryRule{}, &ScheduledFlow{}, &category.Category{})
+	database := testutil.NewDB(t, &Account{}, &Transaction{}, &CategoryRule{}, &ScheduledFlow{}, &ScheduledOccurrence{}, &category.Category{})
 	SetDB(database)
 	return database
 }
@@ -220,6 +220,75 @@ func TestScheduledFlowRequiresAccountCurrencyMatch(t *testing.T) {
 	})
 	if !errors.Is(err, ErrInvalidSchedule) {
 		t.Errorf("CreateScheduledFlow() error = %v, want %v", err, ErrInvalidSchedule)
+	}
+}
+
+func TestBillInsightAndConfirmedOccurrenceArePriceAwareAndIdempotent(t *testing.T) {
+	database := setupLedgerDB(t)
+	account := &Account{Name: "Checking", Type: "checking", Currency: "USD", OpeningBalanceMinor: 100000}
+	food := &category.Category{Name: "Utilities"}
+	for _, record := range []interface{}{account, food} {
+		if err := database.Create(record).Error; err != nil {
+			t.Fatalf("create fixture: %v", err)
+		}
+	}
+	categoryID := food.ID
+	for _, transaction := range []Transaction{
+		{AccountID: account.ID, CategoryID: &categoryID, Type: "expense", AmountMinor: 10000, Currency: "USD", Date: "2026-01-10", Payee: "Internet"},
+		{AccountID: account.ID, CategoryID: &categoryID, Type: "expense", AmountMinor: 12000, Currency: "USD", Date: "2026-02-10", Payee: "Internet"},
+	} {
+		if err := database.Create(&transaction).Error; err != nil {
+			t.Fatalf("create bill history: %v", err)
+		}
+	}
+	flow := &ScheduledFlow{
+		AccountID: account.ID, CategoryID: &categoryID, Label: "Internet", Type: "expense",
+		AmountMinor: 12000, Currency: "USD", Frequency: "monthly", NextDate: "2026-03-10",
+		ReminderDays: 3, Enabled: true,
+	}
+	if err := CreateScheduledFlow(flow); err != nil {
+		t.Fatalf("CreateScheduledFlow() error = %v", err)
+	}
+	insights, err := GetBillInsights(time.Date(2026, 3, 8, 12, 0, 0, 0, time.UTC))
+	if err != nil {
+		t.Fatalf("GetBillInsights() error = %v", err)
+	}
+	if len(insights) != 1 || insights[0].Status != "due_soon" ||
+		!insights[0].HasPriceChange || insights[0].ChangePercent != 20 {
+		t.Fatalf("bill insight = %+v, want due-soon with 20%% price increase", insights)
+	}
+
+	request := ProcessOccurrenceRequest{ScheduledDate: "2026-03-10", Action: "record", AmountMinor: 13000}
+	first, err := ProcessScheduledOccurrence(flow.ID, request)
+	if err != nil {
+		t.Fatalf("ProcessScheduledOccurrence() error = %v", err)
+	}
+	retry, err := ProcessScheduledOccurrence(flow.ID, request)
+	if err != nil {
+		t.Fatalf("idempotent ProcessScheduledOccurrence() error = %v", err)
+	}
+	if first.ID != retry.ID || first.TransactionID == nil || *first.TransactionID != *retry.TransactionID {
+		t.Fatalf("idempotent occurrence = %+v, retry = %+v", first, retry)
+	}
+	_, err = ProcessScheduledOccurrence(flow.ID, ProcessOccurrenceRequest{
+		ScheduledDate: request.ScheduledDate, Action: "record", AmountMinor: 14000,
+	})
+	if !errors.Is(err, ErrOccurrenceExists) {
+		t.Fatalf("conflicting retry error = %v, want %v", err, ErrOccurrenceExists)
+	}
+	var recorded Transaction
+	if err := database.First(&recorded, *first.TransactionID).Error; err != nil {
+		t.Fatalf("fetch recorded transaction: %v", err)
+	}
+	if recorded.AmountMinor != 13000 || recorded.CategoryID == nil || *recorded.CategoryID != categoryID {
+		t.Fatalf("recorded transaction = %+v", recorded)
+	}
+	var advanced ScheduledFlow
+	if err := database.First(&advanced, flow.ID).Error; err != nil {
+		t.Fatal(err)
+	}
+	if advanced.NextDate != "2026-04-10" {
+		t.Errorf("next occurrence date = %q, want 2026-04-10", advanced.NextDate)
 	}
 }
 

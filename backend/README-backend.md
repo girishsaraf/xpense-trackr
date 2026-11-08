@@ -15,6 +15,8 @@ The API is available at the legacy `/api/...` paths. `/api/v1/...` currently ali
 - `POST /api/transactions/import.csv`: Upload multipart field `file` to preview a transaction CSV. Add `?commit=true` only after review; invalid rows prevent the whole batch from committing, and repeated imports are deduplicated.
 - `GET|POST /api/category-rules`, `PUT|DELETE /api/category-rules/{id}`: Manage case-insensitive payee-contains rules. Higher priority rules apply first, and an explicitly chosen transaction category is never overwritten.
 - `GET|POST /api/scheduled-flows`, `PUT|DELETE /api/scheduled-flows/{id}`: Manage expected income and bills using `once`, `weekly`, `biweekly`, `monthly`, or `yearly` frequency.
+- `GET /api/bills`: List active expenses with upcoming/due-soon/overdue status and price-change signals from the two latest exact-name transaction matches. Scheduled flows accept an optional category and reminder window (0–30 days).
+- `POST /api/scheduled-flows/{id}/occurrences`: Confirm a scheduled occurrence with `scheduled_date` and `action` (`record` or `skip`). Recording accepts an optional `amount_minor`, writes one ledger transaction, and advances the schedule atomically; duplicate confirmations are idempotent.
 - `GET /api/forecast/cashflow?days=90`: Project account balances from scheduled items (1–365 days). Projections are estimates and never create actual transactions.
 - `GET /api/reports/cashflow?from=YYYY-MM-DD&to=YYYY-MM-DD`: Summarize bounded cash flow by currency and expense category; periods are limited to one year.
 - `GET /api/reports/cashflow.csv`: Download the cash-flow report as CSV.

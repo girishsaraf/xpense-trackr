@@ -227,6 +227,40 @@ func DeleteScheduledFlowHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func GetBillsHandler(w http.ResponseWriter, _ *http.Request) {
+	bills, err := GetBillInsights(time.Now())
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, bills)
+}
+
+func ProcessScheduledOccurrenceHandler(w http.ResponseWriter, r *http.Request) {
+	id, ok := transactionID(w, r)
+	if !ok {
+		return
+	}
+	var request ProcessOccurrenceRequest
+	if err := decodeRequest(r, &request); err != nil {
+		http.Error(w, "Invalid scheduled occurrence payload", http.StatusBadRequest)
+		return
+	}
+	occurrence, err := ProcessScheduledOccurrence(uint(id), request)
+	switch {
+	case err == nil:
+		writeJSON(w, http.StatusOK, occurrence)
+	case errors.Is(err, ErrInvalidOccurrence), errors.Is(err, ErrInvalidTxn):
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	case errors.Is(err, ErrOccurrenceExists):
+		http.Error(w, err.Error(), http.StatusConflict)
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		http.Error(w, "Scheduled item not found", http.StatusNotFound)
+	default:
+		writeError(w, err)
+	}
+}
+
 func CashflowForecastHandler(w http.ResponseWriter, r *http.Request) {
 	days, err := queryInt(r.URL.Query().Get("days"), 90)
 	if err != nil || days < 1 || days > 365 {

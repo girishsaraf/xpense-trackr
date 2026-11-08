@@ -60,6 +60,7 @@ func setupIntegrationDB(t *testing.T) (*gorm.DB, http.Handler) {
 		&ledger.Transaction{},
 		&ledger.CategoryRule{},
 		&ledger.ScheduledFlow{},
+		&ledger.ScheduledOccurrence{},
 		&planning.Goal{},
 		&planning.GoalContribution{},
 		&planning.Envelope{},
@@ -335,6 +336,38 @@ func TestScheduledCashflowAPI(t *testing.T) {
 	forecast := decodeResponse[ledger.CashflowForecast](t, forecastResponse)
 	if len(forecast.Events) != 1 || forecast.Accounts[0].ProjectedBalanceMinor != 3750 {
 		t.Fatalf("cashflow forecast = %+v, want one bill and projected balance 3750", forecast)
+	}
+	billsResponse := apiRequest(t, handler, http.MethodGet, "/api/bills", nil)
+	if billsResponse.Code != http.StatusOK {
+		t.Fatalf("bill reminders status = %d, want %d: %s", billsResponse.Code, http.StatusOK, billsResponse.Body)
+	}
+	bills := decodeResponse[[]ledger.BillInsight](t, billsResponse)
+	if len(bills) != 1 || bills[0].Status != "due_soon" {
+		t.Fatalf("bill reminders = %+v, want one due-soon bill", bills)
+	}
+	occurrenceResponse := apiRequest(t, handler, http.MethodPost,
+		fmt.Sprintf("/api/scheduled-flows/%d/occurrences", bills[0].ID),
+		map[string]interface{}{"scheduled_date": nextDate, "action": "record", "amount_minor": 1300},
+	)
+	if occurrenceResponse.Code != http.StatusOK {
+		t.Fatalf("record bill occurrence status = %d, want %d: %s", occurrenceResponse.Code, http.StatusOK, occurrenceResponse.Body)
+	}
+	occurrence := decodeResponse[ledger.ScheduledOccurrence](t, occurrenceResponse)
+	if occurrence.TransactionID == nil || occurrence.ActualAmountMinor != 1300 {
+		t.Fatalf("recorded occurrence = %+v", occurrence)
+	}
+	retryResponse := apiRequest(t, handler, http.MethodPost,
+		fmt.Sprintf("/api/scheduled-flows/%d/occurrences", bills[0].ID),
+		map[string]interface{}{"scheduled_date": nextDate, "action": "record", "amount_minor": 1300},
+	)
+	retry := decodeResponse[ledger.ScheduledOccurrence](t, retryResponse)
+	if retry.ID != occurrence.ID || retry.TransactionID == nil || *retry.TransactionID != *occurrence.TransactionID {
+		t.Fatalf("idempotent occurrence retry = %+v, initial = %+v", retry, occurrence)
+	}
+	accountsResponse := apiRequest(t, handler, http.MethodGet, "/api/accounts", nil)
+	accounts := decodeResponse[[]ledger.Account](t, accountsResponse)
+	if len(accounts) != 1 || accounts[0].BalanceMinor != 3700 {
+		t.Fatalf("balance after recording bill = %+v, want 3700", accounts)
 	}
 	if invalidDays := apiRequest(t, handler, http.MethodGet, "/api/forecast/cashflow?days=500", nil); invalidDays.Code != http.StatusBadRequest {
 		t.Errorf("invalid forecast range status = %d, want %d", invalidDays.Code, http.StatusBadRequest)

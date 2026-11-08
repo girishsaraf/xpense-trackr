@@ -23,6 +23,7 @@ func TestSetRoutesRegistersExpectedEndpoints(t *testing.T) {
 		{http.MethodPost, "/api/accounts"},
 		{http.MethodGet, "/api/transactions"},
 		{http.MethodPost, "/api/transactions"},
+		{http.MethodGet, "/api/bills"},
 		{http.MethodGet, "/api/transactions/1"},
 		{http.MethodPut, "/api/transactions/1"},
 		{http.MethodDelete, "/api/transactions/1"},
@@ -60,6 +61,7 @@ func TestSetRoutesRegistersExpectedEndpoints(t *testing.T) {
 		{http.MethodPost, "/api/planning/envelopes"},
 		{http.MethodPut, "/api/planning/envelopes/1"},
 		{http.MethodDelete, "/api/planning/envelopes/1"},
+		{http.MethodPost, "/api/scheduled-flows/1/occurrences"},
 		{http.MethodGet, "/api/trends/spending"},
 
 		{http.MethodGet, "/api/investments"},

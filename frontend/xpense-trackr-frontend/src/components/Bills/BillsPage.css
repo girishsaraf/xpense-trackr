@@ -1,0 +1,130 @@
+.bills-page .ledger-heading {
+    margin-bottom: 1.25rem;
+}
+
+.bills-explainer {
+    max-width: 860px;
+    margin: 0 0 1.25rem;
+    padding: 0.85rem 1rem;
+    border-left: 3px solid #65a69a;
+    background: #f1f8f6;
+    color: #435b65;
+    line-height: 1.5;
+}
+
+.bills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+    gap: 1rem;
+}
+
+.bills-card {
+    display: grid;
+    align-content: start;
+    gap: 0.9rem;
+    padding: 1.2rem;
+    border: 1px solid #dfe8e8;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 8px 26px rgb(21 55 68 / 5%);
+}
+
+.bills-card-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.bills-card h2 {
+    margin: 0 0 0.3rem;
+    color: #172a3a;
+    font-size: 1.1rem;
+}
+
+.bills-card p {
+    margin: 0;
+    color: #607181;
+}
+
+.bill-status {
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    background: #edf2f4;
+    color: #455867;
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.bill-due-soon {
+    background: #fff1d2;
+    color: #79500a;
+}
+
+.bill-overdue {
+    background: #ffebe8;
+    color: #8d3029;
+}
+
+.bill-price-change {
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: #f0f7ff;
+    color: #294d6b;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.bill-actual-amount {
+    display: grid;
+    gap: 0.4rem;
+    color: #425667;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.bill-actual-amount input {
+    min-height: 42px;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #cbd8dc;
+    border-radius: 8px;
+    color: #172a3a;
+    font: inherit;
+}
+
+.bill-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+}
+
+.bill-skip-button {
+    min-height: 42px;
+    padding: 0.6rem 0.85rem;
+    border: 1px solid #cbd8dc;
+    border-radius: 8px;
+    background: #fff;
+    color: #465b69;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 650;
+}
+
+.bill-skip-button:hover {
+    background: #f3f7f7;
+}
+
+@media (max-width: 520px) {
+    .bills-card-heading {
+        flex-direction: column;
+    }
+
+    .bill-actions {
+        flex-direction: column;
+    }
+
+    .bill-actions button {
+        width: 100%;
+    }
+}

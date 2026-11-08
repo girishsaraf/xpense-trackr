@@ -11,6 +11,7 @@ const localDate = (date = new Date()) => (
 
 const ForecastPage = () => {
     const [accounts, setAccounts] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [flows, setFlows] = useState([]);
     const [forecast, setForecast] = useState(null);
     const [days, setDays] = useState(90);
@@ -21,20 +22,24 @@ const ForecastPage = () => {
         accountId: '',
         label: '',
         type: 'expense',
+        categoryId: '',
         amount: '',
         frequency: 'monthly',
         nextDate: localDate(new Date(Date.now() + 86400000)),
+        reminderDays: 3,
     });
 
     const refresh = useCallback(async () => {
         setError('');
         try {
-            const [accountResponse, flowResponse, forecastResponse] = await Promise.all([
+            const [accountResponse, categoryResponse, flowResponse, forecastResponse] = await Promise.all([
                 axios.get(`${backendUrl}/api/accounts`),
+                axios.get(`${backendUrl}/api/categories`),
                 axios.get(`${backendUrl}/api/scheduled-flows`),
                 axios.get(`${backendUrl}/api/forecast/cashflow?days=${days}`),
             ]);
             setAccounts(accountResponse.data || []);
+            setCategories(categoryResponse.data || []);
             setFlows(flowResponse.data || []);
             setForecast(forecastResponse.data);
         } catch (requestError) {
@@ -65,10 +70,12 @@ const ForecastPage = () => {
                 account_id: selectedAccount.id,
                 label: form.label.trim(),
                 type: form.type,
+                category_id: form.type === 'expense' && form.categoryId ? Number(form.categoryId) : null,
                 amount_minor: amountMinor,
                 currency: selectedAccount.currency,
                 frequency: form.frequency,
                 next_date: form.nextDate,
+                reminder_days: Number(form.reminderDays),
                 enabled: true,
             });
             setForm((current) => ({ ...current, label: '', amount: '' }));
@@ -163,11 +170,20 @@ const ForecastPage = () => {
                         </label>
                         <label>
                             Type
-                            <select value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value })}>
+                            <select value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value, categoryId: '' })}>
                                 <option value="expense">Bill or expense</option>
                                 <option value="income">Expected income</option>
                             </select>
                         </label>
+                        {form.type === 'expense' && (
+                            <label>
+                                Category
+                                <select value={form.categoryId} onChange={(event) => setForm({ ...form, categoryId: event.target.value })}>
+                                    <option value="">Uncategorized</option>
+                                    {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+                                </select>
+                            </label>
+                        )}
                         <label>
                             Name
                             <input value={form.label} onChange={(event) => setForm({ ...form, label: event.target.value })} maxLength="180" required />
@@ -189,6 +205,10 @@ const ForecastPage = () => {
                         <label>
                             Next date
                             <input type="date" value={form.nextDate} onChange={(event) => setForm({ ...form, nextDate: event.target.value })} required />
+                        </label>
+                        <label>
+                            Reminder days before
+                            <input type="number" min="0" max="30" value={form.reminderDays} onChange={(event) => setForm({ ...form, reminderDays: event.target.value })} />
                         </label>
                         <button type="submit" className="ledger-primary-button" disabled={accounts.length === 0}>Add to forecast</button>
                     </form>
@@ -229,7 +249,7 @@ const ForecastPage = () => {
                             <li key={flow.id}>
                                 <span>
                                     <strong>{flow.label}</strong>
-                                    <small>{flow.frequency} · next on {flow.next_date} · {accounts.find((account) => account.id === flow.account_id)?.name || 'Account'}</small>
+                                    <small>{flow.frequency} · next on {flow.next_date} · {accounts.find((account) => account.id === flow.account_id)?.name || 'Account'} · {flow.reminder_days} day reminder</small>
                                 </span>
                                 <button type="button" onClick={() => deleteFlow(flow.id)} aria-label={`Remove ${flow.label}`}>
                                     Remove

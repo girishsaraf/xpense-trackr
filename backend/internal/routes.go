@@ -44,6 +44,8 @@ func SetRoutes(router *mux.Router) {
 	scheduledFlowRouter.HandleFunc("", ledger.CreateScheduledFlowHandler).Methods("POST")
 	scheduledFlowRouter.HandleFunc("/{id:[0-9]+}", ledger.UpdateScheduledFlowHandler).Methods("PUT")
 	scheduledFlowRouter.HandleFunc("/{id:[0-9]+}", ledger.DeleteScheduledFlowHandler).Methods("DELETE")
+	scheduledFlowRouter.HandleFunc("/{id:[0-9]+}/occurrences", ledger.ProcessScheduledOccurrenceHandler).Methods("POST")
+	router.HandleFunc("/api/bills", ledger.GetBillsHandler).Methods("GET")
 	router.HandleFunc("/api/forecast/cashflow", ledger.CashflowForecastHandler).Methods("GET")
 	router.HandleFunc("/api/reports/cashflow", ledger.CashflowReportHandler).Methods("GET")
 	router.HandleFunc("/api/reports/cashflow.csv", ledger.CashflowCSVHandler).Methods("GET")

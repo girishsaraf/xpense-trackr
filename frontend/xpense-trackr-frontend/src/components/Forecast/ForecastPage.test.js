@@ -10,6 +10,7 @@ jest.mock('axios');
 const accounts = [
     { id: 1, name: 'Checking', type: 'checking', currency: 'USD', balance_minor: 12500 },
 ];
+const categories = [{ id: 2, name: 'Housing' }];
 const forecast = {
     start_date: '2026-01-01',
     end_date: '2026-04-01',
@@ -29,6 +30,7 @@ beforeEach(() => {
     jest.clearAllMocks();
     axios.get.mockImplementation((url) => {
         if (url.endsWith('/api/accounts')) return Promise.resolve({ data: accounts });
+        if (url.endsWith('/api/categories')) return Promise.resolve({ data: categories });
         if (url.endsWith('/api/scheduled-flows')) return Promise.resolve({ data: [] });
         if (url.includes('/api/forecast/cashflow')) return Promise.resolve({ data: forecast });
         return Promise.reject(new Error(`Unexpected GET ${url}`));
@@ -42,6 +44,7 @@ test('creates an expected bill in the cashflow forecast', async () => {
     expect(await screen.findByRole('heading', { name: 'Checking' })).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText('Account'), { target: { value: '1' } });
     fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Rent' } });
+    fireEvent.change(screen.getByLabelText('Category'), { target: { value: '2' } });
     fireEvent.change(screen.getByLabelText('Amount (USD)'), { target: { value: '850.25' } });
     fireEvent.change(screen.getByLabelText('Next date'), { target: { value: '2026-01-15' } });
     fireEvent.click(screen.getByRole('button', { name: 'Add to forecast' }));
@@ -53,10 +56,12 @@ test('creates an expected bill in the cashflow forecast', async () => {
                 account_id: 1,
                 label: 'Rent',
                 type: 'expense',
+                category_id: 2,
                 amount_minor: 85025,
                 currency: 'USD',
                 frequency: 'monthly',
                 next_date: '2026-01-15',
+                reminder_days: 3,
             }),
         );
     });

@@ -86,6 +86,13 @@ var schemaMigrations = []migration{
 			return tx.AutoMigrate(&planning.Goal{}, &planning.GoalContribution{}, &planning.Envelope{})
 		},
 	},
+	{
+		version: 8,
+		name:    "bill-occurrences-and-reminders",
+		apply: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&ledger.ScheduledFlow{}, &ledger.ScheduledOccurrence{})
+		},
+	},
 }
 
 func (schemaMigration) TableName() string {
