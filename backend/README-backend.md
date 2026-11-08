@@ -34,6 +34,9 @@ The JSON report validates categories, expenses, budgets, goals, investments, and
 - `GET /api/reports/cashflow.csv`: Download the cash-flow report as CSV.
 - `GET /api/net-worth`: Summarize account balances as of today, separated by currency without assuming foreign-exchange rates.
 - `GET /api/net-worth/history?months=12`: Return month-end account-balance history for up to 36 months; current month ends at today. Balances include each account's opening balance from its creation date and dated ledger activity, with no currency conversion.
+- `GET|POST /api/assets`: List or create a manually valued asset/liability. Creation requires `name`, `kind` (`asset` or `liability`), `currency`, `value_minor`, `date`, and optional valuation `source`.
+- `PUT|DELETE /api/assets/{id}`: Rename/reclassify or delete a manual balance-sheet item; deletion also removes its valuation history.
+- `GET|POST /api/assets/{id}/valuations`: List or append dated non-negative values with a source label. Values affect current and historical net worth only on or after their valuation date.
 - `GET|POST /api/planning/goals`: Manage exact-minor-unit savings goals. Goal progress is calculated from contribution history.
 - `GET|POST /api/planning/goals/{id}/contributions`: List or add a dated contribution/withdrawal; withdrawals cannot exceed the recorded goal balance.
 - `GET /api/planning/envelopes?period=YYYY-MM`: View category spending, available amount, and carryover for a month.
@@ -41,7 +44,7 @@ The JSON report validates categories, expenses, budgets, goals, investments, and
 - `GET|POST /api/receipts`: List receipts or upload multipart fields `transaction_id` and `file`; uploads allow PDF, PNG, and JPEG up to 10 MB.
 - `GET /api/receipts/{id}/file`, `DELETE /api/receipts/{id}`: Download or delete a receipt attachment.
 
-Currencies are currently limited to the supported set shown in the account form, with 0-, 2-, or 3-digit minor-unit precision handled explicitly. Cross-currency transfers and exchange-rate conversion are not yet supported. Net-worth history is derived from ledger balances; historical asset valuations, securities holdings, and live market prices are not provided. Legacy investment records remain contribution history and are not represented as current holdings.
+Currencies are currently limited to the supported set shown in the account form, with 0-, 2-, or 3-digit minor-unit precision handled explicitly. Cross-currency transfers and exchange-rate conversion are not yet supported. Net-worth history combines dated account balances and manual asset/liability valuations; securities holdings and live market prices are not provided. Legacy investment records remain contribution history and are not represented as current holdings.
 
 Receipt metadata is stored in SQLite/MySQL; receipt content is stored in `APP_DATA_DIR/receipts` (default `./data/receipts`). The backup CLI includes both automatically for SQLite.
 

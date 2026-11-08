@@ -38,6 +38,16 @@ type NetWorthCurrency struct {
 	LiabilitiesMinor int64             `json:"liabilities_minor"`
 	NetWorthMinor    int64             `json:"net_worth_minor"`
 	Accounts         []NetWorthAccount `json:"accounts"`
+	ManualItems      []NetWorthItem    `json:"manual_items"`
+}
+
+type NetWorthItem struct {
+	AssetID    uint   `json:"asset_id"`
+	Name       string `json:"name"`
+	Kind       string `json:"kind"`
+	ValueMinor int64  `json:"value_minor"`
+	AsOf       string `json:"as_of"`
+	Source     string `json:"source"`
 }
 
 type NetWorthReport struct {
@@ -139,7 +149,7 @@ func GetNetWorthReport(asOf time.Time) (*NetWorthReport, error) {
 			index = len(report.Currencies)
 			byCurrency[account.Currency] = index
 			report.Currencies = append(report.Currencies, NetWorthCurrency{
-				Currency: account.Currency, Accounts: make([]NetWorthAccount, 0),
+				Currency: account.Currency, Accounts: make([]NetWorthAccount, 0), ManualItems: make([]NetWorthItem, 0),
 			})
 		}
 		balance := account.BalanceMinor
@@ -152,6 +162,35 @@ func GetNetWorthReport(asOf time.Time) (*NetWorthReport, error) {
 		}
 		currencyReport.Accounts = append(currencyReport.Accounts, NetWorthAccount{
 			AccountID: account.ID, Name: account.Name, Type: account.Type, BalanceMinor: balance,
+		})
+	}
+	manualAssets, err := GetManualAssetsAt(report.AsOf)
+	if err != nil {
+		return nil, err
+	}
+	for _, asset := range manualAssets {
+		if !asset.HasValuation {
+			continue
+		}
+		index, found := byCurrency[asset.Currency]
+		if !found {
+			index = len(report.Currencies)
+			byCurrency[asset.Currency] = index
+			report.Currencies = append(report.Currencies, NetWorthCurrency{
+				Currency: asset.Currency, Accounts: make([]NetWorthAccount, 0), ManualItems: make([]NetWorthItem, 0),
+			})
+		}
+		currencyReport := &report.Currencies[index]
+		if asset.Kind == "asset" {
+			currencyReport.AssetsMinor += asset.LatestValueMinor
+			currencyReport.NetWorthMinor += asset.LatestValueMinor
+		} else {
+			currencyReport.LiabilitiesMinor += asset.LatestValueMinor
+			currencyReport.NetWorthMinor -= asset.LatestValueMinor
+		}
+		currencyReport.ManualItems = append(currencyReport.ManualItems, NetWorthItem{
+			AssetID: asset.ID, Name: asset.Name, Kind: asset.Kind, ValueMinor: asset.LatestValueMinor,
+			AsOf: asset.ValuationDate, Source: asset.ValuationSource,
 		})
 	}
 	sort.Slice(report.Currencies, func(i, j int) bool {

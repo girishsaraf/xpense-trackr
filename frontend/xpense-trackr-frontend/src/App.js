@@ -28,6 +28,7 @@ import ImportExportPage from "./components/ImportExport/ImportExportPage";
 import PlanningPage from "./components/Planning/PlanningPage";
 import BillsPage from "./components/Bills/BillsPage";
 import OfflineNotice from "./components/Common/OfflineNotice";
+import AssetsPage from "./components/Assets/AssetsPage";
 
 function App() {
     return (
@@ -48,6 +49,7 @@ function App() {
                             <li><NavLink to="/transactions" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Transactions</NavLink></li>
                             <li><NavLink to="/forecast" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Cash flow</NavLink></li>
                             <li><NavLink to="/bills" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Bills</NavLink></li>
+                            <li><NavLink to="/assets" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Assets</NavLink></li>
                             <li><NavLink to="/receipts" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Receipts</NavLink></li>
                             <li><NavLink to="/reports" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Reports</NavLink></li>
                             <li><NavLink to="/import-export" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Import / export</NavLink></li>
@@ -69,6 +71,7 @@ function App() {
                     <Route path="/transactions" element={<LedgerPage/>}/>
                     <Route path="/forecast" element={<ForecastPage/>}/>
                     <Route path="/bills" element={<BillsPage/>}/>
+                    <Route path="/assets" element={<AssetsPage/>}/>
                     <Route path="/receipts" element={<ReceiptPage/>}/>
                     <Route path="/reports" element={<ReportsPage/>}/>
                     <Route path="/import-export" element={<ImportExportPage/>}/>

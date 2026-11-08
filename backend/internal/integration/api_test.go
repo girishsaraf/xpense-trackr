@@ -61,6 +61,8 @@ func setupIntegrationDB(t *testing.T) (*gorm.DB, http.Handler) {
 		&ledger.CategoryRule{},
 		&ledger.ScheduledFlow{},
 		&ledger.ScheduledOccurrence{},
+		&ledger.ManualAsset{},
+		&ledger.AssetValuation{},
 		&planning.Goal{},
 		&planning.GoalContribution{},
 		&planning.Envelope{},
@@ -371,6 +373,58 @@ func TestScheduledCashflowAPI(t *testing.T) {
 	}
 	if invalidDays := apiRequest(t, handler, http.MethodGet, "/api/forecast/cashflow?days=500", nil); invalidDays.Code != http.StatusBadRequest {
 		t.Errorf("invalid forecast range status = %d, want %d", invalidDays.Code, http.StatusBadRequest)
+	}
+}
+
+func TestManualAssetValuationsContributeToNetWorth(t *testing.T) {
+	_, handler := setupIntegrationDB(t)
+	today := time.Now().UTC().Format("2006-01-02")
+	houseResponse := apiRequest(t, handler, http.MethodPost, "/api/assets", map[string]interface{}{
+		"name": "Home", "kind": "asset", "currency": "USD",
+		"value_minor": 250000, "date": today, "source": "county estimate",
+	})
+	if houseResponse.Code != http.StatusCreated {
+		t.Fatalf("create manual asset status = %d: %s", houseResponse.Code, houseResponse.Body)
+	}
+	house := decodeResponse[ledger.ManualAsset](t, houseResponse)
+	if !house.HasValuation || house.LatestValueMinor != 250000 || house.ValuationSource != "county estimate" {
+		t.Fatalf("created asset = %+v", house)
+	}
+	loanResponse := apiRequest(t, handler, http.MethodPost, "/api/assets", map[string]interface{}{
+		"name": "Mortgage", "kind": "liability", "currency": "USD",
+		"value_minor": 150000, "date": today, "source": "lender statement",
+	})
+	if loanResponse.Code != http.StatusCreated {
+		t.Fatalf("create manual liability status = %d: %s", loanResponse.Code, loanResponse.Body)
+	}
+
+	netWorthResponse := apiRequest(t, handler, http.MethodGet, "/api/net-worth", nil)
+	netWorth := decodeResponse[ledger.NetWorthReport](t, netWorthResponse)
+	if netWorthResponse.Code != http.StatusOK || len(netWorth.Currencies) != 1 ||
+		netWorth.Currencies[0].AssetsMinor != 250000 ||
+		netWorth.Currencies[0].LiabilitiesMinor != 150000 ||
+		netWorth.Currencies[0].NetWorthMinor != 100000 ||
+		len(netWorth.Currencies[0].ManualItems) != 2 {
+		t.Fatalf("net worth with manual valuations = %+v, status %d", netWorth, netWorthResponse.Code)
+	}
+
+	valuationResponse := apiRequest(t, handler, http.MethodPost,
+		fmt.Sprintf("/api/assets/%d/valuations", house.ID),
+		map[string]interface{}{"value_minor": 300000, "date": today, "source": "manual appraisal"},
+	)
+	if valuationResponse.Code != http.StatusCreated {
+		t.Fatalf("add valuation status = %d: %s", valuationResponse.Code, valuationResponse.Body)
+	}
+	historyResponse := apiRequest(t, handler, http.MethodGet, fmt.Sprintf("/api/assets/%d/valuations", house.ID), nil)
+	valuations := decodeResponse[[]ledger.AssetValuation](t, historyResponse)
+	if historyResponse.Code != http.StatusOK || len(valuations) != 2 || valuations[0].Source != "manual appraisal" {
+		t.Fatalf("asset valuation history = %+v, status %d", valuations, historyResponse.Code)
+	}
+	if invalid := apiRequest(t, handler, http.MethodPost,
+		fmt.Sprintf("/api/assets/%d/valuations", house.ID),
+		map[string]interface{}{"value_minor": -1, "date": today, "source": "invalid"},
+	); invalid.Code != http.StatusBadRequest {
+		t.Errorf("negative valuation status = %d, want %d", invalid.Code, http.StatusBadRequest)
 	}
 }
 

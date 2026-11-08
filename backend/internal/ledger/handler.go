@@ -350,6 +350,88 @@ func NetWorthHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, report)
 }
 
+func GetManualAssetsHandler(w http.ResponseWriter, _ *http.Request) {
+	assets, err := GetManualAssets()
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, assets)
+}
+
+func CreateManualAssetHandler(w http.ResponseWriter, r *http.Request) {
+	var request CreateManualAssetRequest
+	if err := decodeRequest(r, &request); err != nil {
+		http.Error(w, "Invalid asset payload", http.StatusBadRequest)
+		return
+	}
+	asset, err := CreateManualAsset(request)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusCreated, asset)
+}
+
+func UpdateManualAssetHandler(w http.ResponseWriter, r *http.Request) {
+	id, ok := transactionID(w, r)
+	if !ok {
+		return
+	}
+	var request UpdateManualAssetRequest
+	if err := decodeRequest(r, &request); err != nil {
+		http.Error(w, "Invalid asset payload", http.StatusBadRequest)
+		return
+	}
+	if err := UpdateManualAsset(uint(id), request); err != nil {
+		writeError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func DeleteManualAssetHandler(w http.ResponseWriter, r *http.Request) {
+	id, ok := transactionID(w, r)
+	if !ok {
+		return
+	}
+	if err := DeleteManualAsset(uint(id)); err != nil {
+		writeError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func GetAssetValuationsHandler(w http.ResponseWriter, r *http.Request) {
+	id, ok := transactionID(w, r)
+	if !ok {
+		return
+	}
+	valuations, err := GetManualAssetValuations(uint(id))
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, valuations)
+}
+
+func CreateAssetValuationHandler(w http.ResponseWriter, r *http.Request) {
+	id, ok := transactionID(w, r)
+	if !ok {
+		return
+	}
+	var valuation AssetValuation
+	if err := decodeRequest(r, &valuation); err != nil {
+		http.Error(w, "Invalid asset valuation payload", http.StatusBadRequest)
+		return
+	}
+	if err := CreateAssetValuation(uint(id), &valuation); err != nil {
+		writeError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusCreated, valuation)
+}
+
 func ExportTransactionsCSVHandler(w http.ResponseWriter, _ *http.Request) {
 	transactions := make([]Transaction, 0)
 	if err := db.Order("date ASC, id ASC").Find(&transactions).Error; err != nil {
@@ -472,10 +554,11 @@ func writeError(w http.ResponseWriter, err error) {
 	switch {
 	case errors.Is(err, ErrInvalidAccount), errors.Is(err, ErrInvalidTxn),
 		errors.Is(err, ErrInvalidTransfer), errors.Is(err, ErrInvalidTxnTarget),
-		errors.Is(err, ErrInvalidRule), errors.Is(err, ErrInvalidSchedule), errors.Is(err, ErrInvalidCSV):
+		errors.Is(err, ErrInvalidRule), errors.Is(err, ErrInvalidSchedule), errors.Is(err, ErrInvalidCSV),
+		errors.Is(err, ErrInvalidManualAsset):
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	case errors.Is(err, gorm.ErrRecordNotFound):
-		http.Error(w, "Account, category, or transaction not found", http.StatusNotFound)
+		http.Error(w, "Requested finance record not found", http.StatusNotFound)
 	default:
 		log.Printf("ledger request failed: %v", err)
 		http.Error(w, "Unable to complete ledger request", http.StatusInternalServerError)

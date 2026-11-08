@@ -142,6 +142,12 @@ const ReportsPage = () => {
                                             <strong>{formatAmountMinor(account.balance_minor, currency.currency)}</strong>
                                         </li>
                                     ))}
+                                    {currency.manual_items?.map((item) => (
+                                        <li key={`manual-${item.asset_id}`}>
+                                            <span>{item.name} <small>{item.kind} · {item.as_of} · {item.source}</small></span>
+                                            <strong>{formatAmountMinor(item.value_minor, currency.currency)}</strong>
+                                        </li>
+                                    ))}
                                 </ul>
                             </article>
                         ))}

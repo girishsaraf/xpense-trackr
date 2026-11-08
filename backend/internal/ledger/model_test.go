@@ -12,7 +12,10 @@ import (
 
 func setupLedgerDB(t *testing.T) *gorm.DB {
 	t.Helper()
-	database := testutil.NewDB(t, &Account{}, &Transaction{}, &CategoryRule{}, &ScheduledFlow{}, &ScheduledOccurrence{}, &category.Category{})
+	database := testutil.NewDB(
+		t, &Account{}, &Transaction{}, &CategoryRule{}, &ScheduledFlow{}, &ScheduledOccurrence{},
+		&ManualAsset{}, &AssetValuation{}, &category.Category{},
+	)
 	SetDB(database)
 	return database
 }
@@ -303,6 +306,21 @@ func TestCashflowAndNetWorthReportsRemainCurrencyAware(t *testing.T) {
 			t.Fatalf("create fixture: %v", err)
 		}
 	}
+	property := &ManualAsset{Name: "Home", Kind: "asset", Currency: "USD", CreatedAt: createdAt}
+	mortgage := &ManualAsset{Name: "Mortgage", Kind: "liability", Currency: "USD", CreatedAt: createdAt}
+	for _, record := range []interface{}{property, mortgage} {
+		if err := database.Create(record).Error; err != nil {
+			t.Fatalf("create manual net-worth item: %v", err)
+		}
+	}
+	for _, valuation := range []AssetValuation{
+		{AssetID: property.ID, ValueMinor: 20000, Date: "2026-10-01", Source: "appraisal"},
+		{AssetID: mortgage.ID, ValueMinor: 10000, Date: "2026-10-01", Source: "statement"},
+	} {
+		if err := database.Create(&valuation).Error; err != nil {
+			t.Fatalf("create manual valuation: %v", err)
+		}
+	}
 	categoryID := food.ID
 	for _, transaction := range []Transaction{
 		{AccountID: checking.ID, Type: "income", AmountMinor: 5000, Currency: "USD", Date: "2026-10-12"},
@@ -331,23 +349,29 @@ func TestCashflowAndNetWorthReportsRemainCurrencyAware(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetNetWorthReport() error = %v", err)
 	}
-	if len(netWorth.Currencies) != 1 || netWorth.Currencies[0].AssetsMinor != 13400 ||
-		netWorth.Currencies[0].LiabilitiesMinor != 1900 || netWorth.Currencies[0].NetWorthMinor != 11500 {
-		t.Errorf("net worth report = %+v, want USD assets 13400, liabilities 1900, net 11500", netWorth)
+	if len(netWorth.Currencies) != 1 || netWorth.Currencies[0].AssetsMinor != 33400 ||
+		netWorth.Currencies[0].LiabilitiesMinor != 11900 || netWorth.Currencies[0].NetWorthMinor != 21500 ||
+		len(netWorth.Currencies[0].ManualItems) != 2 {
+		t.Errorf("net worth report = %+v, want USD assets 33400, liabilities 11900, net 21500", netWorth)
 	}
 	if err := CreateTransaction(&Transaction{
 		AccountID: checking.ID, Type: "expense", AmountMinor: 100, Currency: "USD", Date: "2026-11-01",
 	}); err != nil {
 		t.Fatalf("create later transaction: %v", err)
 	}
+	if err := CreateAssetValuation(property.ID, &AssetValuation{
+		ValueMinor: 23000, Date: "2026-11-03", Source: "manual update",
+	}); err != nil {
+		t.Fatalf("create later asset valuation: %v", err)
+	}
 	history, err := GetNetWorthHistory(2, time.Date(2026, 11, 8, 12, 0, 0, 0, time.UTC))
 	if err != nil {
 		t.Fatalf("GetNetWorthHistory() error = %v", err)
 	}
 	if len(history.Entries) != 2 || history.Entries[0].AsOf != "2026-10-31" ||
-		history.Entries[0].Currencies[0].NetWorthMinor != 11500 ||
-		history.Entries[1].Currencies[0].NetWorthMinor != 11400 {
-		t.Errorf("net worth history = %+v, want 2026-10-31 at 11500 and current at 11400", history)
+		history.Entries[0].Currencies[0].NetWorthMinor != 21500 ||
+		history.Entries[1].Currencies[0].NetWorthMinor != 24400 {
+		t.Errorf("net worth history = %+v, want 2026-10-31 at 21500 and current at 24400", history)
 	}
 	if _, err := GetNetWorthHistory(37, time.Now()); !errors.Is(err, ErrInvalidTxn) {
 		t.Errorf("invalid history range error = %v, want %v", err, ErrInvalidTxn)

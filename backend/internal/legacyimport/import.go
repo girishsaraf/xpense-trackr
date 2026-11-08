@@ -244,7 +244,8 @@ func ensureDestinationReady(destination *gorm.DB, sourceName string) error {
 	for _, model := range []interface{}{
 		&category.Category{}, &expense.Expense{}, &budget.Budget{}, &goal.Goal{},
 		&investments.Investment{}, &recurring.RecurringExpense{}, &recurring.RecurringInvestment{},
-		&ledger.Account{}, &ledger.Transaction{}, &planning.Goal{}, &planning.Envelope{},
+		&ledger.Account{}, &ledger.Transaction{}, &ledger.ManualAsset{}, &ledger.AssetValuation{},
+		&planning.Goal{}, &planning.Envelope{},
 	} {
 		var count int64
 		if !destination.Migrator().HasTable(model) {

@@ -101,6 +101,13 @@ var schemaMigrations = []migration{
 			return tx.AutoMigrate(&legacyimport.ImportRecord{})
 		},
 	},
+	{
+		version: 10,
+		name:    "manual-assets-and-valuations",
+		apply: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&ledger.ManualAsset{}, &ledger.AssetValuation{})
+		},
+	},
 }
 
 func (schemaMigration) TableName() string {

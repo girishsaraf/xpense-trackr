@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import backendUrl from '../../config';
 import { formatAmountMinor, parseAmountMinor } from '../../utils/money';
+import { supportedCurrencies } from '../../utils/currencies';
 import './LedgerPage.css';
 
 const accountTypes = [
@@ -11,13 +12,6 @@ const accountTypes = [
     ['credit_card', 'Credit card'],
     ['investment', 'Investment'],
     ['loan', 'Loan'],
-];
-
-const currencies = [
-    'AED', 'AUD', 'BHD', 'BRL', 'CAD', 'CHF', 'CLP', 'CNY', 'DKK', 'EUR',
-    'GBP', 'HKD', 'IDR', 'INR', 'IQD', 'ISK', 'JPY', 'JOD', 'KRW', 'KWD',
-    'MXN', 'MYR', 'NOK', 'NZD', 'OMR', 'PHP', 'PLN', 'SAR', 'SEK', 'SGD',
-    'THB', 'TND', 'TRY', 'USD', 'VND', 'ZAR',
 ];
 
 const localDate = () => {
@@ -264,7 +258,7 @@ const LedgerPage = () => {
                                 value={accountForm.currency}
                                 onChange={(event) => setAccountForm({ ...accountForm, currency: event.target.value })}
                             >
-                                {currencies.map((currency) => <option key={currency} value={currency}>{currency}</option>)}
+                                {supportedCurrencies.map((currency) => <option key={currency} value={currency}>{currency}</option>)}
                             </select>
                         </label>
                         <label>

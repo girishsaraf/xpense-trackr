@@ -1,0 +1,91 @@
+.asset-form,
+.asset-valuation-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    align-items: end;
+    gap: 12px;
+}
+
+.asset-form label,
+.asset-valuation-form label {
+    display: grid;
+    gap: 6px;
+    color: #44536c;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.asset-form input,
+.asset-form select,
+.asset-valuation-form input {
+    min-height: 42px;
+    padding: 8px 10px;
+    border: 1px solid #cbd5e2;
+    border-radius: 8px;
+    color: #17243b;
+    font: inherit;
+}
+
+.asset-list {
+    display: grid;
+    gap: 14px;
+}
+
+.asset-card-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.asset-card-heading h3 {
+    margin: 4px 0;
+}
+
+.asset-card-heading p {
+    margin: 0;
+    color: #66748b;
+    font-size: .9rem;
+}
+
+.asset-card-heading > strong {
+    font-size: 1.15rem;
+}
+
+.asset-kind {
+    display: inline-block;
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.asset-kind-asset {
+    color: #187347;
+}
+
+.asset-kind-liability {
+    color: #ad3b3b;
+}
+
+.asset-valuation-form {
+    padding-top: 14px;
+    border-top: 1px solid #edf0f5;
+}
+
+.asset-delete-button {
+    margin-top: 12px;
+    padding: 7px 0;
+    border: 0;
+    background: transparent;
+    color: #ad3b3b;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .asset-card-heading {
+        flex-direction: column;
+    }
+}
