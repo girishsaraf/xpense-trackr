@@ -24,6 +24,23 @@ beforeEach(() => {
                 },
             });
         }
+        if (url.includes('/api/reports/insights')) {
+            return Promise.resolve({
+                data: {
+                    previous_from: '2026-09-01',
+                    previous_to: '2026-09-30',
+                    insights: [{
+                        kind: 'spending_change',
+                        title: 'Spending increased by 25% in USD',
+                        explanation: 'Recorded spending changed between periods.',
+                        currency: 'USD',
+                        current_amount_minor: 1250,
+                        previous_amount_minor: 1000,
+                        change_percent: 25,
+                    }],
+                },
+            });
+        }
         if (url.endsWith('/api/net-worth')) {
             return Promise.resolve({
                 data: {
@@ -63,6 +80,9 @@ test('shows cashflow totals and currency-separated net worth', async () => {
     renderWithRouter(<ReportsPage />, { route: '/reports', path: '/reports' });
 
     expect(await screen.findByRole('heading', { name: 'USD cash flow' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Spending insights' })).toBeInTheDocument();
+    expect(screen.getByText('Spending increased by 25% in USD')).toBeInTheDocument();
+    expect(screen.getByText(/Compared with 2026-09-01 to 2026-09-30/)).toBeInTheDocument();
     expect(screen.getByText('Uncategorized')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Net worth by currency' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Net worth over time' })).toBeInTheDocument();

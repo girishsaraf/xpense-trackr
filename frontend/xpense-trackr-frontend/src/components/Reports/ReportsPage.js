@@ -16,6 +16,7 @@ const ReportsPage = () => {
         to: dateText(now),
     });
     const [report, setReport] = useState(null);
+    const [insights, setInsights] = useState(null);
     const [netWorth, setNetWorth] = useState(null);
     const [netWorthHistory, setNetWorthHistory] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -25,12 +26,14 @@ const ReportsPage = () => {
         setError('');
         try {
             const query = `from=${encodeURIComponent(range.from)}&to=${encodeURIComponent(range.to)}`;
-            const [cashflowResponse, netWorthResponse, historyResponse] = await Promise.all([
+            const [cashflowResponse, insightsResponse, netWorthResponse, historyResponse] = await Promise.all([
                 axios.get(`${backendUrl}/api/reports/cashflow?${query}`),
+                axios.get(`${backendUrl}/api/reports/insights?${query}`),
                 axios.get(`${backendUrl}/api/net-worth`),
                 axios.get(`${backendUrl}/api/net-worth/history?months=12`),
             ]);
             setReport(cashflowResponse.data);
+            setInsights(insightsResponse.data);
             setNetWorth(netWorthResponse.data);
             setNetWorthHistory(historyResponse.data);
         } catch (requestError) {
@@ -61,6 +64,38 @@ const ReportsPage = () => {
             </header>
 
             {error && <p className="ledger-message ledger-error" role="alert">{error}</p>}
+
+            <section aria-labelledby="spending-insights-heading" className="ledger-section">
+                <div className="ledger-section-heading">
+                    <div>
+                        <p className="eyebrow">PERIOD COMPARISON</p>
+                        <h2 id="spending-insights-heading">Spending insights</h2>
+                    </div>
+                </div>
+                <p className="spending-insights-note">
+                    Compared with {insights?.previous_from} to {insights?.previous_to}. Amounts are analyzed separately by currency.
+                </p>
+                {!insights?.insights?.length ? (
+                    <p className="ledger-empty">No notable spending changes for this period.</p>
+                ) : (
+                    <ul className="spending-insights-list">
+                        {insights.insights.map((insight, index) => (
+                            <li className="ledger-panel" key={`${insight.kind}-${insight.currency}-${insight.category_name || 'total'}-${index}`}>
+                                <div className="spending-insight-heading">
+                                    <h3>{insight.title}</h3>
+                                    <span>{insight.currency}{insight.category_name ? ` · ${insight.category_name}` : ''}</span>
+                                </div>
+                                <p>{insight.explanation}</p>
+                                {insight.previous_amount_minor > 0 && (
+                                    <p className="spending-insight-amounts">
+                                        {formatAmountMinor(insight.previous_amount_minor, insight.currency)} → {formatAmountMinor(insight.current_amount_minor, insight.currency)}
+                                    </p>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </section>
 
             <section aria-labelledby="cashflow-report-heading" className="ledger-section">
                 <div className="ledger-section-heading">

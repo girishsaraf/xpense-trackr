@@ -100,9 +100,51 @@
     overflow-x: auto;
 }
 
+.spending-insights-note {
+    color: #66748b;
+}
+
+.spending-insights-list {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.spending-insights-list .ledger-panel {
+    padding: 16px;
+}
+
+.spending-insight-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.spending-insight-heading h3 {
+    margin: 0;
+}
+
+.spending-insight-heading span,
+.spending-insight-amounts {
+    color: #66748b;
+}
+
+.spending-insights-list p {
+    margin-bottom: 0;
+}
+
 @media (max-width: 600px) {
     .report-range-form {
         align-items: stretch;
         flex-direction: column;
+    }
+
+    .spending-insight-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
     }
 }

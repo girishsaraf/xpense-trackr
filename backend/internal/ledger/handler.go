@@ -327,6 +327,16 @@ func CashflowCSVHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func FinancialInsightsHandler(w http.ResponseWriter, r *http.Request) {
+	from, to := reportDateRange(r)
+	report, err := GetFinancialInsights(from, to)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, report)
+}
+
 func NetWorthHandler(w http.ResponseWriter, _ *http.Request) {
 	report, err := GetNetWorthReport(time.Now())
 	if err != nil {

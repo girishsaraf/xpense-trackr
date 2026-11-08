@@ -31,6 +31,7 @@ The JSON report validates categories, expenses, budgets, goals, investments, and
 - `POST /api/scheduled-flows/{id}/occurrences`: Confirm a scheduled occurrence with `scheduled_date` and `action` (`record` or `skip`). Recording accepts an optional `amount_minor`, writes one ledger transaction, and advances the schedule atomically; duplicate confirmations are idempotent.
 - `GET /api/forecast/cashflow?days=90`: Project account balances from scheduled items (1–365 days). Projections are estimates and never create actual transactions.
 - `GET /api/reports/cashflow?from=YYYY-MM-DD&to=YYYY-MM-DD`: Summarize bounded cash flow by currency and expense category; periods are limited to one year.
+- `GET /api/reports/insights?from=YYYY-MM-DD&to=YYYY-MM-DD`: Compare spending with the preceding equal-length period, returning only material total/category changes and never combining currencies.
 - `GET /api/reports/cashflow.csv`: Download the cash-flow report as CSV.
 - `GET /api/net-worth`: Summarize account balances as of today, separated by currency without assuming foreign-exchange rates.
 - `GET /api/net-worth/history?months=12`: Return month-end account-balance history for up to 36 months; current month ends at today. Balances include each account's opening balance from its creation date and dated ledger activity, with no currency conversion.
