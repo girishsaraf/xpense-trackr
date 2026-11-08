@@ -92,6 +92,14 @@
     color: #66748b;
 }
 
+.net-worth-history-note {
+    color: #66748b;
+}
+
+.net-worth-history-table-wrap {
+    overflow-x: auto;
+}
+
 @media (max-width: 600px) {
     .report-range-form {
         align-items: stretch;

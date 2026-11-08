@@ -336,6 +336,20 @@ func NetWorthHandler(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, report)
 }
 
+func NetWorthHistoryHandler(w http.ResponseWriter, r *http.Request) {
+	months, err := queryInt(r.URL.Query().Get("months"), 12)
+	if err != nil || months < 1 || months > 36 {
+		http.Error(w, "months must be between 1 and 36", http.StatusBadRequest)
+		return
+	}
+	report, err := GetNetWorthHistory(months, time.Now())
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, report)
+}
+
 func ExportTransactionsCSVHandler(w http.ResponseWriter, _ *http.Request) {
 	transactions := make([]Transaction, 0)
 	if err := db.Order("date ASC, id ASC").Find(&transactions).Error; err != nil {

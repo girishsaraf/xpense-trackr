@@ -45,6 +45,25 @@ type NetWorthReport struct {
 	Currencies []NetWorthCurrency `json:"currencies"`
 }
 
+type NetWorthHistoryEntry struct {
+	AsOf       string             `json:"as_of"`
+	Currencies []NetWorthCurrency `json:"currencies"`
+}
+
+type NetWorthHistoryReport struct {
+	Months  int                    `json:"months"`
+	Entries []NetWorthHistoryEntry `json:"entries"`
+}
+
+type netWorthAccountRow struct {
+	ID                  uint   `gorm:"column:id"`
+	Name                string `gorm:"column:name"`
+	Type                string `gorm:"column:account_type"`
+	Currency            string `gorm:"column:currency"`
+	OpeningBalanceMinor int64  `gorm:"column:opening_balance_minor"`
+	BalanceMinor        int64  `gorm:"column:balance_minor"`
+}
+
 type cashflowAggregateRow struct {
 	Currency     string `gorm:"column:currency"`
 	Type         string `gorm:"column:transaction_type"`
@@ -105,7 +124,8 @@ func GetCashflowReport(from, to string) (*CashflowReport, error) {
 }
 
 func GetNetWorthReport(asOf time.Time) (*NetWorthReport, error) {
-	accounts, err := GetAllAccounts()
+	asOf = asOf.UTC()
+	accounts, err := getAccountsAtDate(asOf.Format("2006-01-02"))
 	if err != nil {
 		return nil, err
 	}
@@ -138,4 +158,69 @@ func GetNetWorthReport(asOf time.Time) (*NetWorthReport, error) {
 		return report.Currencies[i].Currency < report.Currencies[j].Currency
 	})
 	return report, nil
+}
+
+func GetNetWorthHistory(months int, now time.Time) (*NetWorthHistoryReport, error) {
+	if months < 1 || months > 36 {
+		return nil, ErrInvalidTxn
+	}
+	now = now.UTC()
+	currentDate := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+	currentMonth := time.Date(currentDate.Year(), currentDate.Month(), 1, 0, 0, 0, 0, time.UTC)
+	firstMonth := currentMonth.AddDate(0, -(months - 1), 0)
+	report := &NetWorthHistoryReport{Months: months, Entries: make([]NetWorthHistoryEntry, 0, months)}
+	for index := 0; index < months-1; index++ {
+		month := firstMonth.AddDate(0, index, 0)
+		monthEnd := month.AddDate(0, 1, -1)
+		snapshot, err := GetNetWorthReport(monthEnd)
+		if err != nil {
+			return nil, err
+		}
+		report.Entries = append(report.Entries, NetWorthHistoryEntry{
+			AsOf: snapshot.AsOf, Currencies: snapshot.Currencies,
+		})
+	}
+	current, err := GetNetWorthReport(currentDate)
+	if err != nil {
+		return nil, err
+	}
+	report.Entries = append(report.Entries, NetWorthHistoryEntry{
+		AsOf: current.AsOf, Currencies: current.Currencies,
+	})
+	return report, nil
+}
+
+func getAccountsAtDate(asOf string) ([]Account, error) {
+	asOfDate, err := time.Parse("2006-01-02", asOf)
+	if err != nil {
+		return nil, ErrInvalidTxn
+	}
+	rows := make([]netWorthAccountRow, 0)
+	err = db.Table("accounts").
+		Select(`accounts.id, accounts.name, accounts.account_type, accounts.currency,
+			accounts.opening_balance_minor,
+			accounts.opening_balance_minor + COALESCE(SUM(CASE
+				WHEN ledger_transactions.transaction_type = 'income' AND ledger_transactions.account_id = accounts.id THEN ledger_transactions.amount_minor
+				WHEN ledger_transactions.transaction_type = 'expense' AND ledger_transactions.account_id = accounts.id THEN -ledger_transactions.amount_minor
+				WHEN ledger_transactions.transaction_type = 'transfer' AND ledger_transactions.account_id = accounts.id THEN -ledger_transactions.amount_minor
+				WHEN ledger_transactions.transaction_type = 'transfer' AND ledger_transactions.transfer_account_id = accounts.id THEN ledger_transactions.amount_minor
+				ELSE 0 END), 0) AS balance_minor`).
+		Joins(`LEFT JOIN ledger_transactions
+			ON (ledger_transactions.account_id = accounts.id OR ledger_transactions.transfer_account_id = accounts.id)
+			AND ledger_transactions.date <= ?`, asOf).
+		Where("accounts.created_at < ?", asOfDate.AddDate(0, 0, 1)).
+		Group("accounts.id").
+		Order("accounts.name ASC, accounts.id ASC").
+		Scan(&rows).Error
+	if err != nil {
+		return nil, err
+	}
+	accounts := make([]Account, 0, len(rows))
+	for _, row := range rows {
+		accounts = append(accounts, Account{
+			ID: row.ID, Name: row.Name, Type: row.Type, Currency: row.Currency,
+			OpeningBalanceMinor: row.OpeningBalanceMinor, BalanceMinor: row.BalanceMinor,
+		})
+	}
+	return accounts, nil
 }

@@ -92,7 +92,7 @@ The local source host address may differ outside Docker Desktop. The app must ha
 - Merchant categorization rules for new uncategorized transactions
 - Scheduled income and bills with daily balance projections; forecasts never write actual transactions
 - Bill reminders, exact-match price-change signals, and confirmable, idempotent payment/skip actions
-- Currency-separated cash-flow reports, CSV export, and local net-worth summaries
+- Currency-separated cash-flow reports, CSV export, and ledger-derived historical net worth
 - Savings-goal contributions with progress and monthly budget envelopes with optional rollover
 - CSV transaction import with row validation, duplicate detection, preview, and transactional commit
 - Local receipt attachments for PDF, PNG, and JPEG files (10 MB maximum)

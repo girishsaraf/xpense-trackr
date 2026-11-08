@@ -17,6 +17,7 @@ const ReportsPage = () => {
     });
     const [report, setReport] = useState(null);
     const [netWorth, setNetWorth] = useState(null);
+    const [netWorthHistory, setNetWorthHistory] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -24,12 +25,14 @@ const ReportsPage = () => {
         setError('');
         try {
             const query = `from=${encodeURIComponent(range.from)}&to=${encodeURIComponent(range.to)}`;
-            const [cashflowResponse, netWorthResponse] = await Promise.all([
+            const [cashflowResponse, netWorthResponse, historyResponse] = await Promise.all([
                 axios.get(`${backendUrl}/api/reports/cashflow?${query}`),
                 axios.get(`${backendUrl}/api/net-worth`),
+                axios.get(`${backendUrl}/api/net-worth/history?months=12`),
             ]);
             setReport(cashflowResponse.data);
             setNetWorth(netWorthResponse.data);
+            setNetWorthHistory(historyResponse.data);
         } catch (requestError) {
             setError(requestError.response?.data || 'Unable to load your reports.');
         } finally {
@@ -142,6 +145,36 @@ const ReportsPage = () => {
                                 </ul>
                             </article>
                         ))}
+                    </div>
+                )}
+            </section>
+
+            <section aria-labelledby="net-worth-history-heading" className="ledger-section">
+                <div className="ledger-section-heading">
+                    <div>
+                        <p className="eyebrow">LEDGER HISTORY</p>
+                        <h2 id="net-worth-history-heading">Net worth over time</h2>
+                    </div>
+                </div>
+                <p className="net-worth-history-note">Monthly balances include each account’s opening balance from its creation date and dated ledger activity. Currencies are not converted, and legacy investment entries are not market valuations.</p>
+                {!netWorthHistory?.entries?.some((entry) => entry.currencies.length > 0) ? (
+                    <p className="ledger-empty">Add an account and record transactions to see your net-worth history.</p>
+                ) : (
+                    <div className="net-worth-history-table-wrap">
+                        <table className="ledger-table" aria-label="Net worth history by currency">
+                            <thead><tr><th scope="col">As of</th><th scope="col">Currency</th><th scope="col">Assets</th><th scope="col">Liabilities</th><th scope="col">Net worth</th></tr></thead>
+                            <tbody>
+                                {netWorthHistory.entries.flatMap((entry) => entry.currencies.map((currency) => (
+                                    <tr key={`${entry.as_of}-${currency.currency}`}>
+                                        <td>{entry.as_of}</td>
+                                        <td>{currency.currency}</td>
+                                        <td>{formatAmountMinor(currency.assets_minor, currency.currency)}</td>
+                                        <td>{formatAmountMinor(currency.liabilities_minor, currency.currency)}</td>
+                                        <td>{formatAmountMinor(currency.net_worth_minor, currency.currency)}</td>
+                                    </tr>
+                                )))}
+                            </tbody>
+                        </table>
                     </div>
                 )}
             </section>

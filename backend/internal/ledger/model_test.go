@@ -294,8 +294,9 @@ func TestBillInsightAndConfirmedOccurrenceArePriceAwareAndIdempotent(t *testing.
 
 func TestCashflowAndNetWorthReportsRemainCurrencyAware(t *testing.T) {
 	database := setupLedgerDB(t)
-	checking := &Account{Name: "Checking", Type: "checking", Currency: "USD", OpeningBalanceMinor: 10000}
-	card := &Account{Name: "Card", Type: "credit_card", Currency: "USD"}
+	createdAt := time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)
+	checking := &Account{Name: "Checking", Type: "checking", Currency: "USD", OpeningBalanceMinor: 10000, CreatedAt: createdAt}
+	card := &Account{Name: "Card", Type: "credit_card", Currency: "USD", CreatedAt: createdAt}
 	food := &category.Category{Name: "Food"}
 	for _, record := range []interface{}{checking, card, food} {
 		if err := database.Create(record).Error; err != nil {
@@ -333,6 +334,23 @@ func TestCashflowAndNetWorthReportsRemainCurrencyAware(t *testing.T) {
 	if len(netWorth.Currencies) != 1 || netWorth.Currencies[0].AssetsMinor != 13400 ||
 		netWorth.Currencies[0].LiabilitiesMinor != 1900 || netWorth.Currencies[0].NetWorthMinor != 11500 {
 		t.Errorf("net worth report = %+v, want USD assets 13400, liabilities 1900, net 11500", netWorth)
+	}
+	if err := CreateTransaction(&Transaction{
+		AccountID: checking.ID, Type: "expense", AmountMinor: 100, Currency: "USD", Date: "2026-11-01",
+	}); err != nil {
+		t.Fatalf("create later transaction: %v", err)
+	}
+	history, err := GetNetWorthHistory(2, time.Date(2026, 11, 8, 12, 0, 0, 0, time.UTC))
+	if err != nil {
+		t.Fatalf("GetNetWorthHistory() error = %v", err)
+	}
+	if len(history.Entries) != 2 || history.Entries[0].AsOf != "2026-10-31" ||
+		history.Entries[0].Currencies[0].NetWorthMinor != 11500 ||
+		history.Entries[1].Currencies[0].NetWorthMinor != 11400 {
+		t.Errorf("net worth history = %+v, want 2026-10-31 at 11500 and current at 11400", history)
+	}
+	if _, err := GetNetWorthHistory(37, time.Now()); !errors.Is(err, ErrInvalidTxn) {
+		t.Errorf("invalid history range error = %v, want %v", err, ErrInvalidTxn)
 	}
 	if _, err := GetCashflowReport("2026-11-01", "2026-10-01"); !errors.Is(err, ErrInvalidTxn) {
 		t.Errorf("reversed report period error = %v, want %v", err, ErrInvalidTxn)

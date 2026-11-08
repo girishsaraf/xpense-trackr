@@ -38,6 +38,23 @@ beforeEach(() => {
                 },
             });
         }
+        if (url.includes('/api/net-worth/history')) {
+            return Promise.resolve({
+                data: {
+                    months: 12,
+                    entries: [{
+                        as_of: '2026-10-31',
+                        currencies: [{
+                            currency: 'USD',
+                            assets_minor: 10000,
+                            liabilities_minor: 0,
+                            net_worth_minor: 10000,
+                            accounts: [],
+                        }],
+                    }],
+                },
+            });
+        }
         return Promise.reject(new Error(`Unexpected GET ${url}`));
     });
 });
@@ -48,6 +65,8 @@ test('shows cashflow totals and currency-separated net worth', async () => {
     expect(await screen.findByRole('heading', { name: 'USD cash flow' })).toBeInTheDocument();
     expect(screen.getByText('Uncategorized')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Net worth by currency' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Net worth over time' })).toBeInTheDocument();
+    expect(screen.getByRole('table', { name: 'Net worth history by currency' })).toHaveTextContent('2026-10-31');
     expect(screen.getByText('Checking')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Download CSV' })).toHaveAttribute('href', expect.stringContaining('/api/reports/cashflow.csv'));
 });

@@ -50,6 +50,7 @@ func SetRoutes(router *mux.Router) {
 	router.HandleFunc("/api/reports/cashflow", ledger.CashflowReportHandler).Methods("GET")
 	router.HandleFunc("/api/reports/cashflow.csv", ledger.CashflowCSVHandler).Methods("GET")
 	router.HandleFunc("/api/net-worth", ledger.NetWorthHandler).Methods("GET")
+	router.HandleFunc("/api/net-worth/history", ledger.NetWorthHistoryHandler).Methods("GET")
 	receiptRouter := router.PathPrefix("/api/receipts").Subrouter()
 	receiptRouter.HandleFunc("", receipt.GetReceiptsHandler).Methods("GET")
 	receiptRouter.HandleFunc("", receipt.CreateReceiptHandler).Methods("POST")
