@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
 import axios from 'axios';
 import backendUrl from '../../config';
 import { formatAmountMinor, parseAmountMinor } from '../../utils/money';
@@ -11,18 +12,46 @@ const localDate = () => {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 };
 
-const minorToInput = (amountMinor, currency) => {
+type ManualAsset = {
+    id: number;
+    name: string;
+    kind: 'asset' | 'liability';
+    currency: string;
+    latest_value_minor: number;
+    valuation_date: string;
+    valuation_source: string;
+    has_valuation: boolean;
+};
+
+type AssetForm = {
+    name: string;
+    kind: 'asset' | 'liability';
+    currency: string;
+    value: string;
+    date: string;
+    source: string;
+};
+
+type ValuationDraft = {
+    value: string;
+    date: string;
+    source: string;
+};
+
+const isAssetKind = (value: string): value is AssetForm['kind'] => value === 'asset' || value === 'liability';
+
+const minorToInput = (amountMinor: number, currency: string): string => {
     const digits = new Intl.NumberFormat('en-US', { style: 'currency', currency }).resolvedOptions().maximumFractionDigits;
     return (amountMinor / (10 ** digits)).toFixed(digits);
 };
 
 const AssetsPage = () => {
-    const [assets, setAssets] = useState([]);
+    const [assets, setAssets] = useState<ManualAsset[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [notice, setNotice] = useState('');
-    const [drafts, setDrafts] = useState({});
-    const [form, setForm] = useState({
+    const [drafts, setDrafts] = useState<Record<number, ValuationDraft>>({});
+    const [form, setForm] = useState<AssetForm>({
         name: '',
         kind: 'asset',
         currency: 'USD',
@@ -34,7 +63,7 @@ const AssetsPage = () => {
     const refresh = useCallback(async () => {
         setError('');
         try {
-            const response = await axios.get(`${backendUrl}/api/assets`);
+            const response = await axios.get<ManualAsset[]>(`${backendUrl}/api/assets`);
             setAssets(response.data || []);
         } catch (requestError) {
             console.error('Error loading assets:', requestError);
@@ -48,7 +77,7 @@ const AssetsPage = () => {
         refresh();
     }, [refresh]);
 
-    const createAsset = async (event) => {
+    const createAsset = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const valueMinor = parseAmountMinor(form.value, form.currency);
         if (!form.name.trim() || valueMinor === null || valueMinor < 0) {
@@ -76,11 +105,11 @@ const AssetsPage = () => {
             await refresh();
         } catch (requestError) {
             console.error('Error creating asset:', requestError);
-            setError(requestError.response?.data || 'Unable to add this asset or liability.');
+            setError(errorMessage(requestError, 'Unable to add this asset or liability.'));
         }
     };
 
-    const addValuation = async (event, asset) => {
+    const addValuation = async (event: FormEvent<HTMLFormElement>, asset: ManualAsset) => {
         event.preventDefault();
         const draft = drafts[asset.id] || {};
         const valueMinor = parseAmountMinor(draft.value ?? '', asset.currency);
@@ -99,11 +128,11 @@ const AssetsPage = () => {
             await refresh();
         } catch (requestError) {
             console.error('Error adding asset valuation:', requestError);
-            setError(requestError.response?.data || 'Unable to add this valuation.');
+            setError(errorMessage(requestError, 'Unable to add this valuation.'));
         }
     };
 
-    const deleteAsset = async (asset) => {
+    const deleteAsset = async (asset: ManualAsset) => {
         if (!window.confirm(`Delete ${asset.name} and its valuation history?`)) return;
         try {
             await axios.delete(`${backendUrl}/api/assets/${asset.id}`);
@@ -111,7 +140,7 @@ const AssetsPage = () => {
             await refresh();
         } catch (requestError) {
             console.error('Error deleting asset:', requestError);
-            setError(requestError.response?.data || 'Unable to delete this asset.');
+            setError(errorMessage(requestError, 'Unable to delete this asset.'));
         }
     };
 
@@ -134,11 +163,14 @@ const AssetsPage = () => {
                 <form className="asset-form" onSubmit={createAsset}>
                     <label>
                         Name
-                        <input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} maxLength="120" required />
+                        <input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} maxLength={120} required />
                     </label>
                     <label>
                         Type
-                        <select value={form.kind} onChange={(event) => setForm({ ...form, kind: event.target.value })}>
+                        <select value={form.kind} onChange={(event) => {
+                            const kind = event.target.value;
+                            if (isAssetKind(kind)) setForm({ ...form, kind });
+                        }}>
                             <option value="asset">Asset</option>
                             <option value="liability">Liability</option>
                         </select>
@@ -159,7 +191,7 @@ const AssetsPage = () => {
                     </label>
                     <label>
                         Value source
-                        <input value={form.source} onChange={(event) => setForm({ ...form, source: event.target.value })} maxLength="100" placeholder="Manual estimate, statement…" />
+                        <input value={form.source} onChange={(event) => setForm({ ...form, source: event.target.value })} maxLength={100} placeholder="Manual estimate, statement…" />
                     </label>
                     <button className="ledger-primary-button" type="submit">Add to balance sheet</button>
                 </form>
@@ -204,7 +236,7 @@ const AssetsPage = () => {
                                         </label>
                                         <label>
                                             Source
-                                            <input value={draft.source} onChange={(event) => setDrafts((current) => ({ ...current, [asset.id]: { ...draft, source: event.target.value } }))} maxLength="100" />
+                                            <input value={draft.source} onChange={(event) => setDrafts((current) => ({ ...current, [asset.id]: { ...draft, source: event.target.value } }))} maxLength={100} />
                                         </label>
                                         <button className="ledger-primary-button" type="submit">Add valuation</button>
                                     </form>
@@ -217,6 +249,13 @@ const AssetsPage = () => {
             </section>
         </main>
     );
+};
+
+const errorMessage = (error: unknown, fallback: string): string => {
+    if (axios.isAxiosError(error) && typeof error.response?.data === 'string') {
+        return error.response.data;
+    }
+    return fallback;
 };
 
 export default AssetsPage;

@@ -1,19 +1,43 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import backendUrl from '../../config';
 import { formatAmountMinor, parseAmountMinor } from '../../utils/money';
 import '../Ledger/LedgerPage.css';
 import './BillsPage.css';
 
-const minorToInput = (amountMinor, currency) => {
+type ScheduledBill = {
+    id: number;
+    label: string;
+    account_name: string;
+    category_id: number | null;
+    currency: string;
+    amount_minor: number;
+    next_date: string;
+    frequency: string;
+    status: 'due_soon' | 'overdue' | 'upcoming';
+    days_until_due: number;
+    has_price_change: boolean;
+    previous_amount_minor: number;
+    latest_amount_minor: number;
+    change_percent: number;
+};
+
+type Category = {
+    id: number;
+    name: string;
+};
+
+type OccurrenceAction = 'record' | 'skip';
+
+const minorToInput = (amountMinor: number, currency: string): string => {
     const digits = new Intl.NumberFormat('en-US', { style: 'currency', currency }).resolvedOptions().maximumFractionDigits;
     return (amountMinor / (10 ** digits)).toFixed(digits);
 };
 
 function BillsPage() {
-    const [bills, setBills] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [amounts, setAmounts] = useState({});
+    const [bills, setBills] = useState<ScheduledBill[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [amounts, setAmounts] = useState<Record<number, string>>({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [notice, setNotice] = useState('');
@@ -22,8 +46,8 @@ function BillsPage() {
         setError('');
         try {
             const [billResponse, categoryResponse] = await Promise.all([
-                axios.get(`${backendUrl}/api/bills`),
-                axios.get(`${backendUrl}/api/categories`),
+                axios.get<ScheduledBill[]>(`${backendUrl}/api/bills`),
+                axios.get<Category[]>(`${backendUrl}/api/categories`),
             ]);
             setBills(billResponse.data || []);
             setCategories(categoryResponse.data || []);
@@ -39,7 +63,7 @@ function BillsPage() {
         refresh();
     }, [refresh]);
 
-    const processOccurrence = async (bill, action) => {
+    const processOccurrence = async (bill: ScheduledBill, action: OccurrenceAction) => {
         const amountMinor = action === 'record'
             ? parseAmountMinor(amounts[bill.id] ?? minorToInput(bill.amount_minor, bill.currency), bill.currency)
             : 0;
@@ -62,7 +86,7 @@ function BillsPage() {
             await refresh();
         } catch (requestError) {
             console.error('Error processing scheduled bill:', requestError);
-            setError(requestError.response?.status === 409
+            setError(axios.isAxiosError(requestError) && requestError.response?.status === 409
                 ? 'This bill occurrence was already processed with different details.'
                 : 'We couldn’t process this bill. Refresh and try again.');
         }

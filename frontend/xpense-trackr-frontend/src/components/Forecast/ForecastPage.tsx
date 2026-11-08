@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { FormEvent } from 'react';
 import axios from 'axios';
 import backendUrl from '../../config';
 import { formatAmountMinor, parseAmountMinor } from '../../utils/money';
@@ -9,16 +10,76 @@ const localDate = (date = new Date()) => (
     `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 );
 
+type Account = {
+    id: number;
+    name: string;
+    currency: string;
+};
+
+type Category = {
+    id: number;
+    name: string;
+};
+
+type FlowType = 'expense' | 'income';
+type FlowFrequency = 'once' | 'weekly' | 'biweekly' | 'monthly' | 'yearly';
+
+type ScheduledFlow = {
+    id: number;
+    account_id: number;
+    label: string;
+    type: FlowType;
+    amount_minor: number;
+    currency: string;
+    frequency: FlowFrequency;
+    next_date: string;
+    reminder_days: number;
+};
+
+type ForecastEvent = {
+    scheduled_flow_id: number;
+    account_id: number;
+    label: string;
+    type: FlowType;
+    amount_minor: number;
+    currency: string;
+    date: string;
+};
+
+type Forecast = {
+    start_date: string;
+    end_date: string;
+    accounts: Array<{
+        account_id: number;
+        name: string;
+        currency: string;
+        current_balance_minor: number;
+        projected_balance_minor: number;
+    }>;
+    events: ForecastEvent[];
+};
+
+type ScheduleForm = {
+    accountId: string;
+    label: string;
+    type: FlowType;
+    categoryId: string;
+    amount: string;
+    frequency: FlowFrequency;
+    nextDate: string;
+    reminderDays: string;
+};
+
 const ForecastPage = () => {
-    const [accounts, setAccounts] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [flows, setFlows] = useState([]);
-    const [forecast, setForecast] = useState(null);
+    const [accounts, setAccounts] = useState<Account[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [flows, setFlows] = useState<ScheduledFlow[]>([]);
+    const [forecast, setForecast] = useState<Forecast | null>(null);
     const [days, setDays] = useState(90);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [notice, setNotice] = useState('');
-    const [form, setForm] = useState({
+    const [form, setForm] = useState<ScheduleForm>({
         accountId: '',
         label: '',
         type: 'expense',
@@ -26,24 +87,24 @@ const ForecastPage = () => {
         amount: '',
         frequency: 'monthly',
         nextDate: localDate(new Date(Date.now() + 86400000)),
-        reminderDays: 3,
+        reminderDays: '3',
     });
 
     const refresh = useCallback(async () => {
         setError('');
         try {
             const [accountResponse, categoryResponse, flowResponse, forecastResponse] = await Promise.all([
-                axios.get(`${backendUrl}/api/accounts`),
-                axios.get(`${backendUrl}/api/categories`),
-                axios.get(`${backendUrl}/api/scheduled-flows`),
-                axios.get(`${backendUrl}/api/forecast/cashflow?days=${days}`),
+                axios.get<Account[]>(`${backendUrl}/api/accounts`),
+                axios.get<Category[]>(`${backendUrl}/api/categories`),
+                axios.get<ScheduledFlow[]>(`${backendUrl}/api/scheduled-flows`),
+                axios.get<Forecast>(`${backendUrl}/api/forecast/cashflow?days=${days}`),
             ]);
             setAccounts(accountResponse.data || []);
             setCategories(categoryResponse.data || []);
             setFlows(flowResponse.data || []);
             setForecast(forecastResponse.data);
         } catch (requestError) {
-            setError(requestError.response?.data || 'Unable to load your cash-flow forecast.');
+            setError(errorMessage(requestError, 'Unable to load your cash-flow forecast.'));
         } finally {
             setLoading(false);
         }
@@ -58,7 +119,7 @@ const ForecastPage = () => {
         [accounts, form.accountId],
     );
 
-    const submitFlow = async (event) => {
+    const submitFlow = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const amountMinor = selectedAccount ? parseAmountMinor(form.amount, selectedAccount.currency) : null;
         if (!selectedAccount || amountMinor === null || amountMinor <= 0 || !form.label.trim()) {
@@ -82,17 +143,17 @@ const ForecastPage = () => {
             setNotice('Scheduled item added to your forecast.');
             await refresh();
         } catch (requestError) {
-            setError(requestError.response?.data || 'Unable to add this scheduled item.');
+            setError(errorMessage(requestError, 'Unable to add this scheduled item.'));
         }
     };
 
-    const deleteFlow = async (id) => {
+    const deleteFlow = async (id: number) => {
         try {
             await axios.delete(`${backendUrl}/api/scheduled-flows/${id}`);
             setNotice('Scheduled item removed.');
             await refresh();
         } catch (requestError) {
-            setError(requestError.response?.data || 'Unable to remove this scheduled item.');
+            setError(errorMessage(requestError, 'Unable to remove this scheduled item.'));
         }
     };
 
@@ -170,7 +231,10 @@ const ForecastPage = () => {
                         </label>
                         <label>
                             Type
-                            <select value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value, categoryId: '' })}>
+                            <select value={form.type} onChange={(event) => {
+                                const type = event.target.value;
+                                if (type === 'expense' || type === 'income') setForm({ ...form, type, categoryId: '' });
+                            }}>
                                 <option value="expense">Bill or expense</option>
                                 <option value="income">Expected income</option>
                             </select>
@@ -186,7 +250,7 @@ const ForecastPage = () => {
                         )}
                         <label>
                             Name
-                            <input value={form.label} onChange={(event) => setForm({ ...form, label: event.target.value })} maxLength="180" required />
+                            <input value={form.label} onChange={(event) => setForm({ ...form, label: event.target.value })} maxLength={180} required />
                         </label>
                         <label>
                             Amount {selectedAccount ? `(${selectedAccount.currency})` : ''}
@@ -194,7 +258,12 @@ const ForecastPage = () => {
                         </label>
                         <label>
                             Repeats
-                            <select value={form.frequency} onChange={(event) => setForm({ ...form, frequency: event.target.value })}>
+                            <select value={form.frequency} onChange={(event) => {
+                                const frequency = event.target.value;
+                                if (['once', 'weekly', 'biweekly', 'monthly', 'yearly'].includes(frequency)) {
+                                    setForm({ ...form, frequency: frequency as FlowFrequency });
+                                }
+                            }}>
                                 <option value="once">Once</option>
                                 <option value="weekly">Weekly</option>
                                 <option value="biweekly">Every two weeks</option>
@@ -261,6 +330,13 @@ const ForecastPage = () => {
             </section>
         </main>
     );
+};
+
+const errorMessage = (error: unknown, fallback: string): string => {
+    if (axios.isAxiosError(error) && typeof error.response?.data === 'string') {
+        return error.response.data;
+    }
+    return fallback;
 };
 
 export default ForecastPage;
