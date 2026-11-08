@@ -1,41 +1,57 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { screen } from '@testing-library/react';
+import axios from 'axios';
 import Homepage from './Homepage';
+import { renderWithRouter } from '../../testUtils';
 
-jest.mock('./ExpenseHome/ExpenseOverview', () => () => <div>ExpenseOverviewMock</div>);
-jest.mock('./ExpenseHome/ExpenseGraph', () => () => <div>ExpenseGraphMock</div>);
-jest.mock('./InvestmentHome/InvestmentOverview', () => () => <div>InvestmentOverviewMock</div>);
-jest.mock('./InvestmentHome/InvestmentGraph', () => () => <div>InvestmentGraphMock</div>);
+jest.mock('axios');
 
-describe('Homepage', () => {
-    const renderHomepage = () => render(<MemoryRouter><Homepage /></MemoryRouter>);
-
-    test('shows the expense view by default', () => {
-        renderHomepage();
-
-        expect(screen.getByText('ExpenseOverviewMock')).toBeInTheDocument();
-        expect(screen.getByText('ExpenseGraphMock')).toBeInTheDocument();
-        expect(screen.queryByText('InvestmentOverviewMock')).not.toBeInTheDocument();
+beforeEach(() => {
+    jest.clearAllMocks();
+    axios.get.mockImplementation((url) => {
+        if (url.endsWith('/api/accounts')) {
+            return Promise.resolve({ data: [{ id: 1, name: 'Checking', type: 'checking', currency: 'USD', balance_minor: 12500 }] });
+        }
+        if (url.includes('/api/transactions')) {
+            return Promise.resolve({ data: [{ id: 2, account_id: 1, date: '2026-10-12', type: 'expense', payee: 'Market', amount_minor: 1250, currency: 'USD' }] });
+        }
+        if (url.includes('/api/reports/cashflow')) {
+            return Promise.resolve({ data: { currencies: [{ currency: 'USD', income_minor: 5000, expense_minor: 1250, net_minor: 3750 }] } });
+        }
+        if (url.endsWith('/api/net-worth')) {
+            return Promise.resolve({ data: { currencies: [{ currency: 'USD', net_worth_minor: 12500 }] } });
+        }
+        if (url.includes('/api/forecast/cashflow')) {
+            return Promise.resolve({ data: { events: [{ scheduled_flow_id: 3, date: '2026-10-15', label: 'Rent', type: 'expense', amount_minor: 85000, currency: 'USD' }] } });
+        }
+        return Promise.reject(new Error(`Unexpected GET ${url}`));
     });
+});
 
-    test('switches to the investment view', () => {
-        renderHomepage();
+test('shows local account, cashflow, forecast, and activity summaries', async () => {
+    renderWithRouter(<Homepage />, { route: '/', path: '/' });
 
-        fireEvent.click(screen.getByRole('button', { name: 'Investments' }));
+    expect(await screen.findByRole('heading', { name: 'Your money, in focus.' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Income and spending' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Your accounts' })).toBeInTheDocument();
+    expect(screen.getByText('Checking')).toBeInTheDocument();
+    expect(screen.getByText('Rent')).toBeInTheDocument();
+    expect(screen.getByText('Market')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Add transaction' })).toHaveAttribute('href', '/transactions');
+});
 
-        expect(screen.getByText('InvestmentOverviewMock')).toBeInTheDocument();
-        expect(screen.getByText('InvestmentGraphMock')).toBeInTheDocument();
-        expect(screen.queryByText('ExpenseOverviewMock')).not.toBeInTheDocument();
+test('guides a first-run user to add an account or import data', async () => {
+    axios.get.mockImplementation((url) => {
+        if (url.endsWith('/api/accounts')) return Promise.resolve({ data: [] });
+        if (url.includes('/api/transactions')) return Promise.resolve({ data: [] });
+        if (url.includes('/api/reports/cashflow')) return Promise.resolve({ data: { currencies: [] } });
+        if (url.endsWith('/api/net-worth')) return Promise.resolve({ data: { currencies: [] } });
+        if (url.includes('/api/forecast/cashflow')) return Promise.resolve({ data: { events: [] } });
+        return Promise.reject(new Error(`Unexpected GET ${url}`));
     });
+    renderWithRouter(<Homepage />, { route: '/', path: '/' });
 
-    test('switches back to the expense view', () => {
-        renderHomepage();
-
-        fireEvent.click(screen.getByRole('button', { name: 'Investments' }));
-        fireEvent.click(screen.getByRole('button', { name: 'Expenses' }));
-
-        expect(screen.getByText('ExpenseOverviewMock')).toBeInTheDocument();
-        expect(screen.queryByText('InvestmentOverviewMock')).not.toBeInTheDocument();
-    });
+    expect(await screen.findByRole('heading', { name: 'Your finances stay on this device.' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Set up an account' })).toHaveAttribute('href', '/transactions');
+    expect(screen.getByRole('link', { name: 'Import existing transactions' })).toHaveAttribute('href', '/import-export');
 });

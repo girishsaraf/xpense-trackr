@@ -1,0 +1,242 @@
+.ledger-page {
+    width: min(1200px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 36px 0 64px;
+    color: #17243b;
+}
+
+.ledger-heading {
+    margin-bottom: 30px;
+}
+
+.ledger-heading h1 {
+    margin: 4px 0 8px;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+}
+
+.ledger-heading > div > p:last-child {
+    color: #66748b;
+}
+
+.ledger-section {
+    margin: 28px 0;
+}
+
+.ledger-section-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.ledger-section-heading h2,
+.ledger-panel h2 {
+    margin: 4px 0 12px;
+    font-size: 1.25rem;
+}
+
+.ledger-account-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ledger-account-card,
+.ledger-panel {
+    border: 1px solid #e1e7f0;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 8px 26px rgb(23 36 59 / 5%);
+}
+
+.ledger-account-card {
+    padding: 18px;
+}
+
+.ledger-account-type {
+    color: #6b7890;
+    font-size: .75rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.ledger-account-card h3 {
+    margin: 8px 0;
+    font-size: 1rem;
+}
+
+.ledger-account-card p {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+.ledger-forms {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    align-items: start;
+}
+
+.ledger-panel {
+    padding: 20px;
+}
+
+.ledger-form {
+    display: grid;
+    gap: 14px;
+}
+
+.ledger-form label {
+    display: grid;
+    gap: 6px;
+    color: #44536c;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.ledger-form input,
+.ledger-form select {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 44px;
+    padding: 9px 11px;
+    border: 1px solid #cbd5e2;
+    border-radius: 8px;
+    background: #fff;
+    color: #17243b;
+    font: inherit;
+}
+
+.ledger-form input:focus,
+.ledger-form select:focus {
+    border-color: #2563eb;
+    outline: 3px solid rgb(37 99 235 / 18%);
+}
+
+.ledger-primary-button {
+    min-height: 44px;
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 8px;
+    background: #245bd6;
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+}
+
+.ledger-primary-button:hover {
+    background: #1748b5;
+}
+
+.ledger-message,
+.ledger-empty {
+    padding: 14px 16px;
+    border-radius: 10px;
+}
+
+.ledger-error {
+    background: #fff0ef;
+    color: #9c2c20;
+}
+
+.ledger-notice {
+    background: #eaf8ef;
+    color: #216239;
+}
+
+.ledger-empty {
+    border: 1px dashed #cbd5e2;
+    color: #66748b;
+}
+
+.ledger-table-wrap {
+    overflow-x: auto;
+    border: 1px solid #e1e7f0;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.ledger-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.ledger-table th,
+.ledger-table td {
+    padding: 13px 15px;
+    border-bottom: 1px solid #edf0f5;
+    white-space: nowrap;
+}
+
+.ledger-table th {
+    color: #66748b;
+    font-size: .78rem;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.ledger-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.ledger-rule-list {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ledger-rule-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.ledger-rule-list li:last-child {
+    border-bottom: 0;
+}
+
+.ledger-rule-list span {
+    display: grid;
+    gap: 4px;
+}
+
+.ledger-rule-list small {
+    color: #66748b;
+}
+
+.ledger-rule-list button {
+    min-height: 36px;
+    padding: 6px 10px;
+    border: 1px solid #d5deeb;
+    border-radius: 7px;
+    background: #fff;
+    color: #8a2c28;
+    cursor: pointer;
+    font: inherit;
+}
+
+@media (max-width: 760px) {
+    .ledger-page {
+        width: min(100% - 28px, 620px);
+        padding-top: 24px;
+    }
+
+    .ledger-forms {
+        grid-template-columns: 1fr;
+    }
+
+    .ledger-panel {
+        padding: 16px;
+    }
+}

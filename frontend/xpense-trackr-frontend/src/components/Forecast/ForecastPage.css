@@ -1,0 +1,86 @@
+.forecast-page .ledger-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.forecast-range {
+    display: grid;
+    gap: 6px;
+    color: #44536c;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.forecast-range select {
+    min-height: 42px;
+    padding: 8px 10px;
+    border: 1px solid #cbd5e2;
+    border-radius: 8px;
+    background: #fff;
+    color: #17243b;
+    font: inherit;
+}
+
+.ledger-account-card small,
+.forecast-event-list small,
+.forecast-schedule-list small {
+    color: #66748b;
+}
+
+.forecast-event-list,
+.forecast-schedule-list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.forecast-event-list li,
+.forecast-schedule-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.forecast-event-list li:last-child,
+.forecast-schedule-list li:last-child {
+    border-bottom: 0;
+}
+
+.forecast-event-list span,
+.forecast-schedule-list span {
+    display: grid;
+    gap: 4px;
+}
+
+.forecast-expense {
+    color: #9c2c20;
+}
+
+.forecast-income {
+    color: #216239;
+}
+
+.forecast-schedule-list button {
+    min-height: 36px;
+    padding: 6px 10px;
+    border: 1px solid #d5deeb;
+    border-radius: 7px;
+    background: #fff;
+    color: #8a2c28;
+    cursor: pointer;
+    font: inherit;
+}
+
+@media (max-width: 760px) {
+    .forecast-page .ledger-heading {
+        align-items: start;
+        flex-direction: column;
+    }
+}

@@ -1,3 +1,3 @@
-// config.js
-const backendUrl = 'http://localhost:8080';
+const backendUrl = process.env.REACT_APP_API_URL
+    ?? (process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : '');
 export default backendUrl;

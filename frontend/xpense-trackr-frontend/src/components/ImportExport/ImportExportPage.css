@@ -1,0 +1,72 @@
+.import-export-panel {
+    max-width: 860px;
+}
+
+.import-export-panel p {
+    color: #66748b;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.import-file-label {
+    display: grid;
+    gap: 8px;
+    margin: 18px 0;
+    color: #44536c;
+    font-weight: 600;
+}
+
+.import-file-label input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 44px;
+    padding: 8px;
+    border: 1px solid #cbd5e2;
+    border-radius: 8px;
+    background: #fff;
+    color: #17243b;
+}
+
+.import-summary {
+    color: #44536c;
+    font-weight: 600;
+}
+
+.import-export-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px;
+    border: 1px solid #e1e7f0;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.import-export-section h2 {
+    margin: 4px 0 8px;
+}
+
+.import-export-section p:last-child {
+    margin-bottom: 0;
+    color: #66748b;
+}
+
+.import-export-download {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+    .import-export-section {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .import-export-download {
+        white-space: normal;
+    }
+}

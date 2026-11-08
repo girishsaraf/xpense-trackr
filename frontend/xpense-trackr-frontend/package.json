@@ -23,10 +23,11 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "vite --host 0.0.0.0 --port 3000 --strictPort",
+    "build": "vite build",
     "test": "react-scripts test",
     "test:ci": "react-scripts test --watchAll=false --coverage",
+    "typecheck": "tsc --noEmit",
     "eject": "react-scripts eject"
   },
   "engines": {
@@ -56,6 +57,9 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@vitejs/plugin-react": "^5.2.0",
+    "typescript": "^4.9.5",
+    "vite": "^7.3.7"
   }
 }

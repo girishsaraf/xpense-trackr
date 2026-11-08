@@ -1,0 +1,63 @@
+.receipt-upload-panel {
+    max-width: 720px;
+}
+
+.receipt-list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.receipt-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px;
+    border: 1px solid #e1e7f0;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.receipt-list li > span:first-child {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+}
+
+.receipt-list small {
+    overflow-wrap: anywhere;
+    color: #66748b;
+}
+
+.receipt-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.receipt-actions a {
+    color: #245bd6;
+    font-weight: 600;
+}
+
+.receipt-actions button {
+    min-height: 36px;
+    padding: 6px 10px;
+    border: 1px solid #d5deeb;
+    border-radius: 7px;
+    background: #fff;
+    color: #8a2c28;
+    cursor: pointer;
+    font: inherit;
+}
+
+@media (max-width: 600px) {
+    .receipt-list li {
+        align-items: start;
+        flex-direction: column;
+    }
+}

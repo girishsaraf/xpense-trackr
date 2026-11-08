@@ -1,0 +1,100 @@
+.report-export-link {
+    color: #245bd6;
+    font-weight: 700;
+}
+
+.report-range-form {
+    display: flex;
+    align-items: end;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.report-range-form label {
+    display: grid;
+    gap: 6px;
+    color: #44536c;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.report-range-form input {
+    min-height: 42px;
+    padding: 8px 10px;
+    border: 1px solid #cbd5e2;
+    border-radius: 8px;
+    color: #17243b;
+    font: inherit;
+}
+
+.report-currency-list {
+    display: grid;
+    gap: 16px;
+}
+
+.report-currency-list .ledger-panel h3 {
+    margin-top: 0;
+}
+
+.report-currency-list h4 {
+    margin-bottom: 10px;
+}
+
+.report-totals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin: 0 0 20px;
+}
+
+.report-totals div {
+    display: grid;
+    gap: 5px;
+    padding: 13px;
+    border-radius: 10px;
+    background: #f5f7fb;
+}
+
+.report-totals dt {
+    color: #66748b;
+    font-size: .85rem;
+}
+
+.report-totals dd {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.net-worth-account-list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.net-worth-account-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.net-worth-account-list li:last-child {
+    border-bottom: 0;
+}
+
+.net-worth-account-list small {
+    display: block;
+    margin-top: 4px;
+    color: #66748b;
+}
+
+@media (max-width: 600px) {
+    .report-range-form {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
