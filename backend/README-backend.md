@@ -4,6 +4,18 @@ The Go service defaults to SQLite at `./data/xpense-trackr.db`. Set `DB_DRIVER=m
 
 The API is available at the legacy `/api/...` paths. `/api/v1/...` currently aliases the same handlers to provide a versioned path while preserving compatibility; it is not yet a separately versioned contract.
 
+## Import a legacy MySQL database
+
+Run the app once to create/migrate its SQLite destination, stop it, and create a backup before using the import CLI. Set `LEGACY_DB_PASS` in the environment (it is deliberately not accepted as a command-line argument), then preview:
+
+```sh
+LEGACY_DB_PASS='...' ./xpense-trackr import-mysql \
+  --source-host <host> --source-port 3306 --source-user <user> \
+  --source-database <database> --currency USD
+```
+
+The JSON report validates categories, expenses, budgets, goals, investments, and recurring records without importing. Add `--apply` to rerun validation and perform a single destination transaction. Configure `DB_PATH` to select the local SQLite file. The destination must be empty and the app must remain stopped while applying. The source is read-only. Amounts without currency metadata are assigned the selected currency; budgets become monthly envelopes, legacy investments remain contribution history, recurring rules remain in legacy tables, and user/password records are not imported.
+
 ## Local accounts and transaction ledger
 
 - `GET /api/accounts`: List accounts and calculated balances in each account's currency.

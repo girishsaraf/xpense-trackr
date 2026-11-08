@@ -64,6 +64,28 @@ The development frontend uses `http://localhost:8080` for API requests. The prod
 
 The legacy `mysql/init.sql` file is not used by the local Compose setup. It contains demo fixtures for disposable legacy MySQL environments; do not use it to initialize an existing database.
 
+## Import an existing MySQL installation
+
+The importer previews and validates legacy categories, expenses, budgets, goals, investments, and recurring rules before writing to an initialized local SQLite database. Make and verify a backup first. Start the app once to create its schema, stop it, then run a preview and the explicit apply command:
+
+```sh
+export LEGACY_DB_PASS='your-legacy-database-password'
+docker compose exec app /app/xpense-trackr backup --output /data/before-mysql-import.zip
+docker compose cp app:/data/before-mysql-import.zip ./before-mysql-import.zip
+docker compose stop app
+docker compose run --rm --no-deps -e LEGACY_DB_PASS app import-mysql \
+  --source-host host.docker.internal --source-port 3306 \
+  --source-user xpense_trackr --source-database xpense_trackr_db \
+  --currency USD
+docker compose run --rm --no-deps -e LEGACY_DB_PASS app import-mysql \
+  --source-host host.docker.internal --source-port 3306 \
+  --source-user xpense_trackr --source-database xpense_trackr_db \
+  --currency USD --apply
+docker compose start app
+```
+
+The local source host address may differ outside Docker Desktop. The app must have been started once to initialize its schema and must remain stopped while importing. The importer refuses a non-empty destination and records successful source imports to prevent accidental repeats; it never changes the source. Because legacy records have no currency, `--currency` explicitly assigns one to all imported amounts. Legacy budgets become monthly envelopes, investments remain contribution history (not current market valuations), and recurring rows stay in their legacy tables for review. Legacy user/password records are intentionally excluded; this app is single-user and local-first.
+
 ## Current feature areas
 
 - Local financial accounts and an exact-minor-unit transaction ledger for income, expenses, and same-currency transfers

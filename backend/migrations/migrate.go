@@ -10,6 +10,7 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/goal"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/ledger"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/legacyimport"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/planning"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/receipt"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/recurring"
@@ -91,6 +92,13 @@ var schemaMigrations = []migration{
 		name:    "bill-occurrences-and-reminders",
 		apply: func(tx *gorm.DB) error {
 			return tx.AutoMigrate(&ledger.ScheduledFlow{}, &ledger.ScheduledOccurrence{})
+		},
+	},
+	{
+		version: 9,
+		name:    "legacy-import-records",
+		apply: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&legacyimport.ImportRecord{})
 		},
 	},
 }

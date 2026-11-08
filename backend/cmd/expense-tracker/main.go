@@ -25,6 +25,7 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/goal"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/ledger"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/legacyimport"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/planning"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/receipt"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/recurring"
@@ -44,8 +45,10 @@ func main() {
 			err = runBackupCommand(os.Args[2:])
 		case "restore":
 			err = runRestoreCommand(os.Args[2:])
+		case "import-mysql":
+			err = runLegacyImportCommand(os.Args[2:])
 		default:
-			err = fmt.Errorf("unknown command %q; use backup, restore, or start the server without a command", os.Args[1])
+			err = fmt.Errorf("unknown command %q; use backup, restore, import-mysql, or start the server without a command", os.Args[1])
 		}
 	} else {
 		err = run()
@@ -53,6 +56,64 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func runLegacyImportCommand(args []string) error {
+	flags := flag.NewFlagSet("import-mysql", flag.ContinueOnError)
+	host := flags.String("source-host", os.Getenv("LEGACY_DB_HOST"), "legacy MySQL host (or LEGACY_DB_HOST)")
+	port := flags.String("source-port", envOrDefault("LEGACY_DB_PORT", "3306"), "legacy MySQL port")
+	user := flags.String("source-user", os.Getenv("LEGACY_DB_USER"), "legacy MySQL user")
+	databaseName := flags.String("source-database", os.Getenv("LEGACY_DB_NAME"), "legacy MySQL database name")
+	currency := flags.String("currency", "USD", "currency to assign to legacy amounts")
+	apply := flags.Bool("apply", false, "commit the validated import (default is preview only)")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	if flags.NArg() != 0 || *host == "" || *user == "" || *databaseName == "" {
+		return errors.New("usage: xpense-trackr import-mysql --source-host <host> --source-user <user> --source-database <name> [--source-port 3306] [--currency USD] [--apply]; set LEGACY_DB_PASS in the environment")
+	}
+	source, err := config.OpenDatabase(config.DatabaseConfig{
+		Driver: "mysql", Host: *host, Port: *port, User: *user, Password: os.Getenv("LEGACY_DB_PASS"), Name: *databaseName,
+	})
+	if err != nil {
+		return fmt.Errorf("open legacy MySQL source: %w", err)
+	}
+	sourceSQL, err := source.DB()
+	if err != nil {
+		return fmt.Errorf("get legacy source connection: %w", err)
+	}
+	defer sourceSQL.Close()
+	if err := sourceSQL.Ping(); err != nil {
+		return fmt.Errorf("connect to legacy MySQL source: %w", err)
+	}
+
+	destinationConfig := config.LoadDatabaseConfig()
+	if destinationConfig.Driver != "sqlite" {
+		return errors.New("legacy import currently requires a SQLite destination")
+	}
+	destination, err := config.OpenDatabase(destinationConfig)
+	if err != nil {
+		return fmt.Errorf("open local destination: %w", err)
+	}
+	destinationSQL, err := destination.DB()
+	if err != nil {
+		return fmt.Errorf("get local destination connection: %w", err)
+	}
+	defer destinationSQL.Close()
+
+	report, err := legacyimport.Run(source, destination, *databaseName, *currency, *apply)
+	if err != nil {
+		return fmt.Errorf("legacy import: %w", err)
+	}
+	encoded, err := json.MarshalIndent(report, "", "  ")
+	if err != nil {
+		return fmt.Errorf("format legacy import report: %w", err)
+	}
+	fmt.Println(string(encoded))
+	if !*apply {
+		fmt.Println("Preview only; rerun with --apply to import. The app must remain stopped while applying.")
+	}
+	return nil
 }
 
 func runBackupCommand(args []string) error {
