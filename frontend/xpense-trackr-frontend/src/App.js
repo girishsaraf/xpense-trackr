@@ -1,9 +1,9 @@
 // src/App.js
 
-import { lazy, Suspense } from 'react';
-import {BrowserRouter as Router, Routes, Route, NavLink, Link} from 'react-router-dom';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import {BrowserRouter as Router, Routes, Route, NavLink, Link, useLocation} from 'react-router-dom';
 import './App.css';
-import { faArrowTrendUp, faChartPie, faHouse, faThumbtack} from "@fortawesome/free-solid-svg-icons";
+import { faHouse, faThumbtack} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import OfflineNotice from "./components/Common/OfflineNotice";
 
@@ -32,6 +32,90 @@ const BillsPage = lazy(() => import('./components/Bills/BillsPage'));
 const AssetsPage = lazy(() => import('./components/Assets/AssetsPage'));
 const PortfolioPage = lazy(() => import('./components/Portfolio/PortfolioPage'));
 
+const navigationGroups = [
+    {
+        label: 'Activity',
+        links: [
+            ['Expenses', '/expenses'],
+            ['Transactions', '/transactions'],
+            ['Bills', '/bills'],
+            ['Recurring', '/recurring'],
+            ['Receipts', '/receipts'],
+            ['Categories', '/categories'],
+        ],
+    },
+    {
+        label: 'Planning',
+        links: [
+            ['Cash flow', '/forecast'],
+            ['Budgets', '/budgets'],
+            ['Goals', '/goals'],
+            ['Plans', '/planning'],
+        ],
+    },
+    {
+        label: 'Wealth',
+        links: [
+            ['Investments', '/investments'],
+            ['Portfolio', '/portfolio'],
+            ['Assets', '/assets'],
+        ],
+    },
+    {
+        label: 'More',
+        links: [
+            ['Reports', '/reports'],
+            ['Trends', '/trends'],
+            ['Import / export', '/import-export'],
+        ],
+    },
+];
+
+function MainNavigation() {
+    const { pathname } = useLocation();
+    const [openGroup, setOpenGroup] = useState(null);
+
+    useEffect(() => {
+        setOpenGroup(null);
+    }, [pathname]);
+
+    return (
+        <nav className="app-navigation" aria-label="Main navigation">
+            <NavLink to="/" end className={({ isActive }) => `overview-link${isActive ? ' active-tab' : ''}`}>
+                <FontAwesomeIcon icon={faHouse}/> Overview
+            </NavLink>
+            {navigationGroups.map((group) => {
+                const isGroupActive = group.links.some(([, path]) => pathname.startsWith(path));
+                return (
+                    <details
+                        className={`navigation-group${isGroupActive ? ' group-active' : ''}`}
+                        key={group.label}
+                        open={openGroup === group.label}
+                    >
+                        <summary onClick={(event) => {
+                            event.preventDefault();
+                            setOpenGroup((current) => current === group.label ? null : group.label);
+                        }}>
+                            {group.label}
+                        </summary>
+                        <div className="navigation-menu">
+                            {group.links.map(([label, path]) => (
+                                <NavLink
+                                    key={path}
+                                    to={path}
+                                    className={({ isActive }) => isActive ? 'active-tab' : undefined}
+                                >
+                                    {label}
+                                </NavLink>
+                            ))}
+                        </div>
+                    </details>
+                );
+            })}
+        </nav>
+    );
+}
+
 function App() {
     return (
         <Router>
@@ -44,27 +128,7 @@ function App() {
                             <h1>Expense Tracker</h1>
                         </span>
                     </Link>
-                    <nav aria-label="Main navigation">
-                        <ul className="horizontal-tabs">
-                            <li><NavLink to="/" end className={({ isActive }) => isActive ? 'active-tab' : undefined}><FontAwesomeIcon icon={faHouse}/> Overview</NavLink></li>
-                            <li><NavLink to="/expenses" className={({ isActive }) => isActive ? 'active-tab' : undefined}><FontAwesomeIcon icon={faChartPie}/> Expense</NavLink></li>
-                            <li><NavLink to="/transactions" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Transactions</NavLink></li>
-                            <li><NavLink to="/forecast" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Cash flow</NavLink></li>
-                            <li><NavLink to="/bills" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Bills</NavLink></li>
-                            <li><NavLink to="/assets" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Assets</NavLink></li>
-                            <li><NavLink to="/portfolio" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Portfolio</NavLink></li>
-                            <li><NavLink to="/receipts" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Receipts</NavLink></li>
-                            <li><NavLink to="/reports" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Reports</NavLink></li>
-                            <li><NavLink to="/import-export" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Import / export</NavLink></li>
-                            <li><NavLink to="/investments" className={({ isActive }) => isActive ? 'active-tab' : undefined}><FontAwesomeIcon icon={faArrowTrendUp}/> Investments</NavLink></li>
-                            <li><NavLink to="/budgets" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Budgets</NavLink></li>
-                            <li><NavLink to="/goals" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Goals</NavLink></li>
-                            <li><NavLink to="/planning" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Plans</NavLink></li>
-                            <li><NavLink to="/trends" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Trends</NavLink></li>
-                            <li><NavLink to="/recurring" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Recurring</NavLink></li>
-                            <li><NavLink to="/categories" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Categories</NavLink></li>
-                        </ul>
-                    </nav>
+                    <MainNavigation/>
                 </header>
                 <OfflineNotice />
                 <Suspense fallback={<main className="ledger-page"><p role="status">Loading page…</p></main>}>

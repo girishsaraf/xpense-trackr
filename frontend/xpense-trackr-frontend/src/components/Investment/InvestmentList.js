@@ -126,7 +126,14 @@ const InvestmentList = () => {
     };
 
     return (
-        <div className="investment-list-container">
+        <main className="ledger-page legacy-list-page investment-list-container">
+            <header className="ledger-heading">
+                <div>
+                    <p className="eyebrow">YOUR INVESTMENTS</p>
+                    <h1>Investments</h1>
+                    <p>Review and update your recent investment activity.</p>
+                </div>
+            </header>
             {showInvModal && (
                 <div className="modal">
                     <div className="modal-content">
@@ -222,7 +229,7 @@ const InvestmentList = () => {
                 totalItems={investments.length}
                 paginate={paginate}
             />
-        </div>
+        </main>
 
     );
 };

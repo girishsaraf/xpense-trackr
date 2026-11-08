@@ -139,7 +139,7 @@ function PlanningPage() {
             <header className="planning-heading">
                 <div>
                     <p className="planning-eyebrow">PLAN WITH PURPOSE</p>
-                    <h2 id="planning-title">Goals &amp; envelopes</h2>
+                    <h1 id="planning-title">Goals &amp; envelopes</h1>
                     <p>Track progress toward savings goals and give monthly spending a clear limit.</p>
                 </div>
                 <label>

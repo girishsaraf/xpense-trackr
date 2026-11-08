@@ -120,7 +120,14 @@ const ExpenseList = () => {
     };
 
     return (
-        <div className="expense-list-container">
+        <main className="ledger-page legacy-list-page expense-list-container">
+            <header className="ledger-heading">
+                <div>
+                    <p className="eyebrow">YOUR SPENDING</p>
+                    <h1>Expenses</h1>
+                    <p>Review and update your recent spending activity.</p>
+                </div>
+            </header>
             {showModal && (
                 <div className="modal">
                     <div className="modal-content">
@@ -227,7 +234,7 @@ const ExpenseList = () => {
                 totalItems={expenses.length}
                 paginate={paginate}
             />
-        </div>
+        </main>
 
     );
 };

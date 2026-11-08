@@ -19,10 +19,20 @@
     margin-bottom: 2rem;
 }
 
-.planning-heading h2,
+.planning-heading h1,
 .planning-section h3 {
     margin: 0.2rem 0 0.45rem;
     color: #132d3d;
+}
+
+.planning-heading h1 {
+    margin: 0;
+    color: #183253;
+    font-size: clamp(28px, 4vw, 38px);
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    line-height: 1.15;
+    text-align: left;
 }
 
 .planning-heading p {
@@ -42,7 +52,7 @@
 
 .planning-eyebrow {
     margin: 0;
-    color: #207d72;
+    color: #7689a4;
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.12em;
@@ -51,10 +61,10 @@
 .planning-section {
     margin-top: 1.5rem;
     padding: clamp(1rem, 3vw, 1.6rem);
-    border: 1px solid #dfe8e8;
+    border: 1px solid #e1e9f4;
     border-radius: 16px;
     background: #fff;
-    box-shadow: 0 8px 26px rgb(21 55 68 / 5%);
+    box-shadow: 0 4px 18px rgba(37, 76, 137, 0.05);
 }
 
 .planning-form,
@@ -81,8 +91,8 @@
 
 .planning-page input:focus,
 .planning-page select:focus {
-    border-color: #207d72;
-    outline: 3px solid rgb(32 125 114 / 18%);
+    border-color: #678dc9;
+    outline: 3px solid rgba(37, 99, 235, 0.12);
 }
 
 .planning-page button {
@@ -90,7 +100,7 @@
     padding: 0.6rem 1rem;
     border: 0;
     border-radius: 8px;
-    background: #176f65;
+    background: #2563eb;
     color: #fff;
     cursor: pointer;
     font: inherit;
@@ -98,7 +108,7 @@
 }
 
 .planning-page button:hover {
-    background: #12594f;
+    background: #1d4ed8;
 }
 
 .planning-cards {
@@ -125,7 +135,7 @@
 }
 
 .planning-card-top strong {
-    color: #176f65;
+    color: #2563eb;
     white-space: nowrap;
 }
 
@@ -138,7 +148,7 @@
     width: 100%;
     height: 10px;
     margin: 1rem 0 0.6rem;
-    accent-color: #207d72;
+    accent-color: #2563eb;
 }
 
 .planning-history {
@@ -185,7 +195,7 @@
     width: 18px;
     min-height: 18px;
     margin: 0;
-    accent-color: #207d72;
+    accent-color: #2563eb;
 }
 
 .planning-secondary {
