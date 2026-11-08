@@ -6,6 +6,8 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/expense"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/goal"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/ledger"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/receipt"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/recurring"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/trends"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/user"
@@ -18,6 +20,38 @@ func SetRoutes(router *mux.Router) {
 	authRouter := router.PathPrefix("/api/auth").Subrouter()
 	authRouter.HandleFunc("/login", user.Login).Methods("POST")
 	authRouter.HandleFunc("/register", user.Register).Methods("POST")
+
+	// Local account and unified transaction ledger
+	accountRouter := router.PathPrefix("/api/accounts").Subrouter()
+	accountRouter.HandleFunc("", ledger.GetAccountsHandler).Methods("GET")
+	accountRouter.HandleFunc("", ledger.CreateAccountHandler).Methods("POST")
+	transactionRouter := router.PathPrefix("/api/transactions").Subrouter()
+	transactionRouter.HandleFunc("", ledger.GetTransactionsHandler).Methods("GET")
+	transactionRouter.HandleFunc("", ledger.CreateTransactionHandler).Methods("POST")
+	transactionRouter.HandleFunc("/export.csv", ledger.ExportTransactionsCSVHandler).Methods("GET")
+	transactionRouter.HandleFunc("/import.csv", ledger.ImportTransactionsCSVHandler).Methods("POST")
+	transactionRouter.HandleFunc("/{id:[0-9]+}", ledger.GetTransactionHandler).Methods("GET")
+	transactionRouter.HandleFunc("/{id:[0-9]+}", ledger.UpdateTransactionHandler).Methods("PUT")
+	transactionRouter.HandleFunc("/{id:[0-9]+}", ledger.DeleteTransactionHandler).Methods("DELETE")
+	categoryRuleRouter := router.PathPrefix("/api/category-rules").Subrouter()
+	categoryRuleRouter.HandleFunc("", ledger.GetCategoryRulesHandler).Methods("GET")
+	categoryRuleRouter.HandleFunc("", ledger.CreateCategoryRuleHandler).Methods("POST")
+	categoryRuleRouter.HandleFunc("/{id:[0-9]+}", ledger.UpdateCategoryRuleHandler).Methods("PUT")
+	categoryRuleRouter.HandleFunc("/{id:[0-9]+}", ledger.DeleteCategoryRuleHandler).Methods("DELETE")
+	scheduledFlowRouter := router.PathPrefix("/api/scheduled-flows").Subrouter()
+	scheduledFlowRouter.HandleFunc("", ledger.GetScheduledFlowsHandler).Methods("GET")
+	scheduledFlowRouter.HandleFunc("", ledger.CreateScheduledFlowHandler).Methods("POST")
+	scheduledFlowRouter.HandleFunc("/{id:[0-9]+}", ledger.UpdateScheduledFlowHandler).Methods("PUT")
+	scheduledFlowRouter.HandleFunc("/{id:[0-9]+}", ledger.DeleteScheduledFlowHandler).Methods("DELETE")
+	router.HandleFunc("/api/forecast/cashflow", ledger.CashflowForecastHandler).Methods("GET")
+	router.HandleFunc("/api/reports/cashflow", ledger.CashflowReportHandler).Methods("GET")
+	router.HandleFunc("/api/reports/cashflow.csv", ledger.CashflowCSVHandler).Methods("GET")
+	router.HandleFunc("/api/net-worth", ledger.NetWorthHandler).Methods("GET")
+	receiptRouter := router.PathPrefix("/api/receipts").Subrouter()
+	receiptRouter.HandleFunc("", receipt.GetReceiptsHandler).Methods("GET")
+	receiptRouter.HandleFunc("", receipt.CreateReceiptHandler).Methods("POST")
+	receiptRouter.HandleFunc("/{id:[0-9]+}", receipt.DeleteReceiptHandler).Methods("DELETE")
+	receiptRouter.HandleFunc("/{id:[0-9]+}/file", receipt.GetReceiptFileHandler).Methods("GET")
 
 	// Expense Management
 	expenseRouter := router.PathPrefix("/api/expenses").Subrouter()

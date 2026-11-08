@@ -19,6 +19,14 @@ func TestSetRoutesRegistersExpectedEndpoints(t *testing.T) {
 		{http.MethodPost, "/api/auth/login"},
 		{http.MethodPost, "/api/auth/register"},
 
+		{http.MethodGet, "/api/accounts"},
+		{http.MethodPost, "/api/accounts"},
+		{http.MethodGet, "/api/transactions"},
+		{http.MethodPost, "/api/transactions"},
+		{http.MethodGet, "/api/transactions/1"},
+		{http.MethodPut, "/api/transactions/1"},
+		{http.MethodDelete, "/api/transactions/1"},
+
 		{http.MethodGet, "/api/expenses"},
 		{http.MethodPost, "/api/expenses"},
 		{http.MethodGet, "/api/expenses/1"},

@@ -4,9 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -16,27 +19,30 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/expense"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/goal"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/ledger"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/receipt"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/recurring"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/trends"
 	"github.com/gorilla/mux"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-// setupIntegrationDB connects to the MySQL instance configured by
-// TEST_MYSQL_DSN, recreates the schema, and returns the full API handler.
-// The test is skipped when TEST_MYSQL_DSN is not set, so `go test ./...`
-// works without a database.
+var integrationDBCounter int64
+
+// setupIntegrationDB uses an isolated SQLite database by default and MySQL
+// when TEST_MYSQL_DSN is set.
 func setupIntegrationDB(t *testing.T) (*gorm.DB, http.Handler) {
 	t.Helper()
 
 	dsn := os.Getenv("TEST_MYSQL_DSN")
-	if dsn == "" {
-		t.Skip("set TEST_MYSQL_DSN to run MySQL integration tests")
+	dialector := sqlite.Open(fmt.Sprintf("file:integration-%d?mode=memory&cache=shared", atomic.AddInt64(&integrationDBCounter, 1)))
+	if dsn != "" {
+		dialector = mysql.Open(dsn)
 	}
-
-	database, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	database, err := gorm.Open(dialector, &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	if err != nil {
@@ -49,6 +55,11 @@ func setupIntegrationDB(t *testing.T) (*gorm.DB, http.Handler) {
 		&budget.Budget{},
 		&goal.Goal{},
 		&investments.Investment{},
+		&ledger.Account{},
+		&ledger.Transaction{},
+		&ledger.CategoryRule{},
+		&ledger.ScheduledFlow{},
+		&receipt.Receipt{},
 		&recurring.RecurringExpense{},
 		&recurring.RecurringInvestment{},
 	}
@@ -63,7 +74,9 @@ func setupIntegrationDB(t *testing.T) (*gorm.DB, http.Handler) {
 	category.SetDB(database)
 	expense.SetDB(database)
 	investments.SetDB(database)
+	ledger.SetDB(database)
 	recurring.SetDB(database)
+	receipt.SetDB(database)
 	goal.SetDB(database)
 	trends.SetDB(database)
 
@@ -90,6 +103,30 @@ func apiRequest(t *testing.T, handler http.Handler, method, path string, payload
 	return recorder
 }
 
+func apiMultipartRequest(t *testing.T, handler http.Handler, path, transactionID, fileName string, content []byte) *httptest.ResponseRecorder {
+	t.Helper()
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
+	if err := writer.WriteField("transaction_id", transactionID); err != nil {
+		t.Fatalf("write transaction id: %v", err)
+	}
+	file, err := writer.CreateFormFile("file", fileName)
+	if err != nil {
+		t.Fatalf("create multipart file: %v", err)
+	}
+	if _, err := file.Write(content); err != nil {
+		t.Fatalf("write multipart file: %v", err)
+	}
+	if err := writer.Close(); err != nil {
+		t.Fatalf("close multipart writer: %v", err)
+	}
+	request := httptest.NewRequest(http.MethodPost, path, &body)
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+	recorder := httptest.NewRecorder()
+	handler.ServeHTTP(recorder, request)
+	return recorder
+}
+
 func decodeResponse[T any](t *testing.T, recorder *httptest.ResponseRecorder) T {
 	t.Helper()
 	var response T
@@ -106,6 +143,7 @@ func TestExpenseCategoryAPI(t *testing.T) {
 	if categoryResponse.Code != http.StatusCreated {
 		t.Fatalf("create category status = %d, want %d", categoryResponse.Code, http.StatusCreated)
 	}
+
 	createdCategory := decodeResponse[category.Category](t, categoryResponse)
 
 	expenseResponse := apiRequest(t, handler, http.MethodPost, "/api/expenses", map[string]string{
@@ -157,6 +195,269 @@ func TestExpenseCategoryAPI(t *testing.T) {
 	deleteCategoryResponse := apiRequest(t, handler, http.MethodDelete, fmt.Sprintf("/api/categories/%d", createdCategory.ID), nil)
 	if deleteCategoryResponse.Code != http.StatusNoContent {
 		t.Fatalf("delete category status = %d, want %d", deleteCategoryResponse.Code, http.StatusNoContent)
+	}
+}
+
+func TestAccountAndUnifiedTransactionAPI(t *testing.T) {
+	database, handler := setupIntegrationDB(t)
+	categoryValue := category.Category{Name: "Groceries"}
+	if err := database.Create(&categoryValue).Error; err != nil {
+		t.Fatalf("create category: %v", err)
+	}
+
+	checkingResponse := apiRequest(t, handler, http.MethodPost, "/api/accounts", map[string]interface{}{
+		"name": "Checking", "type": "checking", "currency": "USD", "opening_balance_minor": 50000,
+	})
+	if checkingResponse.Code != http.StatusCreated {
+		t.Fatalf("create checking status = %d, want %d; body = %s", checkingResponse.Code, http.StatusCreated, checkingResponse.Body.String())
+	}
+	checking := decodeResponse[ledger.Account](t, checkingResponse)
+
+	savingsResponse := apiRequest(t, handler, http.MethodPost, "/api/accounts", map[string]interface{}{
+		"name": "Savings", "type": "savings", "currency": "USD", "opening_balance_minor": 1000,
+	})
+	if savingsResponse.Code != http.StatusCreated {
+		t.Fatalf("create savings status = %d, want %d; body = %s", savingsResponse.Code, http.StatusCreated, savingsResponse.Body.String())
+	}
+	savings := decodeResponse[ledger.Account](t, savingsResponse)
+
+	expenseResponse := apiRequest(t, handler, http.MethodPost, "/api/transactions", map[string]interface{}{
+		"account_id": checking.ID, "category_id": categoryValue.ID, "type": "expense",
+		"amount_minor": 1250, "currency": "USD", "payee": "Market", "date": "2026-10-12",
+	})
+	if expenseResponse.Code != http.StatusCreated {
+		t.Fatalf("create expense transaction status = %d, want %d; body = %s", expenseResponse.Code, http.StatusCreated, expenseResponse.Body.String())
+	}
+
+	transferResponse := apiRequest(t, handler, http.MethodPost, "/api/transactions", map[string]interface{}{
+		"account_id": checking.ID, "transfer_account_id": savings.ID, "type": "transfer",
+		"amount_minor": 1000, "currency": "USD", "date": "2026-10-13",
+	})
+	if transferResponse.Code != http.StatusCreated {
+		t.Fatalf("create transfer status = %d, want %d; body = %s", transferResponse.Code, http.StatusCreated, transferResponse.Body.String())
+	}
+
+	accountsResponse := apiRequest(t, handler, http.MethodGet, "/api/accounts", nil)
+	if accountsResponse.Code != http.StatusOK {
+		t.Fatalf("list accounts status = %d, want %d", accountsResponse.Code, http.StatusOK)
+	}
+	accounts := decodeResponse[[]ledger.Account](t, accountsResponse)
+	balances := map[uint]int64{}
+	for _, account := range accounts {
+		balances[account.ID] = account.BalanceMinor
+	}
+	if balances[checking.ID] != 47750 || balances[savings.ID] != 2000 {
+		t.Errorf("balances = %+v, want checking 47750 and savings 2000", balances)
+	}
+
+	transactionsResponse := apiRequest(t, handler, http.MethodGet, "/api/transactions?type=transfer", nil)
+	if transactionsResponse.Code != http.StatusOK {
+		t.Fatalf("list transactions status = %d, want %d", transactionsResponse.Code, http.StatusOK)
+	}
+	transactions := decodeResponse[[]ledger.Transaction](t, transactionsResponse)
+	if len(transactions) != 1 || transactions[0].Type != "transfer" {
+		t.Errorf("transfer transactions = %+v, want exactly one transfer", transactions)
+	}
+}
+
+func TestMerchantCategoryRuleAPI(t *testing.T) {
+	database, handler := setupIntegrationDB(t)
+	categoryValue := category.Category{Name: "Groceries"}
+	if err := database.Create(&categoryValue).Error; err != nil {
+		t.Fatalf("create category: %v", err)
+	}
+	accountResponse := apiRequest(t, handler, http.MethodPost, "/api/accounts", map[string]interface{}{
+		"name": "Checking", "type": "checking", "currency": "USD",
+	})
+	if accountResponse.Code != http.StatusCreated {
+		t.Fatalf("create account status = %d: %s", accountResponse.Code, accountResponse.Body)
+	}
+	account := decodeResponse[ledger.Account](t, accountResponse)
+	ruleResponse := apiRequest(t, handler, http.MethodPost, "/api/category-rules", map[string]interface{}{
+		"name": "Groceries", "match_value": "market", "category_id": categoryValue.ID,
+		"priority": 5, "enabled": true,
+	})
+	if ruleResponse.Code != http.StatusCreated {
+		t.Fatalf("create category rule status = %d, want %d: %s", ruleResponse.Code, http.StatusCreated, ruleResponse.Body)
+	}
+	rule := decodeResponse[ledger.CategoryRule](t, ruleResponse)
+
+	transactionResponse := apiRequest(t, handler, http.MethodPost, "/api/transactions", map[string]interface{}{
+		"account_id": account.ID, "type": "expense", "amount_minor": 1250,
+		"currency": "USD", "payee": "Neighborhood Market", "date": "2026-10-12",
+	})
+	if transactionResponse.Code != http.StatusCreated {
+		t.Fatalf("create transaction status = %d, want %d: %s", transactionResponse.Code, http.StatusCreated, transactionResponse.Body)
+	}
+	transaction := decodeResponse[ledger.Transaction](t, transactionResponse)
+	if transaction.CategoryID == nil || *transaction.CategoryID != categoryValue.ID || transaction.CategoryRuleID == nil || *transaction.CategoryRuleID != rule.ID {
+		t.Errorf("categorized transaction = %+v, want category/rule %d/%d", transaction, categoryValue.ID, rule.ID)
+	}
+
+	listResponse := apiRequest(t, handler, http.MethodGet, "/api/category-rules", nil)
+	if listResponse.Code != http.StatusOK {
+		t.Fatalf("list category rules status = %d, want %d", listResponse.Code, http.StatusOK)
+	}
+	rules := decodeResponse[[]ledger.CategoryRule](t, listResponse)
+	if len(rules) != 1 || rules[0].ID != rule.ID {
+		t.Fatalf("category rules = %+v, want the created rule", rules)
+	}
+}
+
+func TestScheduledCashflowAPI(t *testing.T) {
+	_, handler := setupIntegrationDB(t)
+	accountResponse := apiRequest(t, handler, http.MethodPost, "/api/accounts", map[string]interface{}{
+		"name": "Checking", "type": "checking", "currency": "USD", "opening_balance_minor": 5000,
+	})
+	if accountResponse.Code != http.StatusCreated {
+		t.Fatalf("create account status = %d: %s", accountResponse.Code, accountResponse.Body)
+	}
+	account := decodeResponse[ledger.Account](t, accountResponse)
+	nextDate := time.Now().AddDate(0, 0, 1).Format("2006-01-02")
+	flowResponse := apiRequest(t, handler, http.MethodPost, "/api/scheduled-flows", map[string]interface{}{
+		"account_id": account.ID, "label": "Phone bill", "type": "expense",
+		"amount_minor": 1250, "currency": "USD", "frequency": "once",
+		"next_date": nextDate, "enabled": true,
+	})
+	if flowResponse.Code != http.StatusCreated {
+		t.Fatalf("create scheduled flow status = %d, want %d: %s", flowResponse.Code, http.StatusCreated, flowResponse.Body)
+	}
+
+	forecastResponse := apiRequest(t, handler, http.MethodGet, "/api/forecast/cashflow?days=30", nil)
+	if forecastResponse.Code != http.StatusOK {
+		t.Fatalf("cashflow forecast status = %d, want %d: %s", forecastResponse.Code, http.StatusOK, forecastResponse.Body)
+	}
+	forecast := decodeResponse[ledger.CashflowForecast](t, forecastResponse)
+	if len(forecast.Events) != 1 || forecast.Accounts[0].ProjectedBalanceMinor != 3750 {
+		t.Fatalf("cashflow forecast = %+v, want one bill and projected balance 3750", forecast)
+	}
+	if invalidDays := apiRequest(t, handler, http.MethodGet, "/api/forecast/cashflow?days=500", nil); invalidDays.Code != http.StatusBadRequest {
+		t.Errorf("invalid forecast range status = %d, want %d", invalidDays.Code, http.StatusBadRequest)
+	}
+}
+
+func TestReceiptUploadDownloadAndDelete(t *testing.T) {
+	_, handler := setupIntegrationDB(t)
+	receipt.SetStorageDir(t.TempDir())
+	accountResponse := apiRequest(t, handler, http.MethodPost, "/api/accounts", map[string]interface{}{
+		"name": "Checking", "type": "checking", "currency": "USD",
+	})
+	account := decodeResponse[ledger.Account](t, accountResponse)
+	transactionResponse := apiRequest(t, handler, http.MethodPost, "/api/transactions", map[string]interface{}{
+		"account_id": account.ID, "type": "expense", "amount_minor": 1250,
+		"currency": "USD", "payee": "Market", "date": "2026-10-12",
+	})
+	if transactionResponse.Code != http.StatusCreated {
+		t.Fatalf("create transaction status = %d: %s", transactionResponse.Code, transactionResponse.Body)
+	}
+	transaction := decodeResponse[ledger.Transaction](t, transactionResponse)
+	pdfContent := []byte("%PDF-1.4\nreceipt fixture")
+	upload := apiMultipartRequest(t, handler, "/api/receipts", fmt.Sprint(transaction.ID), "receipt.pdf", pdfContent)
+	if upload.Code != http.StatusCreated {
+		t.Fatalf("upload receipt status = %d, want %d: %s", upload.Code, http.StatusCreated, upload.Body)
+	}
+	item := decodeResponse[receipt.Receipt](t, upload)
+	if item.TransactionID != transaction.ID || item.FileName != "receipt.pdf" || item.SizeBytes != int64(len(pdfContent)) {
+		t.Fatalf("receipt metadata = %+v", item)
+	}
+
+	fileResponse := apiRequest(t, handler, http.MethodGet, fmt.Sprintf("/api/receipts/%d/file", item.ID), nil)
+	if fileResponse.Code != http.StatusOK || !bytes.Equal(fileResponse.Body.Bytes(), pdfContent) {
+		t.Fatalf("download status/body = %d/%q", fileResponse.Code, fileResponse.Body.Bytes())
+	}
+	if fileResponse.Header().Get("X-Content-Type-Options") != "nosniff" {
+		t.Errorf("receipt download missing nosniff header")
+	}
+	listResponse := apiRequest(t, handler, http.MethodGet, fmt.Sprintf("/api/receipts?transaction_id=%d", transaction.ID), nil)
+	listed := decodeResponse[[]receipt.Receipt](t, listResponse)
+	if len(listed) != 1 || listed[0].ID != item.ID {
+		t.Fatalf("listed receipts = %+v", listed)
+	}
+
+	deleteResponse := apiRequest(t, handler, http.MethodDelete, fmt.Sprintf("/api/receipts/%d", item.ID), nil)
+	if deleteResponse.Code != http.StatusNoContent {
+		t.Fatalf("delete receipt status = %d, want %d", deleteResponse.Code, http.StatusNoContent)
+	}
+	if missing := apiRequest(t, handler, http.MethodGet, fmt.Sprintf("/api/receipts/%d/file", item.ID), nil); missing.Code != http.StatusNotFound {
+		t.Errorf("download deleted receipt status = %d, want %d", missing.Code, http.StatusNotFound)
+	}
+	if invalid := apiMultipartRequest(t, handler, "/api/receipts", fmt.Sprint(transaction.ID), "bad.txt", []byte("not a receipt")); invalid.Code != http.StatusBadRequest {
+		t.Errorf("upload invalid receipt type status = %d, want %d", invalid.Code, http.StatusBadRequest)
+	}
+}
+
+func TestCashflowAndNetWorthReportsAPI(t *testing.T) {
+	_, handler := setupIntegrationDB(t)
+	accountResponse := apiRequest(t, handler, http.MethodPost, "/api/accounts", map[string]interface{}{
+		"name": "Checking", "type": "checking", "currency": "USD", "opening_balance_minor": 10000,
+	})
+	account := decodeResponse[ledger.Account](t, accountResponse)
+	transactionResponse := apiRequest(t, handler, http.MethodPost, "/api/transactions", map[string]interface{}{
+		"account_id": account.ID, "type": "expense", "amount_minor": 1250,
+		"currency": "USD", "date": "2026-10-12", "payee": "Market",
+	})
+	if transactionResponse.Code != http.StatusCreated {
+		t.Fatalf("create transaction status = %d: %s", transactionResponse.Code, transactionResponse.Body)
+	}
+
+	reportResponse := apiRequest(t, handler, http.MethodGet, "/api/reports/cashflow?from=2026-10-01&to=2026-10-31", nil)
+	if reportResponse.Code != http.StatusOK {
+		t.Fatalf("cashflow report status = %d: %s", reportResponse.Code, reportResponse.Body)
+	}
+	report := decodeResponse[ledger.CashflowReport](t, reportResponse)
+	if len(report.Currencies) != 1 || report.Currencies[0].ExpenseMinor != 1250 || report.Currencies[0].NetMinor != -1250 {
+		t.Fatalf("cashflow report = %+v", report)
+	}
+
+	csvResponse := apiRequest(t, handler, http.MethodGet, "/api/reports/cashflow.csv?from=2026-10-01&to=2026-10-31", nil)
+	if csvResponse.Code != http.StatusOK || !strings.Contains(csvResponse.Body.String(), "USD,expense,Uncategorized,1250") {
+		t.Fatalf("cashflow CSV status/body = %d/%s", csvResponse.Code, csvResponse.Body.String())
+	}
+	netWorthResponse := apiRequest(t, handler, http.MethodGet, "/api/net-worth", nil)
+	netWorth := decodeResponse[ledger.NetWorthReport](t, netWorthResponse)
+	if len(netWorth.Currencies) != 1 || netWorth.Currencies[0].NetWorthMinor != 8750 {
+		t.Fatalf("net worth report = %+v", netWorth)
+	}
+}
+
+func TestTransactionCSVImportPreviewCommitAndExport(t *testing.T) {
+	_, handler := setupIntegrationDB(t)
+	accountResponse := apiRequest(t, handler, http.MethodPost, "/api/accounts", map[string]interface{}{
+		"name": "Checking", "type": "checking", "currency": "USD",
+	})
+	account := decodeResponse[ledger.Account](t, accountResponse)
+	csvContent := []byte(fmt.Sprintf(
+		"account_id,type,amount,currency,date,payee,description,category_id,transfer_account_id\n"+
+			"%d,expense,12.34,USD,2026-10-12,Market,Groceries,,\n",
+		account.ID,
+	))
+
+	previewResponse := apiMultipartRequest(t, handler, "/api/transactions/import.csv", "", "transactions.csv", csvContent)
+	if previewResponse.Code != http.StatusOK {
+		t.Fatalf("preview status = %d, want %d: %s", previewResponse.Code, http.StatusOK, previewResponse.Body)
+	}
+	preview := decodeResponse[ledger.CSVImportReport](t, previewResponse)
+	if preview.Ready != 1 || preview.Imported != 0 {
+		t.Fatalf("preview report = %+v", preview)
+	}
+
+	commitResponse := apiMultipartRequest(t, handler, "/api/transactions/import.csv?commit=true", "", "transactions.csv", csvContent)
+	if commitResponse.Code != http.StatusOK {
+		t.Fatalf("commit status = %d, want %d: %s", commitResponse.Code, http.StatusOK, commitResponse.Body)
+	}
+	committed := decodeResponse[ledger.CSVImportReport](t, commitResponse)
+	if committed.Imported != 1 {
+		t.Fatalf("commit report = %+v", committed)
+	}
+
+	exportResponse := apiRequest(t, handler, http.MethodGet, "/api/transactions/export.csv", nil)
+	if exportResponse.Code != http.StatusOK || !strings.Contains(exportResponse.Body.String(), "12.34") {
+		t.Fatalf("export status/body = %d/%s", exportResponse.Code, exportResponse.Body.String())
+	}
+	repeatResponse := apiMultipartRequest(t, handler, "/api/transactions/import.csv?commit=true", "", "transactions.csv", csvContent)
+	repeated := decodeResponse[ledger.CSVImportReport](t, repeatResponse)
+	if repeated.Imported != 0 || repeated.Duplicates != 1 {
+		t.Fatalf("repeated import report = %+v", repeated)
 	}
 }
 
