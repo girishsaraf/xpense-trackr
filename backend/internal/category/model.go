@@ -54,10 +54,14 @@ func CreateCategory(category *Category) error {
 
 // UpdateCategory updates an existing category in the database.
 func UpdateCategory(id int, updatedCategory *Category) error {
-	if err := db.Model(&Category{}).Where("id = ?", id).Updates(updatedCategory).Error; err != nil {
+	var existing Category
+	if err := db.First(&existing, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return ErrRecordNotFound
 		}
+		return err
+	}
+	if err := db.Model(&existing).Updates(updatedCategory).Error; err != nil {
 		return err
 	}
 	return nil
@@ -65,11 +69,12 @@ func UpdateCategory(id int, updatedCategory *Category) error {
 
 // DeleteCategory deletes an existing category from the database.
 func DeleteCategory(id int) error {
-	if err := db.Delete(&Category{}, id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return ErrRecordNotFound
-		}
-		return err
+	result := db.Delete(&Category{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return ErrRecordNotFound
 	}
 	return nil
 }

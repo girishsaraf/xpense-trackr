@@ -94,7 +94,7 @@ const ExpenseForm = () => {
                     />
                 </div>
                 <div className="input-container">
-                    <label htmlFor="category">Category:</label>
+                    <label htmlFor="category_id">Category:</label>
                     <input
                         type="text"
                         id="category_id"

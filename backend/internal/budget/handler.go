@@ -4,6 +4,7 @@ package budget
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -61,6 +62,10 @@ func UpdateBudgetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := UpdateBudget(budgetID, &updatedBudget); err != nil {
+		if errors.Is(err, ErrRecordNotFound) {
+			http.Error(w, "Budget not found", http.StatusNotFound)
+			return
+		}
 		http.Error(w, "Failed to update budget", http.StatusInternalServerError)
 		return
 	}
@@ -75,6 +80,10 @@ func DeleteBudgetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := DeleteBudget(budgetID); err != nil {
+		if errors.Is(err, ErrRecordNotFound) {
+			http.Error(w, "Budget not found", http.StatusNotFound)
+			return
+		}
 		http.Error(w, "Failed to delete budget", http.StatusInternalServerError)
 		return
 	}

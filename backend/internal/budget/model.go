@@ -55,10 +55,14 @@ func CreateBudget(budget *Budget) error {
 
 // UpdateBudget updates an existing budget in the database.
 func UpdateBudget(id int, updatedBudget *Budget) error {
-	if err := db.Model(&Budget{}).Where("id = ?", id).Updates(updatedBudget).Error; err != nil {
+	var existing Budget
+	if err := db.First(&existing, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return ErrRecordNotFound
 		}
+		return err
+	}
+	if err := db.Model(&existing).Updates(updatedBudget).Error; err != nil {
 		return err
 	}
 	return nil
@@ -66,11 +70,12 @@ func UpdateBudget(id int, updatedBudget *Budget) error {
 
 // DeleteBudget deletes an existing budget from the database.
 func DeleteBudget(id int) error {
-	if err := db.Delete(&Budget{}, id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return ErrRecordNotFound
-		}
-		return err
+	result := db.Delete(&Budget{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return ErrRecordNotFound
 	}
 	return nil
 }
