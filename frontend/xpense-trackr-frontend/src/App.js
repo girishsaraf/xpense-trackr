@@ -25,6 +25,7 @@ import ForecastPage from "./components/Forecast/ForecastPage";
 import ReceiptPage from "./components/Receipt/ReceiptPage";
 import ReportsPage from "./components/Reports/ReportsPage";
 import ImportExportPage from "./components/ImportExport/ImportExportPage";
+import PlanningPage from "./components/Planning/PlanningPage";
 
 function App() {
     return (
@@ -50,6 +51,7 @@ function App() {
                             <li><NavLink to="/investments" className={({ isActive }) => isActive ? 'active-tab' : undefined}><FontAwesomeIcon icon={faArrowTrendUp}/> Investments</NavLink></li>
                             <li><NavLink to="/budgets" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Budgets</NavLink></li>
                             <li><NavLink to="/goals" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Goals</NavLink></li>
+                            <li><NavLink to="/planning" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Plans</NavLink></li>
                             <li><NavLink to="/trends" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Trends</NavLink></li>
                             <li><NavLink to="/recurring" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Recurring</NavLink></li>
                             <li><NavLink to="/categories" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Categories</NavLink></li>
@@ -73,6 +75,7 @@ function App() {
                     <Route path="/goals" element={<GoalList/>}/>
                     <Route path="/goals/new" element={<GoalForm/>}/>
                     <Route path="/goals/:id/edit" element={<GoalForm/>}/>
+                    <Route path="/planning" element={<PlanningPage/>}/>
                     <Route path="/trends" element={<TrendsPage/>}/>
                     <Route path="/recurring" element={<RecurringPage/>}/>
                     <Route path="/recurring/:kind/:id/edit" element={<RecurringForm/>}/>

@@ -346,6 +346,10 @@ func validCurrency(currency string) bool {
 	return ok
 }
 
+func SupportedCurrency(currency string) bool {
+	return validCurrency(strings.ToUpper(strings.TrimSpace(currency)))
+}
+
 func validDate(value string) bool {
 	parsed, err := time.Parse("2006-01-02", value)
 	return err == nil && parsed.Format("2006-01-02") == value

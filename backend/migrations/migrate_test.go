@@ -27,8 +27,8 @@ func TestMigrateCreatesLegacySchemaAndIsRepeatable(t *testing.T) {
 	if err := db.Model(&schemaMigration{}).Count(&count).Error; err != nil {
 		t.Fatalf("count migration records: %v", err)
 	}
-	if count != 6 {
-		t.Errorf("migration record count = %d, want 6", count)
+	if count != 7 {
+		t.Errorf("migration record count = %d, want 7", count)
 	}
 
 	for _, table := range []string{
@@ -44,6 +44,9 @@ func TestMigrateCreatesLegacySchemaAndIsRepeatable(t *testing.T) {
 		"goals",
 		"recurring_expenses",
 		"recurring_investments",
+		"financial_goals",
+		"goal_contributions",
+		"budget_envelopes",
 	} {
 		if !db.Migrator().HasTable(table) {
 			t.Errorf("migration did not create %q table", table)

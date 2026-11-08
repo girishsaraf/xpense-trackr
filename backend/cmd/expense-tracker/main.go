@@ -25,6 +25,7 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/goal"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/ledger"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/planning"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/receipt"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/recurring"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/trends"
@@ -119,6 +120,7 @@ func run() error {
 	category.SetDB(db)
 	investments.SetDB(db)
 	ledger.SetDB(db)
+	planning.SetDB(db)
 	goal.SetDB(db)
 	recurring.SetDB(db)
 	receipt.SetDB(db)

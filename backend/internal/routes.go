@@ -7,6 +7,7 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/goal"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/ledger"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/planning"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/receipt"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/recurring"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/trends"
@@ -52,6 +53,17 @@ func SetRoutes(router *mux.Router) {
 	receiptRouter.HandleFunc("", receipt.CreateReceiptHandler).Methods("POST")
 	receiptRouter.HandleFunc("/{id:[0-9]+}", receipt.DeleteReceiptHandler).Methods("DELETE")
 	receiptRouter.HandleFunc("/{id:[0-9]+}/file", receipt.GetReceiptFileHandler).Methods("GET")
+
+	planningRouter := router.PathPrefix("/api/planning").Subrouter()
+	planningRouter.HandleFunc("/goals", planning.GetGoalsHandler).Methods("GET")
+	planningRouter.HandleFunc("/goals", planning.CreateGoalHandler).Methods("POST")
+	planningRouter.HandleFunc("/goals/{id:[0-9]+}", planning.DeleteGoalHandler).Methods("DELETE")
+	planningRouter.HandleFunc("/goals/{id:[0-9]+}/contributions", planning.GetContributionsHandler).Methods("GET")
+	planningRouter.HandleFunc("/goals/{id:[0-9]+}/contributions", planning.CreateContributionHandler).Methods("POST")
+	planningRouter.HandleFunc("/envelopes", planning.GetEnvelopesHandler).Methods("GET")
+	planningRouter.HandleFunc("/envelopes", planning.CreateEnvelopeHandler).Methods("POST")
+	planningRouter.HandleFunc("/envelopes/{id:[0-9]+}", planning.UpdateEnvelopeHandler).Methods("PUT")
+	planningRouter.HandleFunc("/envelopes/{id:[0-9]+}", planning.DeleteEnvelopeHandler).Methods("DELETE")
 
 	// Expense Management
 	expenseRouter := router.PathPrefix("/api/expenses").Subrouter()

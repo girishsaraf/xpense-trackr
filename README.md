@@ -70,6 +70,7 @@ The legacy `mysql/init.sql` file is not used by the local Compose setup. It cont
 - Merchant categorization rules for new uncategorized transactions
 - Scheduled income and bills with daily balance projections; forecasts never write actual transactions
 - Currency-separated cash-flow reports, CSV export, and local net-worth summaries
+- Savings-goal contributions with progress and monthly budget envelopes with optional rollover
 - CSV transaction import with row validation, duplicate detection, preview, and transactional commit
 - Local receipt attachments for PDF, PNG, and JPEG files (10 MB maximum)
 - Expense and category management

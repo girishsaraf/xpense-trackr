@@ -1,0 +1,227 @@
+.planning-page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2rem clamp(1rem, 4vw, 3rem) 4rem;
+    color: #172a3a;
+}
+
+.planning-heading,
+.planning-section-heading,
+.planning-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.25rem;
+}
+
+.planning-heading {
+    align-items: flex-end;
+    margin-bottom: 2rem;
+}
+
+.planning-heading h2,
+.planning-section h3 {
+    margin: 0.2rem 0 0.45rem;
+    color: #132d3d;
+}
+
+.planning-heading p {
+    margin: 0;
+    color: #607181;
+}
+
+.planning-heading label,
+.planning-form label,
+.planning-inline-form label {
+    display: grid;
+    gap: 0.4rem;
+    color: #425667;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.planning-eyebrow {
+    margin: 0;
+    color: #207d72;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+.planning-section {
+    margin-top: 1.5rem;
+    padding: clamp(1rem, 3vw, 1.6rem);
+    border: 1px solid #dfe8e8;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 26px rgb(21 55 68 / 5%);
+}
+
+.planning-form,
+.planning-inline-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    align-items: end;
+    gap: 0.85rem;
+    margin: 1.25rem 0;
+}
+
+.planning-page input,
+.planning-page select {
+    min-width: 0;
+    min-height: 42px;
+    box-sizing: border-box;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #cbd8dc;
+    border-radius: 8px;
+    background: #fff;
+    color: #172a3a;
+    font: inherit;
+}
+
+.planning-page input:focus,
+.planning-page select:focus {
+    border-color: #207d72;
+    outline: 3px solid rgb(32 125 114 / 18%);
+}
+
+.planning-page button {
+    min-height: 42px;
+    padding: 0.6rem 1rem;
+    border: 0;
+    border-radius: 8px;
+    background: #176f65;
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+}
+
+.planning-page button:hover {
+    background: #12594f;
+}
+
+.planning-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
+    gap: 1rem;
+}
+
+.planning-card {
+    padding: 1rem;
+    border: 1px solid #e3ebeb;
+    border-radius: 12px;
+    background: #fbfdfd;
+}
+
+.planning-card h4 {
+    margin: 0 0 0.3rem;
+    color: #172a3a;
+}
+
+.planning-card p {
+    margin: 0;
+    color: #607181;
+}
+
+.planning-card-top strong {
+    color: #176f65;
+    white-space: nowrap;
+}
+
+.planning-card-top .planning-over {
+    color: #b44237;
+}
+
+.planning-card progress {
+    display: block;
+    width: 100%;
+    height: 10px;
+    margin: 1rem 0 0.6rem;
+    accent-color: #207d72;
+}
+
+.planning-history {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0.6rem 0;
+    padding: 0;
+    list-style: none;
+}
+
+.planning-history li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e8eeee;
+    color: #607181;
+    font-size: 0.88rem;
+}
+
+.planning-history strong {
+    color: #172a3a;
+}
+
+.planning-note,
+.planning-empty {
+    margin: 0.75rem 0;
+    color: #607181;
+    font-size: 0.9rem;
+}
+
+.planning-inline-form {
+    grid-template-columns: minmax(120px, 0.8fr) minmax(110px, 1fr) minmax(130px, 1fr) auto;
+    margin-bottom: 0;
+}
+
+.planning-checkbox {
+    display: flex !important;
+    align-items: center;
+    min-height: 42px;
+}
+
+.planning-checkbox input {
+    width: 18px;
+    min-height: 18px;
+    margin: 0;
+    accent-color: #207d72;
+}
+
+.planning-secondary {
+    min-height: 36px !important;
+    padding: 0.4rem 0.75rem !important;
+    background: transparent !important;
+    color: #526678 !important;
+    font-size: 0.85rem !important;
+}
+
+.planning-secondary:hover {
+    background: #edf4f3 !important;
+}
+
+.planning-error {
+    margin: 1rem 0;
+    padding: 0.8rem 1rem;
+    border: 1px solid #e6aaa3;
+    border-radius: 8px;
+    background: #fff4f2;
+    color: #8d3029;
+}
+
+@media (max-width: 700px) {
+    .planning-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .planning-inline-form {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 420px) {
+    .planning-inline-form {
+        grid-template-columns: 1fr;
+    }
+}

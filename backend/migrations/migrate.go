@@ -10,6 +10,7 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/goal"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/ledger"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/planning"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/receipt"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/recurring"
 	"gorm.io/gorm"
@@ -76,6 +77,13 @@ var schemaMigrations = []migration{
 		name:    "transaction-csv-import-fingerprints",
 		apply: func(tx *gorm.DB) error {
 			return tx.AutoMigrate(&ledger.Transaction{})
+		},
+	},
+	{
+		version: 7,
+		name:    "goal-contributions-and-budget-envelopes",
+		apply: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&planning.Goal{}, &planning.GoalContribution{}, &planning.Envelope{})
 		},
 	},
 }

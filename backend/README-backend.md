@@ -19,6 +19,10 @@ The API is available at the legacy `/api/...` paths. `/api/v1/...` currently ali
 - `GET /api/reports/cashflow?from=YYYY-MM-DD&to=YYYY-MM-DD`: Summarize bounded cash flow by currency and expense category; periods are limited to one year.
 - `GET /api/reports/cashflow.csv`: Download the cash-flow report as CSV.
 - `GET /api/net-worth`: Summarize positive and negative account balances separately by currency without assuming foreign-exchange rates.
+- `GET|POST /api/planning/goals`: Manage exact-minor-unit savings goals. Goal progress is calculated from contribution history.
+- `GET|POST /api/planning/goals/{id}/contributions`: List or add a dated contribution/withdrawal; withdrawals cannot exceed the recorded goal balance.
+- `GET /api/planning/envelopes?period=YYYY-MM`: View category spending, available amount, and carryover for a month.
+- `POST /api/planning/envelopes`, `PUT|DELETE /api/planning/envelopes/{id}`: Manage monthly category envelopes. Rollover carries prior-month underspend or overspend forward.
 - `GET|POST /api/receipts`: List receipts or upload multipart fields `transaction_id` and `file`; uploads allow PDF, PNG, and JPEG up to 10 MB.
 - `GET /api/receipts/{id}/file`, `DELETE /api/receipts/{id}`: Download or delete a receipt attachment.
 

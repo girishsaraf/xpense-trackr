@@ -20,6 +20,7 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/goal"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/ledger"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/planning"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/receipt"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/recurring"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/trends"
@@ -59,6 +60,9 @@ func setupIntegrationDB(t *testing.T) (*gorm.DB, http.Handler) {
 		&ledger.Transaction{},
 		&ledger.CategoryRule{},
 		&ledger.ScheduledFlow{},
+		&planning.Goal{},
+		&planning.GoalContribution{},
+		&planning.Envelope{},
 		&receipt.Receipt{},
 		&recurring.RecurringExpense{},
 		&recurring.RecurringInvestment{},
@@ -75,6 +79,7 @@ func setupIntegrationDB(t *testing.T) (*gorm.DB, http.Handler) {
 	expense.SetDB(database)
 	investments.SetDB(database)
 	ledger.SetDB(database)
+	planning.SetDB(database)
 	recurring.SetDB(database)
 	receipt.SetDB(database)
 	goal.SetDB(database)
@@ -585,6 +590,7 @@ func TestRecurringAPI(t *testing.T) {
 	if recurringExpenseResponse.Code != http.StatusCreated {
 		t.Fatalf("create recurring expense status = %d, want %d; body = %s", recurringExpenseResponse.Code, http.StatusCreated, recurringExpenseResponse.Body.String())
 	}
+
 	createdExpense := decodeResponse[recurring.RecurringExpense](t, recurringExpenseResponse)
 
 	listResponse := apiRequest(t, handler, http.MethodGet, "/api/recurring/expenses", nil)
@@ -613,5 +619,65 @@ func TestRecurringAPI(t *testing.T) {
 	deleteInvestmentResponse := apiRequest(t, handler, http.MethodDelete, fmt.Sprintf("/api/recurring/investments/%d", createdInvestment.ID), nil)
 	if deleteInvestmentResponse.Code != http.StatusNoContent {
 		t.Fatalf("delete recurring investment status = %d, want %d", deleteInvestmentResponse.Code, http.StatusNoContent)
+	}
+}
+
+func TestGoalContributionsAndBudgetEnvelopesAPI(t *testing.T) {
+	_, handler := setupIntegrationDB(t)
+	targetDate := time.Now().UTC().AddDate(1, 0, 0).Format("2006-01-02")
+	goalResponse := apiRequest(t, handler, http.MethodPost, "/api/planning/goals", map[string]interface{}{
+		"name": "Emergency fund", "currency": "USD", "target_amount_minor": 10000, "target_date": targetDate,
+	})
+	if goalResponse.Code != http.StatusCreated {
+		t.Fatalf("create financial goal status = %d, want %d; body = %s", goalResponse.Code, http.StatusCreated, goalResponse.Body.String())
+	}
+	createdGoal := decodeResponse[planning.Goal](t, goalResponse)
+
+	contributionResponse := apiRequest(t, handler, http.MethodPost,
+		fmt.Sprintf("/api/planning/goals/%d/contributions", createdGoal.ID),
+		map[string]interface{}{"amount_minor": 2500, "direction": "contribution", "date": time.Now().UTC().Format("2006-01-02"), "note": "Monthly saving"},
+	)
+	if contributionResponse.Code != http.StatusCreated {
+		t.Fatalf("create contribution status = %d, want %d; body = %s", contributionResponse.Code, http.StatusCreated, contributionResponse.Body.String())
+	}
+	overdrawResponse := apiRequest(t, handler, http.MethodPost,
+		fmt.Sprintf("/api/planning/goals/%d/contributions", createdGoal.ID),
+		map[string]interface{}{"amount_minor": 3000, "direction": "withdrawal", "date": time.Now().UTC().Format("2006-01-02")},
+	)
+	if overdrawResponse.Code != http.StatusConflict {
+		t.Fatalf("overdraw status = %d, want %d", overdrawResponse.Code, http.StatusConflict)
+	}
+	goalsResponse := apiRequest(t, handler, http.MethodGet, "/api/planning/goals", nil)
+	goals := decodeResponse[[]planning.Goal](t, goalsResponse)
+	if len(goals) != 1 || goals[0].CurrentAmountMinor != 2500 {
+		t.Fatalf("goal progress = %+v", goals)
+	}
+
+	categoryResponse := apiRequest(t, handler, http.MethodPost, "/api/categories", map[string]string{"name": "Food"})
+	createdCategory := decodeResponse[category.Category](t, categoryResponse)
+	accountResponse := apiRequest(t, handler, http.MethodPost, "/api/accounts", map[string]interface{}{
+		"name": "Checking", "type": "checking", "currency": "USD", "opening_balance_minor": 10000,
+	})
+	if accountResponse.Code != http.StatusCreated {
+		t.Fatalf("create account status = %d, want %d", accountResponse.Code, http.StatusCreated)
+	}
+	today := time.Now().UTC().Format("2006-01-02")
+	transactionResponse := apiRequest(t, handler, http.MethodPost, "/api/transactions", map[string]interface{}{
+		"account_id": 1, "type": "expense", "amount_minor": 300, "currency": "USD", "date": today,
+		"category_id": createdCategory.ID,
+	})
+	if transactionResponse.Code != http.StatusCreated {
+		t.Fatalf("create transaction status = %d, want %d; body = %s", transactionResponse.Code, http.StatusCreated, transactionResponse.Body.String())
+	}
+	envelopeResponse := apiRequest(t, handler, http.MethodPost, "/api/planning/envelopes", map[string]interface{}{
+		"category_id": createdCategory.ID, "currency": "USD", "monthly_limit_minor": 1000, "rollover": false,
+	})
+	if envelopeResponse.Code != http.StatusCreated {
+		t.Fatalf("create envelope status = %d, want %d; body = %s", envelopeResponse.Code, http.StatusCreated, envelopeResponse.Body.String())
+	}
+	summaryResponse := apiRequest(t, handler, http.MethodGet, "/api/planning/envelopes?period="+time.Now().UTC().Format("2006-01"), nil)
+	summaries := decodeResponse[[]planning.EnvelopeSummary](t, summaryResponse)
+	if len(summaries) != 1 || summaries[0].SpentMinor != 300 || summaries[0].AvailableMinor != 700 {
+		t.Fatalf("envelope summary = %+v", summaries)
 	}
 }
