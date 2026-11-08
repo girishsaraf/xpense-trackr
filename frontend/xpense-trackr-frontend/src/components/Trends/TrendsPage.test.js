@@ -5,6 +5,9 @@ import TrendsPage from './TrendsPage';
 import backendUrl from '../../config';
 
 jest.mock('axios');
+jest.mock('../Charts/ChartVisualization', () => ({ ariaLabel }) => (
+    <div role="img" aria-label={ariaLabel} />
+));
 
 describe('TrendsPage', () => {
     beforeEach(() => {
@@ -22,16 +25,18 @@ describe('TrendsPage', () => {
         render(<TrendsPage />);
 
         expect(await screen.findByText('$200.00')).toBeInTheDocument();
-        expect(screen.getAllByText('Food')).toHaveLength(2);
-        expect(screen.getByRole('list', { name: 'Monthly spending amounts' })).toBeInTheDocument();
+        expect(screen.getByText('Food')).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: 'Bar chart showing spending by month' })).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: 'Doughnut chart showing spending distribution by category' })).toBeInTheDocument();
     });
 
     test('reloads results when the selected period changes', async () => {
         render(<TrendsPage />);
         await screen.findByText('Monthly spending');
 
-        fireEvent.change(screen.getByLabelText('Time period'), { target: { value: '12' } });
+        fireEvent.click(screen.getByRole('button', { name: '12 months' }));
 
         await waitFor(() => expect(axios.get).toHaveBeenLastCalledWith(`${backendUrl}/api/trends/spending?months=12`));
+        expect(screen.getByRole('button', { name: '12 months' })).toHaveAttribute('aria-pressed', 'true');
     });
 });

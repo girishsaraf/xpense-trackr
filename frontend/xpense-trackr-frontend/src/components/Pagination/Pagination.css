@@ -29,7 +29,7 @@
 
 .pagination li button {
     min-width: 34px;
-    border: 1px solid #e1e9e3;
+    border: 1px solid #dce5f1;
     border-radius: 8px;
     background: #fff;
     color: #53675a;
@@ -39,7 +39,7 @@
 
 .pagination li button:hover,
 .pagination li.active button {
-    border-color: #20734f;
-    background: #20734f;
+    border-color: #2563eb;
+    background: #2563eb;
     color: #fff;
 }

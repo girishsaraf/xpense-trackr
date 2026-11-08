@@ -19,7 +19,7 @@
 
 .table-empty-state {
     padding: 38px 20px !important;
-    color: #78857d !important;
+    color: #7789a2 !important;
     text-align: center;
 }
 
@@ -152,10 +152,10 @@
 /* Define colors for different categories */
 .type-stocks { background-color: #ffe0b2; }
 .type-savings { background-color: #b2ebf2; }
-.type-bonds { background-color: #b2dfdb; }
+.type-bonds { background-color: #c8dcfb; }
 .type-real_estate { background-color: #ffcc80; }
 .type-401k { background-color: #f48fb1; }
-.type-mutual_funds { background-color: #c5e1a5; }
+.type-mutual_funds { background-color: #dbeafe; }
 /* Add more categories as needed */
 
 /* Tag Styles */
@@ -175,10 +175,10 @@
 /* Table Row Colors */
 tr.type-stocks { background-color: #ffe0b2; }
 tr.type-savings { background-color: #b2ebf2; }
-tr.type-bonds { background-color: #b2dfdb; }
+tr.type-bonds { background-color: #c8dcfb; }
 tr.type-real_estate { background-color: #ffcc80; }
 tr.type-401k { background-color: #f48fb1; }
-tr.type-mutual_funds { background-color: #c5e1a5; }
+tr.type-mutual_funds { background-color: #dbeafe; }
 /* Add more type-specific row colors as needed */
 
 
@@ -209,11 +209,11 @@ tr.type-mutual_funds { background-color: #c5e1a5; }
 
 .investment-list-header {
     padding: 0 0 17px;
-    border-bottom: 1px solid #e8ede9;
+    border-bottom: 1px solid #e5ebf4;
 }
 
 .investment-list-header h2 {
-    color: #233d2e;
+    color: #263d5a;
     font-size: 19px;
     letter-spacing: -0.02em;
 }
@@ -223,7 +223,7 @@ tr.type-mutual_funds { background-color: #c5e1a5; }
     border-collapse: separate;
     border-spacing: 0;
     overflow: hidden;
-    border: 1px solid #e7ece8;
+    border: 1px solid #e1e9f4;
     border-radius: 12px;
     background: #fff;
 }
@@ -231,9 +231,9 @@ tr.type-mutual_funds { background-color: #c5e1a5; }
 .investment-list-table th {
     padding: 13px 15px;
     border: 0;
-    border-bottom: 1px solid #e8ede9;
-    background: #f7f9f7;
-    color: #76847a;
+    border-bottom: 1px solid #e5ebf4;
+    background: #f7faff;
+    color: #7789a2;
     font-size: 10px;
     font-weight: 750;
     letter-spacing: 0.08em;
@@ -244,9 +244,9 @@ tr.type-mutual_funds { background-color: #c5e1a5; }
 .investment-list-table td {
     padding: 13px 15px;
     border: 0;
-    border-bottom: 1px solid #eef1ee;
+    border-bottom: 1px solid #eef2f8;
     background: #fff;
-    color: #435449;
+    color: #455a78;
     font-size: 13px;
 }
 
@@ -255,7 +255,7 @@ tr.type-mutual_funds { background-color: #c5e1a5; }
 }
 
 .investment-list-table tr:hover td {
-    background: #fbfcfb;
+    background: #fafcff;
 }
 
 .button-common-add {
@@ -263,13 +263,13 @@ tr.type-mutual_funds { background-color: #c5e1a5; }
     align-items: center;
     padding: 9px 13px;
     border-radius: 9px;
-    background: #20734f;
+    background: #2563eb;
     font-size: 13px;
     font-weight: 650;
 }
 
 .button-common-add:hover {
-    background: #195e40;
+    background: #1d4ed8;
 }
 
 .button-common {
@@ -279,24 +279,24 @@ tr.type-mutual_funds { background-color: #c5e1a5; }
     place-items: center;
     margin: 0;
     padding: 0;
-    border: 1px solid #e4eae5;
+    border: 1px solid #e1e9f4;
     border-radius: 9px;
     background: #fff;
-    color: #597063;
+    color: #5b7391;
     font-size: 13px;
 }
 
 .button-common:hover {
-    border-color: #c6dbcd;
-    background: #eff6f1;
-    color: #216344;
+    border-color: #c6d6ee;
+    background: #eff5ff;
+    color: #1d4ed8;
 }
 
 .type-tag {
     padding: 5px 9px;
     border-radius: 7px;
-    background: #edf4ee;
-    color: #476c50;
+    background: #edf3fc;
+    color: #476ba8;
     font-size: 11px;
     font-weight: 650;
 }

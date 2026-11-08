@@ -80,15 +80,15 @@
     max-width: 700px;
     margin: 0 auto;
     padding: 30px;
-    border: 1px solid #e7ece8;
+    border: 1px solid #e1e9f4;
     border-radius: 16px;
     background: #fff;
-    box-shadow: 0 4px 18px rgba(34, 57, 42, 0.035);
+    box-shadow: 0 4px 18px rgba(37, 76, 137, 0.05);
 }
 
 .expense-form-container h1 {
     margin: 0;
-    color: #203d2e;
+    color: #253b5b;
     font-size: 26px;
     letter-spacing: -0.04em;
     text-align: left;
@@ -110,7 +110,7 @@
 .expense-form-container form .input-container label {
     flex: none;
     margin: 0;
-    color: #44584b;
+    color: #445b79;
     font-size: 12px;
     font-weight: 650;
 }
@@ -121,17 +121,17 @@
     min-height: 44px;
     flex: none;
     padding: 10px 12px;
-    border: 1px solid #dce5de;
+    border: 1px solid #d9e3f0;
     border-radius: 9px;
     background: #fff;
-    color: #2c4033;
+    color: #344b6b;
     font-size: 14px;
 }
 
 .expense-form-container form .input-container input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: #20734f;
+    accent-color: #2563eb;
 }
 
 .expense-form-container .buttons-container {
@@ -140,7 +140,7 @@
     gap: 10px;
     margin-top: 24px;
     padding-top: 18px;
-    border-top: 1px solid #edf0ed;
+    border-top: 1px solid #edf2f8;
 }
 
 .expense-form-container form .buttons-container button {
@@ -148,16 +148,16 @@
     padding: 10px 18px;
     border: 1px solid transparent;
     border-radius: 9px;
-    background: #20734f;
+    background: #2563eb;
     font-size: 13px;
     font-weight: 650;
 }
 
 .expense-form-container form .buttons-container button:last-child {
     margin-left: 0;
-    border-color: #dce5de;
+    border-color: #d9e3f0;
     background: #fff;
-    color: #516356;
+    color: #506582;
 }
 
 @media (max-width: 700px) {

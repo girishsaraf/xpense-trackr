@@ -1,0 +1,25 @@
+.chart-visualization {
+    position: relative;
+    width: 100%;
+    height: 290px;
+}
+
+.chart-visualization-doughnut {
+    max-width: 340px;
+    margin: 0 auto;
+}
+
+.chart-visualization canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+@media (max-width: 600px) {
+    .chart-visualization {
+        height: 250px;
+    }
+
+    .chart-visualization-doughnut {
+        max-width: 290px;
+    }
+}

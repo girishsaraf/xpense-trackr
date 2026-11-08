@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import backendUrl from '../../config';
+import ChartVisualization from '../Charts/ChartVisualization';
 import formatCurrency from '../../utils/formatCurrency';
 
+const periods = [3, 6, 12];
 const monthLabel = (month) => {
     const [year, monthNumber] = month.split('-').map(Number);
     return new Date(year, monthNumber - 1, 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
@@ -49,8 +51,26 @@ export default function TrendsPage() {
     const totalSpent = totals.months.reduce((sum, [, amount]) => sum + amount, 0);
     const average = totals.months.length ? totalSpent / totals.months.length : 0;
     const highestCategory = totals.categories[0];
-    const maxCategory = highestCategory?.[1] || 1;
-    const maxMonth = Math.max(1, ...totals.months.map(([, amount]) => amount));
+    const monthlyChartData = {
+        labels: totals.months.map(([month]) => monthLabel(month)),
+        datasets: [{
+            label: 'Spending',
+            data: totals.months.map(([, amount]) => amount),
+            backgroundColor: '#4b83ed',
+            borderRadius: 7,
+            maxBarThickness: 42,
+        }],
+    };
+    const categoryChartData = {
+        labels: totals.categories.map(([category]) => category),
+        datasets: [{
+            label: 'Spending',
+            data: totals.categories.map(([, amount]) => amount),
+            backgroundColor: totals.categories.map((_, index) => ['#2563eb', '#06b6d4', '#8b5cf6', '#f59e0b', '#ec4899', '#0f766e'][index % 6]),
+            borderColor: '#ffffff',
+            borderWidth: 3,
+        }],
+    };
 
     return (
         <main className="management-page">
@@ -61,12 +81,21 @@ export default function TrendsPage() {
                     <p className="page-description">See where your money goes and how your spending changes over time.</p>
                 </div>
                 <div className="period-picker">
-                    <label htmlFor="trend-period">Time period</label>
-                    <select id="trend-period" value={months} onChange={(event) => setMonths(Number(event.target.value))}>
-                        <option value="3">Last 3 months</option>
-                        <option value="6">Last 6 months</option>
-                        <option value="12">Last 12 months</option>
-                    </select>
+                    <span className="period-label">Time period</span>
+                    <div className="period-control" role="group" aria-label="Time period">
+                        {periods.map((period) => (
+                            <button
+                                key={period}
+                                type="button"
+                                aria-label={`${period} months`}
+                                aria-pressed={months === period}
+                                className={months === period ? 'selected' : ''}
+                                onClick={() => setMonths(period)}
+                            >
+                                {period}M
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </header>
 
@@ -99,28 +128,21 @@ export default function TrendsPage() {
                             <div className="card-heading">
                                 <div><p className="eyebrow">MONTH BY MONTH</p><h2>Monthly spending</h2></div>
                             </div>
-                            <div className="trend-bars" role="list" aria-label="Monthly spending amounts">
-                                {totals.months.map(([month, amount]) => (
-                                    <div className="trend-bar-row" role="listitem" key={month}>
-                                        <span>{monthLabel(month)}</span>
-                                        <div className="trend-bar-track" aria-hidden="true"><span style={{ width: `${(amount / maxMonth) * 100}%` }} /></div>
-                                        <strong>{formatCurrency(amount)}</strong>
-                                    </div>
-                                ))}
-                            </div>
+                            <ChartVisualization
+                                type="bar"
+                                data={monthlyChartData}
+                                ariaLabel="Bar chart showing spending by month"
+                            />
                         </section>
-                        <section className="data-card">
+                        <section className="data-card category-chart-card">
                             <div className="card-heading">
                                 <div><p className="eyebrow">WHERE IT GOES</p><h2>By category</h2></div>
                             </div>
-                            <div className="category-breakdown" role="list" aria-label="Spending by category">
-                                {totals.categories.map(([category, amount]) => (
-                                    <div className="category-breakdown-row" role="listitem" key={category}>
-                                        <div className="breakdown-heading"><span>{category}</span><strong>{formatCurrency(amount)}</strong></div>
-                                        <div className="trend-bar-track" aria-hidden="true"><span style={{ width: `${(amount / maxCategory) * 100}%` }} /></div>
-                                    </div>
-                                ))}
-                            </div>
+                            <ChartVisualization
+                                type="doughnut"
+                                data={categoryChartData}
+                                ariaLabel="Doughnut chart showing spending distribution by category"
+                            />
                         </section>
                     </div>
                 </>

@@ -22,6 +22,7 @@ describe('InvestmentGraph', () => {
     beforeEach(() => {
         Chart.mockClear();
         global.fetch = jest.fn().mockResolvedValue({
+            ok: true,
             json: () => Promise.resolve(graphData),
         });
         HTMLCanvasElement.prototype.getContext = jest.fn(() => ({}));
@@ -46,16 +47,26 @@ describe('InvestmentGraph', () => {
         );
     });
 
-    test('re-fetches when the month range changes', async () => {
+    test('re-fetches when the selected period changes', async () => {
         render(<InvestmentGraph />);
 
         await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
 
-        fireEvent.click(screen.getByRole('button', { name: '4 Months' }));
+        fireEvent.click(screen.getByRole('button', { name: '12 months' }));
 
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenLastCalledWith(`${backendUrl}/api/investments/cumulative?lastMonths=5`);
+            expect(global.fetch).toHaveBeenLastCalledWith(`${backendUrl}/api/investments/cumulative?lastMonths=12`);
         });
+    });
+
+    test('switches to a portfolio mix chart', async () => {
+        render(<InvestmentGraph />);
+        await waitFor(() => expect(Chart).toHaveBeenCalled());
+
+        fireEvent.click(screen.getByRole('button', { name: 'Portfolio mix' }));
+
+        await waitFor(() => expect(Chart.mock.calls[Chart.mock.calls.length - 1][1].type).toBe('doughnut'));
+        expect(screen.getByRole('button', { name: 'Portfolio mix' })).toHaveAttribute('aria-pressed', 'true');
     });
 
     test('reports fetch failures', async () => {

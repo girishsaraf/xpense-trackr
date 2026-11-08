@@ -23,6 +23,7 @@ describe('ExpenseGraph', () => {
     beforeEach(() => {
         Chart.mockClear();
         global.fetch = jest.fn().mockResolvedValue({
+            ok: true,
             json: () => Promise.resolve(graphData),
         });
         HTMLCanvasElement.prototype.getContext = jest.fn(() => ({}));
@@ -46,16 +47,26 @@ describe('ExpenseGraph', () => {
         expect(chartConfig.data.datasets.map((dataset) => dataset.label)).toEqual(expect.arrayContaining(['Food', 'Travel']));
     });
 
-    test('re-fetches when the month range changes', async () => {
+    test('re-fetches when the selected period changes', async () => {
         render(<ExpenseGraph />);
 
         await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
 
-        fireEvent.click(screen.getByRole('button', { name: '2 Months' }));
+        fireEvent.click(screen.getByRole('button', { name: '3 months' }));
 
         await waitFor(() => {
             expect(global.fetch).toHaveBeenLastCalledWith(`${backendUrl}/api/expenses/cumulative?lastMonths=3`);
         });
+    });
+
+    test('switches to a stacked monthly comparison view', async () => {
+        render(<ExpenseGraph />);
+        await waitFor(() => expect(Chart).toHaveBeenCalled());
+
+        fireEvent.click(screen.getByRole('button', { name: 'Monthly' }));
+
+        await waitFor(() => expect(Chart.mock.calls[Chart.mock.calls.length - 1][1].type).toBe('bar'));
+        expect(screen.getByRole('button', { name: 'Monthly' })).toHaveAttribute('aria-pressed', 'true');
     });
 
     test('reports fetch failures', async () => {

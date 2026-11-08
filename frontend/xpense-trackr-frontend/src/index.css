@@ -1,8 +1,8 @@
 body {
   margin: 0;
   min-width: 320px;
-  background: #f5f7f5;
-  color: #23332c;
+  background: #f5f8fc;
+  color: #25364f;
   font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -22,7 +22,7 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 3px solid rgba(32, 132, 95, 0.3);
+  outline: 3px solid rgba(37, 99, 235, 0.3);
   outline-offset: 2px;
 }
 

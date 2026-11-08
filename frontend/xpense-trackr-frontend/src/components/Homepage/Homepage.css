@@ -242,7 +242,7 @@
 
 .homepage .page-intro h1 {
     margin: 0;
-    color: #183b2c;
+    color: #183253;
     font-size: clamp(28px, 4vw, 38px);
     font-weight: 700;
     letter-spacing: -0.05em;
@@ -261,16 +261,16 @@
 .homepage .investment-overview {
     margin: 0 0 20px;
     padding: 20px 22px 22px;
-    border: 1px solid #e7ece8;
+    border: 1px solid #e1e9f4;
     border-radius: 16px;
     background: #fff;
-    box-shadow: 0 4px 18px rgba(34, 57, 42, 0.035);
+    box-shadow: 0 4px 18px rgba(37, 76, 137, 0.05);
 }
 
 .homepage .expense-overview h2,
 .homepage .investment-overview h2 {
     margin: 0 0 16px;
-    color: #30453a;
+    color: #2f4564;
     font-size: 15px;
     font-weight: 700;
     text-align: left;
@@ -292,21 +292,21 @@
     gap: 6px;
     margin: 0;
     padding: 13px 15px;
-    border: 1px solid #edf0ed;
+    border: 1px solid #edf2f8;
     border-radius: 12px;
-    background: #f9fbf9;
+    background: #f7faff;
 }
 
 .homepage .overview-box .category,
 .homepage .overview-box .type {
-    color: #78857d;
+    color: #7789a2;
     font-size: 12px;
     font-weight: 550;
 }
 
 .homepage .overview-box .amount {
     float: none;
-    color: #233b2e;
+    color: #263c59;
     font-size: 19px;
     font-weight: 700;
     letter-spacing: -0.03em;
@@ -316,11 +316,11 @@
     width: 100%;
     min-height: 370px;
     padding: 22px 24px;
-    border: 1px solid #e7ece8;
+    border: 1px solid #e1e9f4;
     border-radius: 16px;
     background: #fff;
-    color: #23332c;
-    box-shadow: 0 4px 18px rgba(34, 57, 42, 0.035);
+    color: #25364f;
+    box-shadow: 0 4px 18px rgba(37, 76, 137, 0.05);
 }
 
 .homepage .section-heading {
@@ -333,7 +333,7 @@
 
 .homepage .graph-title {
     margin: 0;
-    color: #30453a;
+    color: #2f4564;
     font-size: 17px;
     font-weight: 700;
     letter-spacing: -0.02em;
@@ -352,10 +352,10 @@
 .homepage .graph-container .buttons-container button {
     margin: 0;
     padding: 7px 11px;
-    border: 1px solid #e6ebe7;
+    border: 1px solid #e1e9f4;
     border-radius: 8px;
     background: #fff;
-    color: #65756b;
+    color: #657995;
     box-shadow: none;
     font-size: 12px;
     font-weight: 600;
@@ -366,9 +366,9 @@
     flex: none;
     gap: 4px;
     padding: 4px;
-    border: 1px solid #e5ebe6;
+    border: 1px solid #dce5f1;
     border-radius: 12px;
-    background: #edf1ed;
+    background: #f0f4fb;
 }
 
 .homepage .dashboard-tools {
@@ -388,7 +388,7 @@
     border: 0;
     border-radius: 9px;
     background: transparent;
-    color: #718078;
+    color: #7185a1;
     font-size: 13px;
     font-weight: 650;
     box-shadow: none;
@@ -396,7 +396,7 @@
 
 .homepage .view-switch .toggle-button.active {
     background: #fff;
-    color: #21573d;
+    color: #1d4ed8;
     box-shadow: 0 1px 3px rgba(29, 55, 39, 0.12);
 }
 
@@ -419,6 +419,119 @@
     .homepage .graph-container {
         min-height: 330px;
         padding: 18px 15px;
+    }
+}
+
+.homepage .graph-container {
+    border-color: #e2eaf5;
+    box-shadow: 0 12px 32px rgba(37, 76, 137, 0.06);
+}
+
+.homepage .graph-container canvas {
+    max-height: none;
+}
+
+.homepage .finance-graph {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.homepage .graph-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.homepage .chart-visualization {
+    height: 300px;
+}
+
+.chart-mode-control,
+.chart-period-control,
+.period-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 4px;
+    border: 1px solid #e1e9f4;
+    border-radius: 12px;
+    background: #f5f8fd;
+}
+
+.chart-mode-control button,
+.chart-period-control button,
+.period-control button {
+    min-height: 34px;
+    padding: 7px 11px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #647995;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.2;
+    transition: background-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+
+.chart-mode-control button.selected,
+.chart-period-control button.selected,
+.period-control button.selected {
+    background: #fff;
+    color: #1d4ed8;
+    box-shadow: 0 1px 4px rgba(36, 67, 117, 0.13);
+}
+
+.chart-mode-control button:hover:not(.selected),
+.chart-period-control button:hover:not(.selected),
+.period-control button:hover:not(.selected) {
+    background: #eaf1fc;
+    color: #1d4ed8;
+}
+
+.chart-mode-control button:focus-visible,
+.chart-period-control button:focus-visible,
+.period-control button:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.28);
+    outline-offset: 2px;
+}
+
+.chart-message {
+    display: flex;
+    min-height: 250px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 0;
+    color: #71829a;
+    font-size: 13px;
+    text-align: center;
+}
+
+.chart-error button {
+    padding: 8px 12px;
+    border: 1px solid #c9d8ef;
+    border-radius: 8px;
+    background: #fff;
+    color: #1d4ed8;
+    cursor: pointer;
+    font-weight: 650;
+}
+
+@media (max-width: 620px) {
+    .homepage .graph-controls {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .homepage .chart-mode-control {
+        width: 100%;
+    }
+
+    .homepage .chart-mode-control button {
+        flex: 1;
     }
 }
 
