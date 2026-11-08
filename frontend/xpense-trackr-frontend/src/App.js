@@ -1,34 +1,35 @@
 // src/App.js
 
-import React from 'react';
+import { lazy, Suspense } from 'react';
 import {BrowserRouter as Router, Routes, Route, NavLink, Link} from 'react-router-dom';
-import ExpenseList from './components/Expense/ExpenseList';
 import './App.css';
-import ExpenseForm from "./components/Expense/ExpenseForm";
-import InvestmentList from "./components/Investment/InvestmentList";
-import InvestmentForm from "./components/Investment/InvestmentForm"
 import { faArrowTrendUp, faChartPie, faHouse, faThumbtack} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import Homepage from "./components/Homepage/Homepage";
-import BudgetList from "./components/Budget/BudgetList";
-import BudgetForm from "./components/Budget/BudgetForm";
-import GoalList from "./components/Goal/GoalList";
-import GoalForm from "./components/Goal/GoalForm";
-import TrendsPage from "./components/Trends/TrendsPage";
-import CategoryList from "./components/Category/CategoryList";
-import CategoryForm from "./components/Category/CategoryForm";
-import RecurringPage from "./components/Recurring/RecurringPage";
-import RecurringForm from "./components/Recurring/RecurringForm";
-import NotFoundPage from "./components/Common/NotFoundPage";
-import LedgerPage from "./components/Ledger/LedgerPage";
-import ForecastPage from "./components/Forecast/ForecastPage";
-import ReceiptPage from "./components/Receipt/ReceiptPage";
-import ReportsPage from "./components/Reports/ReportsPage";
-import ImportExportPage from "./components/ImportExport/ImportExportPage";
-import PlanningPage from "./components/Planning/PlanningPage";
-import BillsPage from "./components/Bills/BillsPage";
 import OfflineNotice from "./components/Common/OfflineNotice";
-import AssetsPage from "./components/Assets/AssetsPage";
+
+const ExpenseList = lazy(() => import('./components/Expense/ExpenseList'));
+const ExpenseForm = lazy(() => import('./components/Expense/ExpenseForm'));
+const InvestmentList = lazy(() => import('./components/Investment/InvestmentList'));
+const InvestmentForm = lazy(() => import('./components/Investment/InvestmentForm'));
+const Homepage = lazy(() => import('./components/Homepage/Homepage'));
+const BudgetList = lazy(() => import('./components/Budget/BudgetList'));
+const BudgetForm = lazy(() => import('./components/Budget/BudgetForm'));
+const GoalList = lazy(() => import('./components/Goal/GoalList'));
+const GoalForm = lazy(() => import('./components/Goal/GoalForm'));
+const TrendsPage = lazy(() => import('./components/Trends/TrendsPage'));
+const CategoryList = lazy(() => import('./components/Category/CategoryList'));
+const CategoryForm = lazy(() => import('./components/Category/CategoryForm'));
+const RecurringPage = lazy(() => import('./components/Recurring/RecurringPage'));
+const RecurringForm = lazy(() => import('./components/Recurring/RecurringForm'));
+const NotFoundPage = lazy(() => import('./components/Common/NotFoundPage'));
+const LedgerPage = lazy(() => import('./components/Ledger/LedgerPage'));
+const ForecastPage = lazy(() => import('./components/Forecast/ForecastPage'));
+const ReceiptPage = lazy(() => import('./components/Receipt/ReceiptPage'));
+const ReportsPage = lazy(() => import('./components/Reports/ReportsPage'));
+const ImportExportPage = lazy(() => import('./components/ImportExport/ImportExportPage'));
+const PlanningPage = lazy(() => import('./components/Planning/PlanningPage'));
+const BillsPage = lazy(() => import('./components/Bills/BillsPage'));
+const AssetsPage = lazy(() => import('./components/Assets/AssetsPage'));
 
 function App() {
     return (
@@ -64,34 +65,36 @@ function App() {
                     </nav>
                 </header>
                 <OfflineNotice />
-                <Routes>
-                    <Route path="/" element={<Homepage/>}/>
-                    <Route path="/expenses" element={<ExpenseList/>}/>
-                    <Route path="/expenses/new" element={<ExpenseForm/>}/>
-                    <Route path="/transactions" element={<LedgerPage/>}/>
-                    <Route path="/forecast" element={<ForecastPage/>}/>
-                    <Route path="/bills" element={<BillsPage/>}/>
-                    <Route path="/assets" element={<AssetsPage/>}/>
-                    <Route path="/receipts" element={<ReceiptPage/>}/>
-                    <Route path="/reports" element={<ReportsPage/>}/>
-                    <Route path="/import-export" element={<ImportExportPage/>}/>
-                    <Route path="/investments" element={<InvestmentList/>}/>
-                    <Route path="/investments/new" element={<InvestmentForm/>}/>
-                    <Route path="/budgets" element={<BudgetList/>}/>
-                    <Route path="/budgets/new" element={<BudgetForm/>}/>
-                    <Route path="/budgets/:id/edit" element={<BudgetForm/>}/>
-                    <Route path="/goals" element={<GoalList/>}/>
-                    <Route path="/goals/new" element={<GoalForm/>}/>
-                    <Route path="/goals/:id/edit" element={<GoalForm/>}/>
-                    <Route path="/planning" element={<PlanningPage/>}/>
-                    <Route path="/trends" element={<TrendsPage/>}/>
-                    <Route path="/recurring" element={<RecurringPage/>}/>
-                    <Route path="/recurring/:kind/:id/edit" element={<RecurringForm/>}/>
-                    <Route path="/categories" element={<CategoryList/>}/>
-                    <Route path="/categories/new" element={<CategoryForm/>}/>
-                    <Route path="/categories/:id/edit" element={<CategoryForm/>}/>
-                    <Route path="*" element={<NotFoundPage/>}/>
-                </Routes>
+                <Suspense fallback={<main className="ledger-page"><p role="status">Loading page…</p></main>}>
+                    <Routes>
+                        <Route path="/" element={<Homepage/>}/>
+                        <Route path="/expenses" element={<ExpenseList/>}/>
+                        <Route path="/expenses/new" element={<ExpenseForm/>}/>
+                        <Route path="/transactions" element={<LedgerPage/>}/>
+                        <Route path="/forecast" element={<ForecastPage/>}/>
+                        <Route path="/bills" element={<BillsPage/>}/>
+                        <Route path="/assets" element={<AssetsPage/>}/>
+                        <Route path="/receipts" element={<ReceiptPage/>}/>
+                        <Route path="/reports" element={<ReportsPage/>}/>
+                        <Route path="/import-export" element={<ImportExportPage/>}/>
+                        <Route path="/investments" element={<InvestmentList/>}/>
+                        <Route path="/investments/new" element={<InvestmentForm/>}/>
+                        <Route path="/budgets" element={<BudgetList/>}/>
+                        <Route path="/budgets/new" element={<BudgetForm/>}/>
+                        <Route path="/budgets/:id/edit" element={<BudgetForm/>}/>
+                        <Route path="/goals" element={<GoalList/>}/>
+                        <Route path="/goals/new" element={<GoalForm/>}/>
+                        <Route path="/goals/:id/edit" element={<GoalForm/>}/>
+                        <Route path="/planning" element={<PlanningPage/>}/>
+                        <Route path="/trends" element={<TrendsPage/>}/>
+                        <Route path="/recurring" element={<RecurringPage/>}/>
+                        <Route path="/recurring/:kind/:id/edit" element={<RecurringForm/>}/>
+                        <Route path="/categories" element={<CategoryList/>}/>
+                        <Route path="/categories/new" element={<CategoryForm/>}/>
+                        <Route path="/categories/:id/edit" element={<CategoryForm/>}/>
+                        <Route path="*" element={<NotFoundPage/>}/>
+                    </Routes>
+                </Suspense>
             </div>
         </Router>
     );

@@ -13,13 +13,13 @@ beforeEach(() => {
 });
 
 describe('App', () => {
-    test('renders the header and navigation', () => {
+    test('renders the header and navigation', async () => {
         render(<App />);
 
         expect(screen.getByRole('heading', { name: /Expense Tracker/ })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'Expense' })).toHaveAttribute('href', '/expenses');
         expect(screen.getByRole('link', { name: 'Investments' })).toHaveAttribute('href', '/investments');
-        expect(screen.getByText('Homepage')).toBeInTheDocument();
+        expect(await screen.findByText('Homepage')).toBeInTheDocument();
     });
 
     test('navigates to the expense list', async () => {
