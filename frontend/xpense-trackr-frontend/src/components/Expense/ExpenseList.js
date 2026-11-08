@@ -114,6 +114,56 @@ const ExpenseList = () => {
 
     return (
         <div className="expense-list-container">
+            {showModal && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <h2>Edit Expense</h2>
+                        <div>
+                            <label htmlFor="edited-description">Description:</label>
+                            <input
+                                type="text"
+                                id="edited-description"
+                                value={editedDescription}
+                                onChange={(e) => setEditedDescription(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="edited-amount">Amount:</label>
+                            <input
+                                type="number"
+                                id="edited-amount"
+                                value={editedAmount}
+                                onChange={(e) => setEditedAmount(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="edited-date">Date:</label>
+                            <input
+                                type="date"
+                                id="edited-date"
+                                value={editedDate}
+                                onChange={(e) => setEditedDate(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="edited-category">Category:</label>
+                            <select
+                                id="edited-category"
+                                value={editedCategory}
+                                onChange={(e) => setEditedCategory(e.target.value)}
+                            >
+                                {categories.map(category => (
+                                    <option key={category.id} value={category.id}>
+                                        {category.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <button onClick={handleSubmitEdit}>Submit</button>
+                        <button onClick={handleCloseModal}>Cancel</button>
+                    </div>
+                </div>
+            )}
             <div className="expense-list-header">
                 <h2>Recent Expense Overview</h2>
                 {/* Add button to navigate to ExpenseForm page */}
@@ -132,56 +182,6 @@ const ExpenseList = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {showModal && (
-                    <div className="modal">
-                        <div className="modal-content">
-                            <h2>Edit Expense</h2>
-                            <div>
-                                <label htmlFor="edited-description">Description:</label>
-                                <input
-                                    type="text"
-                                    id="edited-description"
-                                    value={editedDescription}
-                                    onChange={(e) => setEditedDescription(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="edited-amount">Amount:</label>
-                                <input
-                                    type="number"
-                                    id="edited-amount"
-                                    value={editedAmount}
-                                    onChange={(e) => setEditedAmount(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="edited-date">Date:</label>
-                                <input
-                                    type="date"
-                                    id="edited-date"
-                                    value={editedDate}
-                                    onChange={(e) => setEditedDate(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="edited-category">Category:</label>
-                                <select
-                                    id="edited-category"
-                                    value={editedCategory}
-                                    onChange={(e) => setEditedCategory(e.target.value)}
-                                >
-                                    {categories.map(category => (
-                                        <option key={category.id} value={category.id}>
-                                            {category.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <button onClick={handleSubmitEdit}>Submit</button>
-                            <button onClick={handleCloseModal}>Cancel</button>
-                        </div>
-                    </div>
-                )}
                 {currentExpenses.map(expense => (
                     <tr key={expense.id}>
                         <td>

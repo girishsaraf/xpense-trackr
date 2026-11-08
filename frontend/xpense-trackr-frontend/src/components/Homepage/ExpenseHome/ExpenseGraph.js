@@ -10,6 +10,14 @@ const ExpenseGraph = () => {
     const chartRef = useRef(null);
     const chartInstanceRef = useRef(null);
 
+    const destroyChart = () => {
+        const chart = chartInstanceRef.current;
+        if (chart && typeof chart.destroy === 'function') {
+            chart.destroy();
+        }
+        chartInstanceRef.current = null;
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -43,13 +51,14 @@ const ExpenseGraph = () => {
 
 
     useEffect(() => {
-        // Destroy the existing chart instance before rendering a new one
-        if (chartInstanceRef.current) {
-            chartInstanceRef.current.destroy();
-            chartInstanceRef.current = null;
-        }
+        destroyChart();
+
         if (graphData && chartRef.current) {
             const ctx = chartRef.current.getContext('2d');
+            if (!ctx) {
+                return undefined;
+            }
+
             chartInstanceRef.current = new Chart(ctx, {
                 type: 'line',
                 data: graphData,
@@ -71,12 +80,8 @@ const ExpenseGraph = () => {
                 },
             });
         }
-        return () => {
-            if (chartInstanceRef.current) {
-                chartInstanceRef.current.destroy();
-                chartInstanceRef.current = null;
-            }
-        };
+
+        return destroyChart;
     }, [graphData]);
 
     const handleButtonClick = (months) => {

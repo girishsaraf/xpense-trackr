@@ -20,11 +20,11 @@ function App() {
                 </Link>
                 <nav>
                     <ul className="horizontal-tabs">
-                        <li><NavLink to="/expenses" activeClassName="active-tab">Expense</NavLink></li>
-                        <li><NavLink to="/investments" activeClassName="active-tab">Investments</NavLink></li>
-                        <li><NavLink to="/budgets" activeClassName="active-tab">Plan your Budget</NavLink></li>
-                        <li><NavLink to="/goals" activeClassName="active-tab">Investment Goals</NavLink></li>
-                        <li><NavLink to="/trends" activeClassName="active-tab">Trends</NavLink></li>
+                        <li><NavLink to="/expenses" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Expense</NavLink></li>
+                        <li><NavLink to="/investments" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Investments</NavLink></li>
+                        <li><NavLink to="/budgets" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Plan your Budget</NavLink></li>
+                        <li><NavLink to="/goals" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Investment Goals</NavLink></li>
+                        <li><NavLink to="/trends" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Trends</NavLink></li>
                     </ul>
                 </nav>
                 <Routes>

@@ -10,6 +10,14 @@ const InvestmentGraph = () => {
     const chartRef = useRef(null);
     const chartInstanceRef = useRef(null);
 
+    const destroyChart = () => {
+        const chart = chartInstanceRef.current;
+        if (chart && typeof chart.destroy === 'function') {
+            chart.destroy();
+        }
+        chartInstanceRef.current = null;
+    };
+
     const getTypeName = (type) => {
         switch (type.toLowerCase()) {
             case 'stocks':
@@ -62,13 +70,14 @@ const InvestmentGraph = () => {
     }, [lastMonths]);
 
     useEffect(() => {
-        // Destroy the existing chart instance before rendering a new one
-        if (chartInstanceRef.current) {
-            chartInstanceRef.current.destroy();
-            chartInstanceRef.current = null;
-        }
+        destroyChart();
+
         if (graphData && chartRef.current) {
             const ctx = chartRef.current.getContext('2d');
+            if (!ctx) {
+                return undefined;
+            }
+
             chartInstanceRef.current = new Chart(ctx, {
                 type: 'line',
                 data: graphData,
@@ -90,12 +99,8 @@ const InvestmentGraph = () => {
                 },
             });
         }
-        return () => {
-            if (chartInstanceRef.current) {
-                chartInstanceRef.current.destroy();
-                chartInstanceRef.current = null;
-            }
-        };
+
+        return destroyChart;
     }, [graphData]);
 
     const handleButtonClick = (months) => {
