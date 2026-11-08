@@ -101,8 +101,11 @@ The local source host address may differ outside Docker Desktop. The app must ha
 - Recurring expenses and investments
 - Manual investments
 - A first-run dashboard, spending trends, and accessible tabular summaries
+- An installable PWA app shell with static-only offline caching; financial API responses are never cached
 
 The local account ledger is additive to the existing expense and investment screens while the product data model is being consolidated. Legacy `/api/...` endpoints remain available; the initial `/api/v1/...` path is a compatibility alias for them. The current account login/registration endpoints are intentionally unavailable (`501 Not Implemented`); this local single-user release does not claim to provide authentication.
+
+Install the app from the browser's install menu after opening it over HTTP or HTTPS. Offline mode can load the app shell and cached static assets, but financial data and writes are unavailable until the local app server is reachable again.
 
 The CSV importer accepts `account_id,type,amount,currency,date,payee,description,category_id,transfer_account_id` columns. Use **Import / export** to preview and validate before confirming an import; transaction amounts must use the selected currency's precision. Receipt files are stored alongside the SQLite database in the local data directory (or persistent Docker volume), not in the database itself. Back up both the database and `receipts/` together when backing up manually.
 

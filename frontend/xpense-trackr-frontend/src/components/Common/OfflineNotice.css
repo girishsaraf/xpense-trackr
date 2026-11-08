@@ -1,0 +1,9 @@
+.offline-notice {
+    margin: 0 0 18px;
+    padding: 12px 16px;
+    border: 1px solid #e6bb57;
+    border-radius: 10px;
+    background: #fff7dd;
+    color: #5e470c;
+    font-weight: 600;
+}

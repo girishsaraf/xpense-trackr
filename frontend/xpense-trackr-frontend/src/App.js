@@ -27,6 +27,7 @@ import ReportsPage from "./components/Reports/ReportsPage";
 import ImportExportPage from "./components/ImportExport/ImportExportPage";
 import PlanningPage from "./components/Planning/PlanningPage";
 import BillsPage from "./components/Bills/BillsPage";
+import OfflineNotice from "./components/Common/OfflineNotice";
 
 function App() {
     return (
@@ -60,6 +61,7 @@ function App() {
                         </ul>
                     </nav>
                 </header>
+                <OfflineNotice />
                 <Routes>
                     <Route path="/" element={<Homepage/>}/>
                     <Route path="/expenses" element={<ExpenseList/>}/>

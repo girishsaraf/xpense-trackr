@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#153e75"/>
+  <path d="M170 100h172a28 28 0 0 1 28 28v260a24 24 0 0 1-24 24H166a42 42 0 0 1-42-42V142a42 42 0 0 1 42-42Z" fill="#fff"/>
+  <path d="M152 180h208v48H152zm0 88h208v48H152zm0 88h128v32H152z" fill="#3b82f6"/>
+  <circle cx="348" cy="368" r="52" fill="#f6c453"/>
+  <path d="M348 334v68m18-52c-4-9-12-13-22-13-12 0-20 6-20 15 0 23 45 9 45 33 0 10-9 17-22 17-11 0-21-5-25-15" fill="none" stroke="#153e75" stroke-linecap="round" stroke-width="9"/>
+</svg>
