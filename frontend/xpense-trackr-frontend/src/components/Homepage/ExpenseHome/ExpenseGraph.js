@@ -8,7 +8,7 @@ const ExpenseGraph = () => {
     const [graphData, setGraphData] = useState(null);
     const [lastMonths, setLastMonths] = useState(6); // Default is last 6 months
     const chartRef = useRef(null);
-    const [chartInstance, setChartInstance] = useState(null);
+    const chartInstanceRef = useRef(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -44,12 +44,13 @@ const ExpenseGraph = () => {
 
     useEffect(() => {
         // Destroy the existing chart instance before rendering a new one
-        if (chartInstance) {
-            chartInstance.destroy();
+        if (chartInstanceRef.current) {
+            chartInstanceRef.current.destroy();
+            chartInstanceRef.current = null;
         }
         if (graphData && chartRef.current) {
             const ctx = chartRef.current.getContext('2d');
-            const newChartInstance = new Chart(ctx, {
+            chartInstanceRef.current = new Chart(ctx, {
                 type: 'line',
                 data: graphData,
                 options: {
@@ -69,8 +70,13 @@ const ExpenseGraph = () => {
                     },
                 },
             });
-            setChartInstance(newChartInstance);
         }
+        return () => {
+            if (chartInstanceRef.current) {
+                chartInstanceRef.current.destroy();
+                chartInstanceRef.current = null;
+            }
+        };
     }, [graphData]);
 
     const handleButtonClick = (months) => {

@@ -28,8 +28,6 @@ const InvestmentForm = () => {
 
         let isRecurring = formData.recurring;
 
-        console.log(formData);
-
         try {
             if(isRecurring){
                 await axios.post(`${backendUrl}/api/recurring/investments`, formData);
@@ -62,7 +60,6 @@ const InvestmentForm = () => {
 
     const handleInputChange = event => {
         const { name, value, type, checked } = event.target;
-        console.log(name, value);
         const newValue = type === 'checkbox' ? checked : value;
 
         setFormData({
@@ -163,7 +160,7 @@ const InvestmentForm = () => {
                 )}
                 <div className="buttons-container">
                     <button type="submit">Add</button>
-                    <button type="cancel" onClick={clearFormData}>Cancel</button>
+                    <button type="button" onClick={clearFormData}>Cancel</button>
                 </div>
             </form>
             <div>

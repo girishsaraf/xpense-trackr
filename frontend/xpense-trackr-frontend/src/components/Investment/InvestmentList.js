@@ -189,11 +189,13 @@ const InvestmentList = () => {
                         <td>${investment.amount}</td>
                         <td>{formatDate(investment.date)}</td>
                         <td>
-                            <button className="button-common" onClick={() => handleOpenModal(investment)}>
+                            <button className="button-common" aria-label={`Edit investment ${investment.id}`}
+                                    onClick={() => handleOpenModal(investment)}>
                                 <FontAwesomeIcon icon={faEdit}/></button>
                         </td>
                         <td>
-                            <button className="button-common" onClick={() => handleDeleteInvestment(investment.id)}>
+                            <button className="button-common" aria-label={`Delete investment ${investment.id}`}
+                                    onClick={() => handleDeleteInvestment(investment.id)}>
                                 <FontAwesomeIcon icon={faTrashAlt}/></button>
                         </td>
                     </tr>

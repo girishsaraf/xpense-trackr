@@ -60,10 +60,14 @@ func CreateRecurringExpense(expense *RecurringExpense) error {
 
 // UpdateRecurringExpense updates an existing expense in the database.
 func UpdateRecurringExpense(id int, updatedExpense *RecurringExpense) error {
-	if err := db.Model(&RecurringExpense{}).Where("id = ?", id).Updates(updatedExpense).Error; err != nil {
+	var existing RecurringExpense
+	if err := db.First(&existing, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return ErrRecordNotFound
 		}
+		return err
+	}
+	if err := db.Model(&existing).Updates(updatedExpense).Error; err != nil {
 		return err
 	}
 	return nil
@@ -71,11 +75,12 @@ func UpdateRecurringExpense(id int, updatedExpense *RecurringExpense) error {
 
 // DeleteRecurringExpense deletes an existing expense from the database.
 func DeleteRecurringExpense(id int) error {
-	if err := db.Delete(&RecurringExpense{}, id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return ErrRecordNotFound
-		}
-		return err
+	result := db.Delete(&RecurringExpense{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return ErrRecordNotFound
 	}
 	return nil
 }
@@ -111,10 +116,14 @@ func CreateRecurringInvestment(expense *RecurringInvestment) error {
 
 // UpdateRecurringInvestment updates an existing expense in the database.
 func UpdateRecurringInvestment(id int, updatedInvestment *RecurringInvestment) error {
-	if err := db.Model(&RecurringInvestment{}).Where("id = ?", id).Updates(updatedInvestment).Error; err != nil {
+	var existing RecurringInvestment
+	if err := db.First(&existing, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return ErrRecordNotFound
 		}
+		return err
+	}
+	if err := db.Model(&existing).Updates(updatedInvestment).Error; err != nil {
 		return err
 	}
 	return nil
@@ -122,11 +131,12 @@ func UpdateRecurringInvestment(id int, updatedInvestment *RecurringInvestment) e
 
 // DeleteRecurringInvestment deletes an existing expense from the database.
 func DeleteRecurringInvestment(id int) error {
-	if err := db.Delete(&RecurringInvestment{}, id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return ErrRecordNotFound
-		}
-		return err
+	result := db.Delete(&RecurringInvestment{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return ErrRecordNotFound
 	}
 	return nil
 }

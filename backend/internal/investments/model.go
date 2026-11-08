@@ -56,10 +56,14 @@ func CreateInvestment(Investment *Investment) error {
 
 // UpdateInvestment updates an existing Investment in the database.
 func UpdateInvestment(id int, updatedInvestment *Investment) error {
-	if err := db.Model(&Investment{}).Where("id = ?", id).Updates(updatedInvestment).Error; err != nil {
+	var existing Investment
+	if err := db.First(&existing, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return ErrRecordNotFound
 		}
+		return err
+	}
+	if err := db.Model(&existing).Updates(updatedInvestment).Error; err != nil {
 		return err
 	}
 	return nil
@@ -67,11 +71,12 @@ func UpdateInvestment(id int, updatedInvestment *Investment) error {
 
 // DeleteInvestment deletes an existing Investment from the database.
 func DeleteInvestment(id int) error {
-	if err := db.Delete(&Investment{}, id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return ErrRecordNotFound
-		}
-		return err
+	result := db.Delete(&Investment{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return ErrRecordNotFound
 	}
 	return nil
 }

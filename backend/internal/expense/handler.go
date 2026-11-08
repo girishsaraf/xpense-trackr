@@ -158,9 +158,15 @@ func CumulativeExpensesByMonthHandler(w http.ResponseWriter, r *http.Request) {
 	// Calculate start date based on lastMonths
 	startDate := time.Now().AddDate(0, -lastMonths, 0)
 
+	// SQLite (used by unit tests) and MySQL format dates differently.
+	monthExpression := "DATE_FORMAT(date, '%Y-%m')"
+	if db.Dialector.Name() == "sqlite" {
+		monthExpression = "strftime('%Y-%m', date)"
+	}
+
 	// Query to get cumulative investments grouped by month
 	query := db.Model(&Expense{}).
-		Select("DATE_FORMAT(date, '%Y-%m') AS month, category_id AS category, SUM(amount) AS amount").
+		Select(monthExpression+" AS month, category_id AS category, SUM(amount) AS amount").
 		Where("date >= ?", startDate).
 		Group("month, category").
 		Order("month ASC").

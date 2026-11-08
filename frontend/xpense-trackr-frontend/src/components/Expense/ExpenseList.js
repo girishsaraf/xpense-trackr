@@ -194,11 +194,13 @@ const ExpenseList = () => {
                         <td>${expense.amount}</td>
                         <td>{formatDate(expense.date)}</td>
                         <td>
-                            <button className="button-common" onClick={() => handleOpenModal(expense)}><FontAwesomeIcon
+                            <button className="button-common" aria-label={`Edit expense ${expense.id}`}
+                                    onClick={() => handleOpenModal(expense)}><FontAwesomeIcon
                                 icon={faEdit}/></button>
                         </td>
                         <td>
-                            <button className="button-common" onClick={() => handleDeleteExpense(expense.id)}>
+                            <button className="button-common" aria-label={`Delete expense ${expense.id}`}
+                                    onClick={() => handleDeleteExpense(expense.id)}>
                                 <FontAwesomeIcon icon={faTrashAlt}/></button>
                         </td>
                     </tr>

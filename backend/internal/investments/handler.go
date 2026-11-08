@@ -4,6 +4,7 @@ package investments
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -62,6 +63,10 @@ func UpdateInvestmentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := UpdateInvestment(InvestmentID, &updatedInvestment); err != nil {
+		if errors.Is(err, ErrRecordNotFound) {
+			http.Error(w, "Investment not found", http.StatusNotFound)
+			return
+		}
 		http.Error(w, "Failed to update Investment", http.StatusInternalServerError)
 		return
 	}
@@ -76,6 +81,10 @@ func DeleteInvestmentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := DeleteInvestment(InvestmentID); err != nil {
+		if errors.Is(err, ErrRecordNotFound) {
+			http.Error(w, "Investment not found", http.StatusNotFound)
+			return
+		}
 		http.Error(w, "Failed to delete Investment", http.StatusInternalServerError)
 		return
 	}
@@ -100,9 +109,15 @@ func CumulativeInvestmentsByMonthHandler(w http.ResponseWriter, r *http.Request)
 	// Calculate start date based on lastMonths
 	startDate := time.Now().AddDate(0, -lastMonths, 0)
 
+	// SQLite (used by unit tests) and MySQL format dates differently.
+	monthExpression := "DATE_FORMAT(date, '%Y-%m')"
+	if db.Dialector.Name() == "sqlite" {
+		monthExpression = "strftime('%Y-%m', date)"
+	}
+
 	// Query to get cumulative investments grouped by month
 	query := db.Model(&Investment{}).
-		Select("DATE_FORMAT(date, '%Y-%m') AS month, investment_type AS type, SUM(amount) AS amount").
+		Select(monthExpression+" AS month, investment_type AS type, SUM(amount) AS amount").
 		Where("date >= ?", startDate).
 		Group("month, type").
 		Order("month ASC").

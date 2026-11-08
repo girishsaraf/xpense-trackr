@@ -57,10 +57,14 @@ func CreateExpense(expense *Expense) error {
 
 // UpdateExpense updates an existing expense in the database.
 func UpdateExpense(id int, updatedExpense *Expense) error {
-	if err := db.Model(&Expense{}).Where("id = ?", id).Updates(updatedExpense).Error; err != nil {
+	var existing Expense
+	if err := db.First(&existing, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return ErrRecordNotFound
 		}
+		return err
+	}
+	if err := db.Model(&existing).Updates(updatedExpense).Error; err != nil {
 		return err
 	}
 	return nil
@@ -68,11 +72,12 @@ func UpdateExpense(id int, updatedExpense *Expense) error {
 
 // DeleteExpense deletes an existing expense from the database.
 func DeleteExpense(id int) error {
-	if err := db.Delete(&Expense{}, id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return ErrRecordNotFound
-		}
-		return err
+	result := db.Delete(&Expense{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return ErrRecordNotFound
 	}
 	return nil
 }
