@@ -22,6 +22,8 @@ const ExpenseList = () => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [expensesPerPage] = useState(15); // Number of expenses per page
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState('');
 
     // Calculate the indexes of the expenses to display on the current page
     const indexOfLastExpense = currentPage * expensesPerPage;
@@ -36,6 +38,7 @@ const ExpenseList = () => {
     }, []);
 
     const fetchExpenses = async () => {
+        setLoadError('');
         try {
             const response = await axios.get(`${backendUrl}/api/expenses`);
 
@@ -47,6 +50,9 @@ const ExpenseList = () => {
             setCategories(responseCategories.data);
         } catch (error) {
             console.error('Error fetching expenses:', error);
+            setLoadError('We couldn’t load your expenses. Check your connection and try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -97,6 +103,7 @@ const ExpenseList = () => {
     };
 
     const handleDeleteExpense = async (expenseId) => {
+        if (!window.confirm('Delete this expense? This action cannot be undone.')) return;
         try {
             await axios.delete(`${backendUrl}/api/expenses/${expenseId}`);
             alert('Expense deleted successfully');
@@ -172,6 +179,7 @@ const ExpenseList = () => {
                 </Link>
             </div>
             <table className="expense-list-table">
+                <caption className="sr-only">Your recent expenses with category, amount, date, and actions</caption>
                 <thead>
                 <tr>
                     <th>Category</th>
@@ -182,7 +190,13 @@ const ExpenseList = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {currentExpenses.map(expense => (
+                {loading ? (
+                    <tr><td colSpan="6"><span role="status">Loading expenses…</span></td></tr>
+                ) : loadError ? (
+                    <tr><td colSpan="6"><span role="alert">{loadError}</span></td></tr>
+                ) : currentExpenses.length === 0 ? (
+                    <tr><td colSpan="6" className="table-empty-state">No expenses yet. Add your first expense to start tracking your spending.</td></tr>
+                ) : currentExpenses.map(expense => (
                     <tr key={expense.id}>
                         <td>
                             <div

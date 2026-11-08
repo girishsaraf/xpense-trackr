@@ -1,121 +1,107 @@
-import React, { useState, useEffect, useRef } from 'react';
-import Chart from 'chart.js/auto'; // Import Chart.js
-import backendUrl from "../../../config";
-import 'chartjs-adapter-moment';
+import React, { useEffect, useMemo, useState } from 'react';
+import backendUrl from '../../../config';
+import ChartVisualization from '../../Charts/ChartVisualization';
+import cumulativeChartData from '../../../utils/cumulativeChartData';
 import './InvestmentHome.css';
 
+const periods = [3, 6, 12];
+const views = [
+    { id: 'trend', label: 'Trend' },
+    { id: 'monthly', label: 'Monthly' },
+    { id: 'mix', label: 'Portfolio mix' },
+];
+
+const getTypeName = (type) => ({
+    stocks: 'Stocks',
+    '401k': '401(k)',
+    mutual_funds: 'Mutual funds',
+    real_estate: 'Real estate',
+    savings: 'Savings',
+    bonds: 'Bonds',
+}[type.toLowerCase()] || type);
+
 const InvestmentGraph = () => {
-    const [graphData, setGraphData] = useState(null);
-    const [lastMonths, setLastMonths] = useState(6); // Default is last 6 months
-    const chartRef = useRef(null);
-    const chartInstanceRef = useRef(null);
-
-    const destroyChart = () => {
-        const chart = chartInstanceRef.current;
-        if (chart && typeof chart.destroy === 'function') {
-            chart.destroy();
-        }
-        chartInstanceRef.current = null;
-    };
-
-    const getTypeName = (type) => {
-        switch (type.toLowerCase()) {
-            case 'stocks':
-                return 'Stocks';
-            case '401k':
-                return '401(k)';
-            case 'mutual_funds':
-                return 'Mutual Funds';
-            case 'real_estate':
-                return 'Real Estate';
-            case 'savings':
-                return 'Savings';
-            case 'bonds':
-                return 'Bonds';
-            default:
-                return type;
-        }
-    };
+    const [rows, setRows] = useState([]);
+    const [lastMonths, setLastMonths] = useState(6);
+    const [view, setView] = useState('trend');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [retryKey, setRetryKey] = useState(0);
 
     useEffect(() => {
+        let active = true;
         const fetchData = async () => {
+            setLoading(true);
+            setError('');
             try {
                 const response = await fetch(`${backendUrl}/api/investments/cumulative?lastMonths=${lastMonths}`);
+                if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
                 const data = await response.json();
-                const datasets = {};
-
-                const colors = ['#FFA280', '#80FFD6', '#80A4FF', '#FFF380', '#D980FF', '#33FF33'];
-
-                // Group data by investment type
-                data.forEach((item, index) => {
-                    if (!datasets[getTypeName(item.type)]) {
-                        datasets[getTypeName(item.type)] = { label: getTypeName(item.type), data: [], borderColor: colors[index % colors.length] };
-                    }
-                    datasets[getTypeName(item.type)].data.push({ x: item.month, y: item.amount });
-                });
-
-                // Prepare data for Chart.js
-                const chartData = {
-                    labels: [...new Set(data.map(item => item.month))],
-                    datasets: Object.values(datasets),
-                };
-
-                setGraphData(chartData);
-            } catch (error) {
-                console.error('Error fetching data:', error);
+                if (active) setRows(data || []);
+            } catch (requestError) {
+                console.error('Error fetching data:', requestError);
+                if (active) setError('We couldn’t load your investment chart. Check your connection and try again.');
+            } finally {
+                if (active) setLoading(false);
             }
         };
-
         fetchData();
-    }, [lastMonths]);
+        return () => { active = false; };
+    }, [lastMonths, retryKey]);
 
-    useEffect(() => {
-        destroyChart();
-
-        if (graphData && chartRef.current) {
-            const ctx = chartRef.current.getContext('2d');
-            if (!ctx) {
-                return undefined;
-            }
-
-            chartInstanceRef.current = new Chart(ctx, {
-                type: 'line',
-                data: graphData,
-                options: {
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'month',
-                            },
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Amount',
-                            },
-                        },
-                    },
-                },
-            });
-        }
-
-        return destroyChart;
-    }, [graphData]);
-
-    const handleButtonClick = (months) => {
-        setLastMonths(months+1);
-    };
+    const chart = useMemo(
+        () => cumulativeChartData(rows, 'type', getTypeName, view),
+        [rows, view]
+    );
 
     return (
-        <div className="investment-graph">
-            <div className="buttons-container">
-                <button onClick={() => handleButtonClick(2)}>2 Months</button>
-                <button onClick={() => handleButtonClick(4)}>4 Months</button>
-                <button onClick={() => handleButtonClick(6)}>6 Months</button>
+        <section className="finance-graph" aria-label="Investment chart">
+            <div className="graph-controls">
+                <div className="chart-mode-control" role="group" aria-label="Chart display">
+                    {views.map((item) => (
+                        <button
+                            key={item.id}
+                            type="button"
+                            aria-pressed={view === item.id}
+                            className={view === item.id ? 'selected' : ''}
+                            onClick={() => setView(item.id)}
+                        >
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+                <div className="chart-period-control" role="group" aria-label="Chart time period">
+                    {periods.map((months) => (
+                        <button
+                            key={months}
+                            type="button"
+                            aria-label={`${months} months`}
+                            aria-pressed={lastMonths === months}
+                            className={lastMonths === months ? 'selected' : ''}
+                            onClick={() => setLastMonths(months)}
+                        >
+                            {months}M
+                        </button>
+                    ))}
+                </div>
             </div>
-            <canvas ref={chartRef}></canvas>
-        </div>
+            {loading ? (
+                <p className="chart-message" role="status">Loading investment history…</p>
+            ) : error ? (
+                <div className="chart-message chart-error" role="alert">
+                    <span>{error}</span>
+                    <button type="button" onClick={() => setRetryKey((key) => key + 1)}>Try again</button>
+                </div>
+            ) : rows.length === 0 ? (
+                <p className="chart-message">Add investments to see your portfolio history here.</p>
+            ) : (
+                <ChartVisualization
+                    type={chart.type}
+                    data={chart.data}
+                    ariaLabel={`${views.find((item) => item.id === view).label} of investments over the last ${lastMonths} months`}
+                />
+            )}
+        </section>
     );
 };
 

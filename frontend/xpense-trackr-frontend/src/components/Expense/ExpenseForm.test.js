@@ -15,7 +15,8 @@ function renderExpenseForm() {
     });
 }
 
-function fillExpenseFields() {
+async function fillExpenseFields() {
+    await screen.findByRole('option', { name: 'Food' });
     fireEvent.change(screen.getByLabelText('Description:'), { target: { value: 'Lunch' } });
     fireEvent.change(screen.getByLabelText('Amount:'), { target: { value: '15.5' } });
     fireEvent.change(screen.getByLabelText('Category:'), { target: { value: '1' } });
@@ -26,12 +27,13 @@ beforeEach(() => {
     jest.clearAllMocks();
     window.alert = jest.fn();
     axios.post.mockResolvedValue({});
+    axios.get.mockResolvedValue({ data: [{ id: 1, name: 'Food' }] });
 });
 
 describe('ExpenseForm', () => {
     test('submits a one-off expense', async () => {
         renderExpenseForm();
-        fillExpenseFields();
+        await fillExpenseFields();
 
         fireEvent.click(screen.getByRole('button', { name: 'Add' }));
 
@@ -51,7 +53,7 @@ describe('ExpenseForm', () => {
 
     test('submits a recurring expense', async () => {
         renderExpenseForm();
-        fillExpenseFields();
+        await fillExpenseFields();
 
         fireEvent.click(screen.getByLabelText('Is Recurring Expense?'));
         fireEvent.change(screen.getByLabelText('Start Date:'), { target: { value: '2026-01-20' } });
@@ -63,7 +65,14 @@ describe('ExpenseForm', () => {
         await screen.findByText('Expenses Page');
         expect(axios.post).toHaveBeenCalledWith(
             `${backendUrl}/api/recurring/expenses`,
-            expect.objectContaining({ recurring: true, frequency: 'monthly' })
+            expect.objectContaining({
+                recurring: true,
+                frequency: 'monthly',
+                category_id: 1,
+                amount: 15.5,
+                start_date: '2026-01-20T00:00:00Z',
+                end_date: '2026-06-20T00:00:00Z',
+            })
         );
     });
 
@@ -80,7 +89,7 @@ describe('ExpenseForm', () => {
         const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
         axios.post.mockRejectedValue(new Error('network'));
         renderExpenseForm();
-        fillExpenseFields();
+        await fillExpenseFields();
 
         fireEvent.click(screen.getByRole('button', { name: 'Add' }));
 

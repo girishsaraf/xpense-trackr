@@ -1,102 +1,98 @@
-import React, {useEffect, useRef, useState} from 'react';
-import Chart from 'chart.js/auto'; // Import Chart.js
-import backendUrl from "../../../config";
-import 'chartjs-adapter-moment';
+import React, { useEffect, useMemo, useState } from 'react';
+import backendUrl from '../../../config';
+import ChartVisualization from '../../Charts/ChartVisualization';
+import cumulativeChartData from '../../../utils/cumulativeChartData';
 import './ExpenseHome.css';
 
-const ExpenseGraph = () => {
-    const [graphData, setGraphData] = useState(null);
-    const [lastMonths, setLastMonths] = useState(6); // Default is last 6 months
-    const chartRef = useRef(null);
-    const chartInstanceRef = useRef(null);
+const periods = [3, 6, 12];
+const views = [
+    { id: 'trend', label: 'Trend' },
+    { id: 'monthly', label: 'Monthly' },
+    { id: 'mix', label: 'Category mix' },
+];
 
-    const destroyChart = () => {
-        const chart = chartInstanceRef.current;
-        if (chart && typeof chart.destroy === 'function') {
-            chart.destroy();
-        }
-        chartInstanceRef.current = null;
-    };
+const ExpenseGraph = () => {
+    const [rows, setRows] = useState([]);
+    const [lastMonths, setLastMonths] = useState(6);
+    const [view, setView] = useState('trend');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [retryKey, setRetryKey] = useState(0);
 
     useEffect(() => {
+        let active = true;
         const fetchData = async () => {
+            setLoading(true);
+            setError('');
             try {
-                const [expensesResponse] = await Promise.all([
-                    fetch(`${backendUrl}/api/expenses/cumulative?lastMonths=${lastMonths}`)
-                ]);
-
-                const expensesData = await expensesResponse.json();
-
-                const datasets = {};
-                const colors = ['#FFA280', '#80FFD6', '#80A4FF', '#FFF380', '#D980FF', '#33FF33'];
-
-                expensesData.forEach((item, index) => {
-                    datasets[item.category] = datasets[item.category] || { label: item.category, data: [], borderColor: colors[index % colors.length] };
-                    datasets[item.category].data.push({ x: item.month, y: item.amount });
-                });
-
-                const chartData = {
-                    labels: [...new Set(expensesData.map(item => item.month))],
-                    datasets: Object.values(datasets),
-                };
-
-                setGraphData(chartData);
-            } catch (error) {
-                console.error('Error fetching data:', error);
+                const response = await fetch(`${backendUrl}/api/expenses/cumulative?lastMonths=${lastMonths}`);
+                if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+                const data = await response.json();
+                if (active) setRows(data || []);
+            } catch (requestError) {
+                console.error('Error fetching data:', requestError);
+                if (active) setError('We couldn’t load your spending chart. Check your connection and try again.');
+            } finally {
+                if (active) setLoading(false);
             }
         };
-
         fetchData();
-    }, [lastMonths]);
+        return () => { active = false; };
+    }, [lastMonths, retryKey]);
 
-
-    useEffect(() => {
-        destroyChart();
-
-        if (graphData && chartRef.current) {
-            const ctx = chartRef.current.getContext('2d');
-            if (!ctx) {
-                return undefined;
-            }
-
-            chartInstanceRef.current = new Chart(ctx, {
-                type: 'line',
-                data: graphData,
-                options: {
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'month',
-                            },
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Amount',
-                            },
-                        },
-                    },
-                },
-            });
-        }
-
-        return destroyChart;
-    }, [graphData]);
-
-    const handleButtonClick = (months) => {
-        setLastMonths(months+1);
-    };
+    const chart = useMemo(
+        () => cumulativeChartData(rows, 'category', (category) => category, view),
+        [rows, view]
+    );
 
     return (
-        <div className="investment-graph">
-            <div className="buttons-container">
-                <button onClick={() => handleButtonClick(2)}>2 Months</button>
-                <button onClick={() => handleButtonClick(4)}>4 Months</button>
-                <button onClick={() => handleButtonClick(6)}>6 Months</button>
+        <section className="finance-graph" aria-label="Spending chart">
+            <div className="graph-controls">
+                <div className="chart-mode-control" role="group" aria-label="Chart display">
+                    {views.map((item) => (
+                        <button
+                            key={item.id}
+                            type="button"
+                            aria-pressed={view === item.id}
+                            className={view === item.id ? 'selected' : ''}
+                            onClick={() => setView(item.id)}
+                        >
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+                <div className="chart-period-control" role="group" aria-label="Chart time period">
+                    {periods.map((months) => (
+                        <button
+                            key={months}
+                            type="button"
+                            aria-label={`${months} months`}
+                            aria-pressed={lastMonths === months}
+                            className={lastMonths === months ? 'selected' : ''}
+                            onClick={() => setLastMonths(months)}
+                        >
+                            {months}M
+                        </button>
+                    ))}
+                </div>
             </div>
-            <canvas ref={chartRef}></canvas>
-        </div>
+            {loading ? (
+                <p className="chart-message" role="status">Loading spending history…</p>
+            ) : error ? (
+                <div className="chart-message chart-error" role="alert">
+                    <span>{error}</span>
+                    <button type="button" onClick={() => setRetryKey((key) => key + 1)}>Try again</button>
+                </div>
+            ) : rows.length === 0 ? (
+                <p className="chart-message">Add expenses to see your spending history here.</p>
+            ) : (
+                <ChartVisualization
+                    type={chart.type}
+                    data={chart.data}
+                    ariaLabel={`${views.find((item) => item.id === view).label} of spending over the last ${lastMonths} months`}
+                />
+            )}
+        </section>
     );
 };
 

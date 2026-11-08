@@ -3,6 +3,7 @@ import InvestmentOverview from "./InvestmentHome/InvestmentOverview";
 import ExpenseGraph from "./ExpenseHome/ExpenseGraph";
 import InvestmentGraph from "./InvestmentHome/InvestmentGraph";
 import {useState} from "react"; // Import your CSS file
+import { Link } from "react-router-dom";
 import './Homepage.css';
 
 const Homepage = () => {
@@ -14,22 +15,34 @@ const Homepage = () => {
 
     return (
         <div className="homepage">
-            <h1>Welcome to Your Financial Overview</h1>
-            <div className="toggle-container" onClick={() => toggleView(activeView === 'expense' ? 'investment' : 'expense')}>
-                <button
-                    className={`toggle-button ${activeView === 'expense' ? 'active' : ''}`}
-                    onClick={() => toggleView('expense')}
-                >
-                    Expenses
-                </button>
-                <div className="toggle-switch"
-                     onClick={() => toggleView(activeView === 'expense' ? 'investment' : 'expense')}></div>
-                <button
-                    className={`toggle-button ${activeView === 'investment' ? 'active' : ''}`}
-                    onClick={() => toggleView('investment')}
-                >
-                    Investments
-                </button>
+            <div className="page-intro">
+                <div>
+                    <p className="eyebrow">YOUR FINANCES AT A GLANCE</p>
+                    <h1>Your money, in focus.</h1>
+                    <p className="page-description">A clear view of your spending and investments, all in one place.</p>
+                </div>
+                <div className="dashboard-tools">
+                    <div className="view-switch" aria-label="Financial overview">
+                        <button
+                            className={`toggle-button ${activeView === 'expense' ? 'active' : ''}`}
+                            aria-pressed={activeView === 'expense'}
+                            onClick={() => toggleView('expense')}
+                        >
+                            Expenses
+                        </button>
+                        <button
+                            className={`toggle-button ${activeView === 'investment' ? 'active' : ''}`}
+                            aria-pressed={activeView === 'investment'}
+                            onClick={() => toggleView('investment')}
+                        >
+                            Investments
+                        </button>
+                    </div>
+                    <div className="quick-actions" aria-label="Quick actions">
+                        <Link className="secondary-action" to="/expenses/new">Add expense</Link>
+                        <Link className="primary-action" to="/investments/new">Add investment</Link>
+                    </div>
+                </div>
             </div>
 
             <div className="overview-section">
@@ -39,20 +52,24 @@ const Homepage = () => {
             <div className="graph-section">
                 {activeView === 'expense' && (
                     <div className="graph-container">
-                        <h2 className="graph-title">Expense Graph</h2>
-                        <ExpenseGraph/>
-                        <div className="legend">
-                            {/* Legend for Expense Graph */}
+                        <div className="section-heading">
+                            <div>
+                                <p className="eyebrow">MONTHLY BREAKDOWN</p>
+                                <h2 className="graph-title">Spending over time</h2>
+                            </div>
                         </div>
+                        <ExpenseGraph/>
                     </div>
                 )}
                 {activeView === 'investment' && (
                     <div className="graph-container">
-                        <h2 className="graph-title">Investment Graph</h2>
-                        <InvestmentGraph/>
-                        <div className="legend">
-                            {/* Legend for Investment Graph */}
+                        <div className="section-heading">
+                            <div>
+                                <p className="eyebrow">PORTFOLIO HISTORY</p>
+                                <h2 className="graph-title">Investments over time</h2>
+                            </div>
                         </div>
+                        <InvestmentGraph/>
                     </div>
                 )}
             </div>

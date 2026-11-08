@@ -26,3 +26,20 @@
 .pagination li.active button {
     background-color: #0056b3;
 }
+
+.pagination li button {
+    min-width: 34px;
+    border: 1px solid #dce5f1;
+    border-radius: 8px;
+    background: #fff;
+    color: #53675a;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.pagination li button:hover,
+.pagination li.active button {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #fff;
+}

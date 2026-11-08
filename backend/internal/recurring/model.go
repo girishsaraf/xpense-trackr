@@ -10,23 +10,23 @@ import (
 var ErrRecordNotFound = gorm.ErrRecordNotFound
 
 type RecurringExpense struct {
-	ID          uint      `gorm:"primaryKey" json:"id"`
-	CategoryID  uint      `json:"category_id"`
-	Amount      float64   `json:"amount"`
-	Description string    `json:"description"`
-	StartDate   time.Time `json:"start_date"`
-	EndDate     time.Time `json:"end_date"`
-	Frequency   string    `json:"frequency"`
+	ID          uint       `gorm:"primaryKey" json:"id"`
+	CategoryID  uint       `json:"category_id"`
+	Amount      float64    `json:"amount"`
+	Description string     `json:"description"`
+	StartDate   time.Time  `json:"start_date"`
+	EndDate     *time.Time `json:"end_date"`
+	Frequency   string     `json:"frequency"`
 }
 
 type RecurringInvestment struct {
-	ID             uint      `gorm:"primaryKey" json:"id"`
-	Amount         float64   `json:"amount"`
-	InvestmentType string    `json:"investment_type"`
-	Description    string    `json:"description"`
-	StartDate      time.Time `json:"start_date"`
-	EndDate        time.Time `json:"end_date"`
-	Frequency      string    `json:"frequency"`
+	ID             uint       `gorm:"primaryKey" json:"id"`
+	Amount         float64    `json:"amount"`
+	InvestmentType string     `json:"investment_type"`
+	Description    string     `json:"description"`
+	StartDate      time.Time  `json:"start_date"`
+	EndDate        *time.Time `json:"end_date"`
+	Frequency      string     `json:"frequency"`
 }
 
 // GetAllRecurringExpenses retrieves all expenses from the database.
@@ -67,7 +67,7 @@ func UpdateRecurringExpense(id int, updatedExpense *RecurringExpense) error {
 		}
 		return err
 	}
-	if err := db.Model(&existing).Updates(updatedExpense).Error; err != nil {
+	if err := db.Model(&existing).Select("CategoryID", "Amount", "Description", "StartDate", "EndDate", "Frequency").Updates(updatedExpense).Error; err != nil {
 		return err
 	}
 	return nil
@@ -123,7 +123,7 @@ func UpdateRecurringInvestment(id int, updatedInvestment *RecurringInvestment) e
 		}
 		return err
 	}
-	if err := db.Model(&existing).Updates(updatedInvestment).Error; err != nil {
+	if err := db.Model(&existing).Select("Amount", "InvestmentType", "Description", "StartDate", "EndDate", "Frequency").Updates(updatedInvestment).Error; err != nil {
 		return err
 	}
 	return nil

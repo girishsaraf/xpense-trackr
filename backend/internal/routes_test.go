@@ -38,6 +38,13 @@ func TestSetRoutesRegistersExpectedEndpoints(t *testing.T) {
 		{http.MethodPut, "/api/budgets/1"},
 		{http.MethodDelete, "/api/budgets/1"},
 
+		{http.MethodGet, "/api/goals"},
+		{http.MethodPost, "/api/goals"},
+		{http.MethodGet, "/api/goals/1"},
+		{http.MethodPut, "/api/goals/1"},
+		{http.MethodDelete, "/api/goals/1"},
+		{http.MethodGet, "/api/trends/spending"},
+
 		{http.MethodGet, "/api/investments"},
 		{http.MethodPost, "/api/investments"},
 		{http.MethodGet, "/api/investments/1"},

@@ -15,8 +15,9 @@
 }
 
 .success {
-    background-color: lightgreen;
-    border: 1px solid darkgreen;
+    background-color: #eff5ff;
+    border: 1px solid #c6d6ee;
+    color: #1d4ed8;
 }
 
 .error {

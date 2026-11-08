@@ -1,6 +1,6 @@
 // src/components/Expense/ExpenseForm.js
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import backendUrl from "../../config";
 import './ExpenseForm.css';
@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router-dom';
 const ExpenseForm = () => {
 
     const navigate = useNavigate();
+    const [categories, setCategories] = useState([]);
+    const [categoryError, setCategoryError] = useState('');
     const [formData, setFormData] = useState({
         description: '',
         amount: '',
@@ -21,6 +23,19 @@ const ExpenseForm = () => {
         frequency: '',
     });
 
+    useEffect(() => {
+        const loadCategories = async () => {
+            try {
+                const response = await axios.get(`${backendUrl}/api/categories`);
+                setCategories(response.data || []);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+                setCategoryError('Categories could not be loaded. Please try again before adding an expense.');
+            }
+        };
+        loadCategories();
+    }, []);
+
     const handleSubmit = async event => {
         event.preventDefault();
 
@@ -29,7 +44,13 @@ const ExpenseForm = () => {
         try
         {
             if(isRecurring){
-                await axios.post(`${backendUrl}/api/recurring/expenses`, formData);
+                await axios.post(`${backendUrl}/api/recurring/expenses`, {
+                    ...formData,
+                    category_id: Number(formData.category_id),
+                    amount: Number(formData.amount),
+                    start_date: `${formData.start_date}T00:00:00Z`,
+                    end_date: formData.end_date ? `${formData.end_date}T00:00:00Z` : null,
+                });
                 alert('Expense added successfully');
             }
             else {
@@ -70,9 +91,13 @@ const ExpenseForm = () => {
     };
 
     return (
-        <div className="expense-form-container">
-            <h2>Add Expense</h2>
+        <main className="management-page form-page">
+        <section className="expense-form-container">
+            <p className="eyebrow">KEEP YOUR PICTURE CLEAR</p>
+            <h1>Add an expense</h1>
+            <p className="form-description">Capture a purchase and keep your monthly spending up to date.</p>
             <form onSubmit={handleSubmit}>
+                {categoryError && <p className="inline-message" role="alert">{categoryError}</p>}
                 <div className="input-container">
                     <label htmlFor="description">Description:</label>
                     <input
@@ -81,6 +106,8 @@ const ExpenseForm = () => {
                         name="description"
                         value={formData.description}
                         onChange={handleInputChange}
+                        maxLength="255"
+                        required
                     />
                 </div>
                 <div className="input-container">
@@ -91,17 +118,24 @@ const ExpenseForm = () => {
                         name="amount"
                         value={formData.amount}
                         onChange={handleInputChange}
+                        min="0.01"
+                        step="0.01"
+                        inputMode="decimal"
+                        required
                     />
                 </div>
                 <div className="input-container">
                     <label htmlFor="category_id">Category:</label>
-                    <input
-                        type="text"
+                    <select
                         id="category_id"
                         name="category_id"
                         value={formData.category_id}
                         onChange={handleInputChange}
-                    />
+                        required
+                    >
+                        <option value="">Select a category</option>
+                        {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+                    </select>
                 </div>
                 <div className="input-container">
                     <label htmlFor="date">Date:</label>
@@ -111,6 +145,7 @@ const ExpenseForm = () => {
                         name="date"
                         value={formData.date}
                         onChange={handleInputChange}
+                        required
                     />
                 </div>
                 <div className="input-container">
@@ -133,6 +168,7 @@ const ExpenseForm = () => {
                                 name="start_date"
                                 value={formData.start_date}
                                 onChange={handleInputChange}
+                                required
                             />
                         </div>
                         <div className="input-container">
@@ -152,6 +188,7 @@ const ExpenseForm = () => {
                                 name="frequency"
                                 value={formData.frequency}
                                 onChange={handleInputChange}
+                                required
                             >
                                 <option value="daily">Daily</option>
                                 <option value="weekly">Weekly</option>
@@ -166,7 +203,8 @@ const ExpenseForm = () => {
                     <button type="button" onClick={clearFormData}>Cancel</button>
                 </div>
             </form>
-        </div>
+        </section>
+        </main>
     );
 
 };

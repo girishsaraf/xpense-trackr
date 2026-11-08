@@ -31,7 +31,7 @@ describe('InvestmentForm', () => {
         renderInvestmentForm();
         fillInvestmentFields();
 
-        fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Add investment' }));
 
         await screen.findByText('Investments Page');
         expect(axios.post).toHaveBeenCalledWith(
@@ -50,16 +50,24 @@ describe('InvestmentForm', () => {
         fillInvestmentFields();
 
         fireEvent.click(screen.getByLabelText('Is Recurring Investment?'));
+        fireEvent.change(screen.getByLabelText('Description:'), { target: { value: 'Monthly contribution' } });
         fireEvent.change(screen.getByLabelText('Start Date:'), { target: { value: '2026-02-01' } });
         fireEvent.change(screen.getByLabelText('End Date:'), { target: { value: '2026-08-01' } });
         fireEvent.change(screen.getByLabelText('Frequency:'), { target: { value: 'weekly' } });
 
-        fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Add investment' }));
 
         await screen.findByText('Investments Page');
         expect(axios.post).toHaveBeenCalledWith(
             `${backendUrl}/api/recurring/investments`,
-            expect.objectContaining({ recurring: true, frequency: 'weekly' })
+            expect.objectContaining({
+                recurring: true,
+                frequency: 'weekly',
+                amount: 300,
+                description: 'Monthly contribution',
+                start_date: '2026-02-01T00:00:00Z',
+                end_date: '2026-08-01T00:00:00Z',
+            })
         );
     });
 
@@ -77,7 +85,7 @@ describe('InvestmentForm', () => {
         renderInvestmentForm();
         fillInvestmentFields();
 
-        fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Add investment' }));
 
         expect(await screen.findByText('Error adding investment')).toBeInTheDocument();
         await waitFor(() => expect(axios.post).toHaveBeenCalled());

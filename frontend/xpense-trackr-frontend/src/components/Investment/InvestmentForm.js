@@ -21,6 +21,7 @@ const InvestmentForm = () => {
         start_date: '',
         end_date: '',
         frequency: '',
+        description: '',
     });
 
     const handleSubmit = async event => {
@@ -30,7 +31,12 @@ const InvestmentForm = () => {
 
         try {
             if(isRecurring){
-                await axios.post(`${backendUrl}/api/recurring/investments`, formData);
+                await axios.post(`${backendUrl}/api/recurring/investments`, {
+                    ...formData,
+                    amount: Number(formData.amount),
+                    start_date: `${formData.start_date}T00:00:00Z`,
+                    end_date: formData.end_date ? `${formData.end_date}T00:00:00Z` : null,
+                });
                 setNotification({ message: 'Recurring Investment added successfully', isError: false });
             }
             else{
@@ -54,6 +60,7 @@ const InvestmentForm = () => {
             start_date: '',
             end_date: '',
             frequency: '',
+            description: '',
         });
         navigate('/investments');
     }
@@ -69,8 +76,11 @@ const InvestmentForm = () => {
     };
 
     return (
-        <div className="expense-form-container">
-            <h2>Add New Investment</h2>
+        <main className="management-page form-page">
+            <section className="expense-form-container">
+            <p className="eyebrow">GROW YOUR FUTURE</p>
+            <h1>Add an investment</h1>
+            <p className="form-description">Record a contribution and keep your portfolio history up to date.</p>
             <form onSubmit={handleSubmit}>
                 <div className="input-container">
                     <label htmlFor="investment_type">Investment Type:</label>
@@ -81,7 +91,7 @@ const InvestmentForm = () => {
                         onChange={handleInputChange}
                     >
                         <option value="stocks">Stocks</option>
-                        <option value="401_k">401(k)</option>
+                        <option value="401k">401(k)</option>
                         <option value="mutual_funds">Mutual Funds</option>
                         <option value="real_estate">Real Estate</option>
                         <option value="savings">Savings</option>
@@ -96,6 +106,10 @@ const InvestmentForm = () => {
                         name="amount"
                         value={formData.amount}
                         onChange={handleInputChange}
+                        min="0.01"
+                        step="0.01"
+                        inputMode="decimal"
+                        required
                     />
                 </div>
                 <div className="input-container">
@@ -106,6 +120,7 @@ const InvestmentForm = () => {
                         name="date"
                         value={formData.date}
                         onChange={handleInputChange}
+                        required
                     />
                 </div>
                 <div className="input-container">
@@ -121,6 +136,18 @@ const InvestmentForm = () => {
                 {formData.recurring && (
                     <>
                         <div className="input-container">
+                            <label htmlFor="recurring-description">Description:</label>
+                            <input
+                                type="text"
+                                id="recurring-description"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleInputChange}
+                                maxLength="255"
+                                required
+                            />
+                        </div>
+                        <div className="input-container">
                             <label htmlFor="startDate">Start Date:</label>
                             <input
                                 type="date"
@@ -128,6 +155,7 @@ const InvestmentForm = () => {
                                 name="start_date"
                                 value={formData.start_date}
                                 onChange={handleInputChange}
+                                required
                             />
                         </div>
                         <div className="input-container">
@@ -147,7 +175,9 @@ const InvestmentForm = () => {
                                 name="frequency"
                                 value={formData.frequency}
                                 onChange={handleInputChange}
+                                required
                             >
+                                <option value="">Choose a frequency</option>
                                 <option value="daily">Daily</option>
                                 <option value="weekly">Weekly</option>
                                 <option value="biweekly">Bi-Weekly</option>
@@ -157,14 +187,13 @@ const InvestmentForm = () => {
                     </>
                 )}
                 <div className="buttons-container">
-                    <button type="submit">Add</button>
-                    <button type="button" onClick={clearFormData}>Cancel</button>
+                    <button className="primary-action" type="submit">Add investment</button>
+                    <button className="secondary-action" type="button" onClick={clearFormData}>Cancel</button>
                 </div>
             </form>
-            <div>
-                <Notification message={notification.message} isError={notification.isError}/>
-            </div>
-        </div>
+            <Notification message={notification.message} isError={notification.isError}/>
+            </section>
+        </main>
     )
         ;
 };

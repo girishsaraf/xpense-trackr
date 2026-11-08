@@ -18,7 +18,11 @@ const Notification = ({ message, isError }) => {
     const notificationClass = isError ? 'error' : 'success';
 
     return (
-        <div className={`notification ${notificationClass} ${isVisible ? 'show' : ''}`}>
+        <div
+            className={`notification ${notificationClass} ${isVisible ? 'show' : ''}`}
+            role={isError ? 'alert' : 'status'}
+            aria-live={isError ? 'assertive' : 'polite'}
+        >
             {message}
         </div>
     );

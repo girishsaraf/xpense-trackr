@@ -4,6 +4,23 @@
     padding: 20px;
 }
 
+.sr-only {
+    position: absolute;
+    overflow: hidden;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+.table-empty-state {
+    padding: 38px 20px !important;
+    color: #7789a2 !important;
+    text-align: center;
+}
+
 .expense-list-header {
     display: flex;
     justify-content: space-between;
@@ -133,7 +150,7 @@
 /* Define colors for different categories */
 .category-food { background-color: #ffe0b2; }
 .category-transportation { background-color: #b2ebf2; }
-.category-utilities { background-color: #b2dfdb; }
+.category-utilities { background-color: #c8dcfb; }
 .category-entertainment { background-color: #ffcc80; }
 .category-healthcare { background-color: #f48fb1; }
 /* Add more categories as needed */
@@ -141,7 +158,7 @@
 /* Define colors for different categories */
 .category-food { background-color: #ffe0b2; }
 .category-transportation { background-color: #b2ebf2; }
-.category-utilities { background-color: #b2dfdb; }
+.category-utilities { background-color: #c8dcfb; }
 .category-entertainment { background-color: #ffcc80; }
 .category-healthcare { background-color: #f48fb1; }
 /* Add more categories as needed */
@@ -163,7 +180,7 @@
 /* Table Row Colors */
 tr.category-food { background-color: #ffe0b2; }
 tr.category-transportation { background-color: #b2ebf2; }
-tr.category-utilities { background-color: #b2dfdb; }
+tr.category-utilities { background-color: #c8dcfb; }
 tr.category-entertainment { background-color: #ffcc80; }
 tr.category-healthcare { background-color: #f48fb1; }
 /* Add more category-specific row colors as needed */
@@ -187,4 +204,164 @@ tr.category-healthcare { background-color: #f48fb1; }
 
 .button-common:hover {
     background-color: #0056b3;
+}
+
+.expense-list-container {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+}
+
+.expense-list-header {
+    padding: 0 0 17px;
+    border-bottom: 1px solid #e5ebf4;
+}
+
+.expense-list-header h2 {
+    color: #263d5a;
+    font-size: 19px;
+    letter-spacing: -0.02em;
+}
+
+.expense-list-table {
+    margin-top: 12px;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border: 1px solid #e1e9f4;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.expense-list-table th {
+    padding: 13px 15px;
+    border: 0;
+    border-bottom: 1px solid #e5ebf4;
+    background: #f7faff;
+    color: #7789a2;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.expense-list-table td {
+    padding: 13px 15px;
+    border: 0;
+    border-bottom: 1px solid #eef2f8;
+    background: #fff;
+    color: #455a78;
+    font-size: 13px;
+}
+
+.expense-list-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.expense-list-table tr:hover td {
+    background: #fafcff;
+}
+
+.button-common-add {
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 13px;
+    border-radius: 9px;
+    background: #2563eb;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.button-common-add:hover {
+    background: #1d4ed8;
+}
+
+.button-common {
+    display: inline-grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #e1e9f4;
+    border-radius: 9px;
+    background: #fff;
+    color: #5b7391;
+    font-size: 13px;
+}
+
+.button-common:hover {
+    border-color: #c6d6ee;
+    background: #eff5ff;
+    color: #1d4ed8;
+}
+
+.category-tag {
+    padding: 5px 9px;
+    border-radius: 7px;
+    background: #edf3fc;
+    color: #476ba8;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.modal {
+    padding: 20px;
+    background: rgba(25, 42, 32, 0.42);
+    backdrop-filter: blur(3px);
+}
+
+.modal-content {
+    width: min(100%, 480px);
+    padding: 28px;
+    border: 1px solid #e1e9f4;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(19, 39, 27, 0.2);
+}
+
+.modal-content h2 {
+    color: #263d5a;
+    font-size: 20px;
+}
+
+.modal-content label {
+    color: #4b5e51;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.modal-content input,
+.modal-content select {
+    min-height: 42px;
+    border-color: #d9e3f0;
+    border-radius: 8px;
+}
+
+.modal-content button {
+    padding: 10px 18px;
+    border-radius: 9px;
+    background: #2563eb;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.modal-content button:last-child {
+    border: 1px solid #d9e3f0;
+    background: #fff;
+    color: #506582;
+}
+
+@media (max-width: 700px) {
+    .expense-list-container {
+        overflow-x: auto;
+    }
+
+    .expense-list-header {
+        gap: 12px;
+    }
+
+    .expense-list-table {
+        min-width: 620px;
+    }
 }

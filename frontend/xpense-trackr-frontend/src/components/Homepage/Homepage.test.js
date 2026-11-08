@@ -1,5 +1,6 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import Homepage from './Homepage';
 
 jest.mock('./ExpenseHome/ExpenseOverview', () => () => <div>ExpenseOverviewMock</div>);
@@ -8,8 +9,10 @@ jest.mock('./InvestmentHome/InvestmentOverview', () => () => <div>InvestmentOver
 jest.mock('./InvestmentHome/InvestmentGraph', () => () => <div>InvestmentGraphMock</div>);
 
 describe('Homepage', () => {
+    const renderHomepage = () => render(<MemoryRouter><Homepage /></MemoryRouter>);
+
     test('shows the expense view by default', () => {
-        render(<Homepage />);
+        renderHomepage();
 
         expect(screen.getByText('ExpenseOverviewMock')).toBeInTheDocument();
         expect(screen.getByText('ExpenseGraphMock')).toBeInTheDocument();
@@ -17,7 +20,7 @@ describe('Homepage', () => {
     });
 
     test('switches to the investment view', () => {
-        render(<Homepage />);
+        renderHomepage();
 
         fireEvent.click(screen.getByRole('button', { name: 'Investments' }));
 
@@ -27,7 +30,7 @@ describe('Homepage', () => {
     });
 
     test('switches back to the expense view', () => {
-        render(<Homepage />);
+        renderHomepage();
 
         fireEvent.click(screen.getByRole('button', { name: 'Investments' }));
         fireEvent.click(screen.getByRole('button', { name: 'Expenses' }));

@@ -90,17 +90,12 @@ func checkIfExpenseOrInvestmentIsDue(frequency string, lastRunDate time.Time) bo
 		// Check if last run date is before today
 		return lastRunDate.Before(time.Now().Truncate(24 * time.Hour))
 	case "weekly":
-		// Check if last run date is before the start of this week
-		startOfWeek := time.Now().Truncate(24 * 7 * time.Hour)
-		return lastRunDate.Before(startOfWeek)
+		return lastRunDate.Before(time.Now().AddDate(0, 0, -7))
 	case "biweekly":
-		// Check if last run date is before the start of this biweekly
-		startOfBiweekly := time.Now().Truncate(24 * 14 * time.Hour)
-		return lastRunDate.Before(startOfBiweekly)
+		return lastRunDate.Before(time.Now().AddDate(0, 0, -14))
 	case "monthly":
-		// Check if last run date is before the start of this month
-		startOfMonth := time.Now().Truncate(24 * 30 * time.Hour) // Approximation for a month
-		return lastRunDate.Before(startOfMonth)
+		now := time.Now()
+		return lastRunDate.Year() < now.Year() || lastRunDate.Year() == now.Year() && lastRunDate.Month() < now.Month()
 	default:
 		// Unsupported frequency
 		return false
@@ -109,7 +104,7 @@ func checkIfExpenseOrInvestmentIsDue(frequency string, lastRunDate time.Time) bo
 
 func getCurrDayMonth() string {
 	today := time.Now()
-	return "-" + today.Format("DD/MM")
+	return "-" + today.Format("01/02")
 }
 
 func insertExpense(currExpense RecurringExpense) error {
@@ -119,7 +114,7 @@ func insertExpense(currExpense RecurringExpense) error {
 			CategoryID:  currExpense.CategoryID,
 			Amount:      currExpense.Amount,
 			Description: currExpense.Description + getCurrDayMonth(),
-			Date:        time.Now().String(),
+			Date:        time.Now().Format("2006-01-02"),
 		}
 		err := db.Create(&newExpense).Error
 		if err != nil {
@@ -143,7 +138,7 @@ func insertInvestment(investment RecurringInvestment) error {
 		newInvestment := investments.Investment{
 			Amount:         investment.Amount,
 			InvestmentType: investment.InvestmentType,
-			Date:           time.Now().String(),
+			Date:           time.Now().Format("2006-01-02"),
 		}
 		err := db.Create(&newInvestment).Error
 		if err != nil {

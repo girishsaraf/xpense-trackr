@@ -14,8 +14,10 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/budget"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/category"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/expense"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/goal"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/recurring"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/trends"
 	"github.com/gorilla/mux"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -45,6 +47,7 @@ func setupIntegrationDB(t *testing.T) (*gorm.DB, http.Handler) {
 		&category.Category{},
 		&expense.Expense{},
 		&budget.Budget{},
+		&goal.Goal{},
 		&investments.Investment{},
 		&recurring.RecurringExpense{},
 		&recurring.RecurringInvestment{},
@@ -61,6 +64,8 @@ func setupIntegrationDB(t *testing.T) (*gorm.DB, http.Handler) {
 	expense.SetDB(database)
 	investments.SetDB(database)
 	recurring.SetDB(database)
+	goal.SetDB(database)
+	trends.SetDB(database)
 
 	router := mux.NewRouter()
 	internal.SetRoutes(router)
@@ -165,6 +170,7 @@ func TestBudgetAndInvestmentAPI(t *testing.T) {
 	if budgetResponse.Code != http.StatusOK {
 		t.Fatalf("create budget status = %d, want %d", budgetResponse.Code, http.StatusOK)
 	}
+
 	createdBudget := decodeResponse[budget.Budget](t, budgetResponse)
 
 	updateBudgetResponse := apiRequest(t, handler, http.MethodPut, fmt.Sprintf("/api/budgets/%d", createdBudget.ID), map[string]interface{}{
@@ -205,6 +211,61 @@ func TestBudgetAndInvestmentAPI(t *testing.T) {
 	deleteInvestmentResponse := apiRequest(t, handler, http.MethodDelete, fmt.Sprintf("/api/investments/%d", createdInvestment.ID), nil)
 	if deleteInvestmentResponse.Code != http.StatusOK {
 		t.Fatalf("delete investment status = %d, want %d", deleteInvestmentResponse.Code, http.StatusOK)
+	}
+}
+
+func TestSavingsGoalsAndSpendingTrendsAPI(t *testing.T) {
+	_, handler := setupIntegrationDB(t)
+
+	categoryResponse := apiRequest(t, handler, http.MethodPost, "/api/categories", map[string]string{"name": "Food"})
+	if categoryResponse.Code != http.StatusCreated {
+		t.Fatalf("create category status = %d, want %d", categoryResponse.Code, http.StatusCreated)
+	}
+	createdCategory := decodeResponse[category.Category](t, categoryResponse)
+	expenseResponse := apiRequest(t, handler, http.MethodPost, "/api/expenses", map[string]string{
+		"category_id": fmt.Sprint(createdCategory.ID),
+		"amount":      "24.75",
+		"description": "Lunch",
+		"date":        time.Now().Format("2006-01-02"),
+	})
+	if expenseResponse.Code != http.StatusCreated {
+		t.Fatalf("create expense status = %d, want %d", expenseResponse.Code, http.StatusCreated)
+	}
+
+	trendsResponse := apiRequest(t, handler, http.MethodGet, "/api/trends/spending?months=3", nil)
+	if trendsResponse.Code != http.StatusOK {
+		t.Fatalf("trends status = %d, want %d: %s", trendsResponse.Code, http.StatusOK, trendsResponse.Body)
+	}
+	trendPoints := decodeResponse[[]struct {
+		Month    string  `json:"month"`
+		Category string  `json:"category"`
+		Amount   float64 `json:"amount"`
+	}](t, trendsResponse)
+	if len(trendPoints) != 1 || trendPoints[0].Category != "Food" || trendPoints[0].Amount != 24.75 {
+		t.Fatalf("trend points = %+v", trendPoints)
+	}
+
+	goalResponse := apiRequest(t, handler, http.MethodPost, "/api/goals", map[string]interface{}{
+		"name": "Emergency fund", "target_amount": 5000, "current_amount": 250, "target_date": "2027-01-01",
+	})
+	if goalResponse.Code != http.StatusCreated {
+		t.Fatalf("create goal status = %d, want %d: %s", goalResponse.Code, http.StatusCreated, goalResponse.Body)
+	}
+	createdGoal := decodeResponse[goal.Goal](t, goalResponse)
+	updateResponse := apiRequest(t, handler, http.MethodPut, fmt.Sprintf("/api/goals/%d", createdGoal.ID), map[string]interface{}{
+		"name": "Emergency fund", "target_amount": 5000, "current_amount": 500, "target_date": "",
+	})
+	if updateResponse.Code != http.StatusOK {
+		t.Fatalf("update goal status = %d, want %d: %s", updateResponse.Code, http.StatusOK, updateResponse.Body)
+	}
+	listResponse := apiRequest(t, handler, http.MethodGet, "/api/goals", nil)
+	goals := decodeResponse[[]goal.Goal](t, listResponse)
+	if len(goals) != 1 || goals[0].CurrentAmount != 500 || goals[0].TargetDate != "" {
+		t.Fatalf("listed goals = %+v", goals)
+	}
+	deleteResponse := apiRequest(t, handler, http.MethodDelete, fmt.Sprintf("/api/goals/%d", createdGoal.ID), nil)
+	if deleteResponse.Code != http.StatusNoContent {
+		t.Fatalf("delete goal status = %d, want %d", deleteResponse.Code, http.StatusNoContent)
 	}
 }
 

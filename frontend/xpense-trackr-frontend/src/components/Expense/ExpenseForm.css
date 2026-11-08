@@ -75,3 +75,93 @@
 .expense-form-container form button:hover {
     background-color: #0056b3;
 }
+
+.expense-form-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 30px;
+    border: 1px solid #e1e9f4;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(37, 76, 137, 0.05);
+}
+
+.expense-form-container h1 {
+    margin: 0;
+    color: #253b5b;
+    font-size: 26px;
+    letter-spacing: -0.04em;
+    text-align: left;
+    text-shadow: none;
+}
+
+.expense-form-container form {
+    gap: 0;
+}
+
+.expense-form-container form .input-container {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 18px;
+}
+
+.expense-form-container form .input-container label {
+    flex: none;
+    margin: 0;
+    color: #445b79;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.expense-form-container form .input-container input:not([type="checkbox"]),
+.expense-form-container form .input-container select {
+    width: 100%;
+    min-height: 44px;
+    flex: none;
+    padding: 10px 12px;
+    border: 1px solid #d9e3f0;
+    border-radius: 9px;
+    background: #fff;
+    color: #344b6b;
+    font-size: 14px;
+}
+
+.expense-form-container form .input-container input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #2563eb;
+}
+
+.expense-form-container .buttons-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid #edf2f8;
+}
+
+.expense-form-container form .buttons-container button {
+    min-height: 42px;
+    padding: 10px 18px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: #2563eb;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.expense-form-container form .buttons-container button:last-child {
+    margin-left: 0;
+    border-color: #d9e3f0;
+    background: #fff;
+    color: #506582;
+}
+
+@media (max-width: 700px) {
+    .expense-form-container {
+        padding: 20px 16px;
+    }
+}
