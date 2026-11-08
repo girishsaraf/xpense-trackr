@@ -33,12 +33,14 @@ type NetWorthAccount struct {
 }
 
 type NetWorthCurrency struct {
-	Currency         string            `json:"currency"`
-	AssetsMinor      int64             `json:"assets_minor"`
-	LiabilitiesMinor int64             `json:"liabilities_minor"`
-	NetWorthMinor    int64             `json:"net_worth_minor"`
-	Accounts         []NetWorthAccount `json:"accounts"`
-	ManualItems      []NetWorthItem    `json:"manual_items"`
+	Currency         string                 `json:"currency"`
+	AssetsMinor      int64                  `json:"assets_minor"`
+	LiabilitiesMinor int64                  `json:"liabilities_minor"`
+	NetWorthMinor    int64                  `json:"net_worth_minor"`
+	PortfolioMinor   int64                  `json:"portfolio_minor"`
+	Accounts         []NetWorthAccount      `json:"accounts"`
+	ManualItems      []NetWorthItem         `json:"manual_items"`
+	Holdings         []PortfolioHoldingItem `json:"holdings"`
 }
 
 type NetWorthItem struct {
@@ -48,6 +50,18 @@ type NetWorthItem struct {
 	ValueMinor int64  `json:"value_minor"`
 	AsOf       string `json:"as_of"`
 	Source     string `json:"source"`
+}
+
+type PortfolioHoldingItem struct {
+	HoldingID      uint   `json:"holding_id"`
+	Name           string `json:"name"`
+	Ticker         string `json:"ticker"`
+	AssetClass     string `json:"asset_class"`
+	Quantity       string `json:"quantity"`
+	CostBasisMinor int64  `json:"cost_basis_minor"`
+	ValueMinor     int64  `json:"value_minor"`
+	AsOf           string `json:"as_of"`
+	Source         string `json:"source"`
 }
 
 type NetWorthReport struct {
@@ -149,7 +163,8 @@ func GetNetWorthReport(asOf time.Time) (*NetWorthReport, error) {
 			index = len(report.Currencies)
 			byCurrency[account.Currency] = index
 			report.Currencies = append(report.Currencies, NetWorthCurrency{
-				Currency: account.Currency, Accounts: make([]NetWorthAccount, 0), ManualItems: make([]NetWorthItem, 0),
+				Currency: account.Currency, Accounts: make([]NetWorthAccount, 0),
+				ManualItems: make([]NetWorthItem, 0), Holdings: make([]PortfolioHoldingItem, 0),
 			})
 		}
 		balance := account.BalanceMinor
@@ -177,7 +192,8 @@ func GetNetWorthReport(asOf time.Time) (*NetWorthReport, error) {
 			index = len(report.Currencies)
 			byCurrency[asset.Currency] = index
 			report.Currencies = append(report.Currencies, NetWorthCurrency{
-				Currency: asset.Currency, Accounts: make([]NetWorthAccount, 0), ManualItems: make([]NetWorthItem, 0),
+				Currency: asset.Currency, Accounts: make([]NetWorthAccount, 0),
+				ManualItems: make([]NetWorthItem, 0), Holdings: make([]PortfolioHoldingItem, 0),
 			})
 		}
 		currencyReport := &report.Currencies[index]
@@ -191,6 +207,34 @@ func GetNetWorthReport(asOf time.Time) (*NetWorthReport, error) {
 		currencyReport.ManualItems = append(currencyReport.ManualItems, NetWorthItem{
 			AssetID: asset.ID, Name: asset.Name, Kind: asset.Kind, ValueMinor: asset.LatestValueMinor,
 			AsOf: asset.ValuationDate, Source: asset.ValuationSource,
+		})
+	}
+	holdings, err := GetPortfolioHoldingsAt(report.AsOf)
+	if err != nil {
+		return nil, err
+	}
+	for _, holding := range holdings {
+		if !holding.HasValuation {
+			continue
+		}
+		index, found := byCurrency[holding.Currency]
+		if !found {
+			index = len(report.Currencies)
+			byCurrency[holding.Currency] = index
+			report.Currencies = append(report.Currencies, NetWorthCurrency{
+				Currency: holding.Currency, Accounts: make([]NetWorthAccount, 0),
+				ManualItems: make([]NetWorthItem, 0), Holdings: make([]PortfolioHoldingItem, 0),
+			})
+		}
+		currencyReport := &report.Currencies[index]
+		currencyReport.AssetsMinor += holding.LatestValueMinor
+		currencyReport.NetWorthMinor += holding.LatestValueMinor
+		currencyReport.PortfolioMinor += holding.LatestValueMinor
+		currencyReport.Holdings = append(currencyReport.Holdings, PortfolioHoldingItem{
+			HoldingID: holding.ID, Name: holding.Name, Ticker: holding.Ticker,
+			AssetClass: holding.AssetClass, Quantity: holding.Quantity,
+			CostBasisMinor: holding.CostBasisMinor, ValueMinor: holding.LatestValueMinor,
+			AsOf: holding.ValuationDate, Source: holding.ValuationSource,
 		})
 	}
 	sort.Slice(report.Currencies, func(i, j int) bool {

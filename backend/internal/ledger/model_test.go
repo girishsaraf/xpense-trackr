@@ -14,7 +14,7 @@ func setupLedgerDB(t *testing.T) *gorm.DB {
 	t.Helper()
 	database := testutil.NewDB(
 		t, &Account{}, &Transaction{}, &CategoryRule{}, &ScheduledFlow{}, &ScheduledOccurrence{},
-		&ManualAsset{}, &AssetValuation{}, &category.Category{},
+		&ManualAsset{}, &AssetValuation{}, &PortfolioHolding{}, &HoldingValuation{}, &category.Category{},
 	)
 	SetDB(database)
 	return database

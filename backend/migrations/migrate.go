@@ -108,6 +108,13 @@ var schemaMigrations = []migration{
 			return tx.AutoMigrate(&ledger.ManualAsset{}, &ledger.AssetValuation{})
 		},
 	},
+	{
+		version: 11,
+		name:    "portfolio-holdings-and-valuations",
+		apply: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&ledger.PortfolioHolding{}, &ledger.HoldingValuation{})
+		},
+	},
 }
 
 func (schemaMigration) TableName() string {

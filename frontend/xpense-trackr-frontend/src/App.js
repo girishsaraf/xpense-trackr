@@ -30,6 +30,7 @@ const ImportExportPage = lazy(() => import('./components/ImportExport/ImportExpo
 const PlanningPage = lazy(() => import('./components/Planning/PlanningPage'));
 const BillsPage = lazy(() => import('./components/Bills/BillsPage'));
 const AssetsPage = lazy(() => import('./components/Assets/AssetsPage'));
+const PortfolioPage = lazy(() => import('./components/Portfolio/PortfolioPage'));
 
 function App() {
     return (
@@ -51,6 +52,7 @@ function App() {
                             <li><NavLink to="/forecast" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Cash flow</NavLink></li>
                             <li><NavLink to="/bills" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Bills</NavLink></li>
                             <li><NavLink to="/assets" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Assets</NavLink></li>
+                            <li><NavLink to="/portfolio" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Portfolio</NavLink></li>
                             <li><NavLink to="/receipts" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Receipts</NavLink></li>
                             <li><NavLink to="/reports" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Reports</NavLink></li>
                             <li><NavLink to="/import-export" className={({ isActive }) => isActive ? 'active-tab' : undefined}>Import / export</NavLink></li>
@@ -74,6 +76,7 @@ function App() {
                         <Route path="/forecast" element={<ForecastPage/>}/>
                         <Route path="/bills" element={<BillsPage/>}/>
                         <Route path="/assets" element={<AssetsPage/>}/>
+                        <Route path="/portfolio" element={<PortfolioPage/>}/>
                         <Route path="/receipts" element={<ReceiptPage/>}/>
                         <Route path="/reports" element={<ReportsPage/>}/>
                         <Route path="/import-export" element={<ImportExportPage/>}/>

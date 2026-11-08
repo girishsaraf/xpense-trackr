@@ -63,6 +63,8 @@ func setupIntegrationDB(t *testing.T) (*gorm.DB, http.Handler) {
 		&ledger.ScheduledOccurrence{},
 		&ledger.ManualAsset{},
 		&ledger.AssetValuation{},
+		&ledger.PortfolioHolding{},
+		&ledger.HoldingValuation{},
 		&planning.Goal{},
 		&planning.GoalContribution{},
 		&planning.Envelope{},
@@ -425,6 +427,46 @@ func TestManualAssetValuationsContributeToNetWorth(t *testing.T) {
 		map[string]interface{}{"value_minor": -1, "date": today, "source": "invalid"},
 	); invalid.Code != http.StatusBadRequest {
 		t.Errorf("negative valuation status = %d, want %d", invalid.Code, http.StatusBadRequest)
+	}
+}
+
+func TestPortfolioHoldingsAreValuedAndIncludedInNetWorth(t *testing.T) {
+	_, handler := setupIntegrationDB(t)
+	today := time.Now().UTC().Format("2006-01-02")
+	createResponse := apiRequest(t, handler, http.MethodPost, "/api/portfolio/holdings", map[string]interface{}{
+		"name": "Index fund", "ticker": "vti", "asset_class": "equity", "currency": "USD",
+		"quantity": "2.125", "cost_basis_minor": 20000, "value_minor": 24000,
+		"date": today, "source": "broker statement",
+	})
+	if createResponse.Code != http.StatusCreated {
+		t.Fatalf("create holding status = %d: %s", createResponse.Code, createResponse.Body)
+	}
+	holding := decodeResponse[ledger.PortfolioHolding](t, createResponse)
+	if holding.Ticker != "VTI" || !holding.HasValuation || holding.LatestValueMinor != 24000 {
+		t.Fatalf("created holding = %+v", holding)
+	}
+
+	valuationResponse := apiRequest(t, handler, http.MethodPost,
+		fmt.Sprintf("/api/portfolio/holdings/%d/valuations", holding.ID),
+		map[string]interface{}{"value_minor": 27500, "date": today, "source": "updated statement"},
+	)
+	if valuationResponse.Code != http.StatusCreated {
+		t.Fatalf("add holding valuation status = %d: %s", valuationResponse.Code, valuationResponse.Body)
+	}
+	netWorthResponse := apiRequest(t, handler, http.MethodGet, "/api/net-worth", nil)
+	netWorth := decodeResponse[ledger.NetWorthReport](t, netWorthResponse)
+	if netWorthResponse.Code != http.StatusOK || len(netWorth.Currencies) != 1 ||
+		netWorth.Currencies[0].PortfolioMinor != 27500 ||
+		netWorth.Currencies[0].AssetsMinor != 27500 ||
+		netWorth.Currencies[0].NetWorthMinor != 27500 ||
+		len(netWorth.Currencies[0].Holdings) != 1 {
+		t.Fatalf("net worth with portfolio holding = %+v, status %d", netWorth, netWorthResponse.Code)
+	}
+
+	listResponse := apiRequest(t, handler, http.MethodGet, "/api/portfolio/holdings", nil)
+	holdings := decodeResponse[[]ledger.PortfolioHolding](t, listResponse)
+	if listResponse.Code != http.StatusOK || len(holdings) != 1 || holdings[0].LatestValueMinor != 27500 {
+		t.Fatalf("portfolio holdings = %+v, status %d", holdings, listResponse.Code)
 	}
 }
 

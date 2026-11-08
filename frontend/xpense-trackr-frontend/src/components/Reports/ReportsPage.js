@@ -168,6 +168,7 @@ const ReportsPage = () => {
                                 <dl className="report-totals">
                                     <div><dt>Assets</dt><dd>{formatAmountMinor(currency.assets_minor, currency.currency)}</dd></div>
                                     <div><dt>Liabilities</dt><dd>{formatAmountMinor(currency.liabilities_minor, currency.currency)}</dd></div>
+                                    <div><dt>Portfolio</dt><dd>{formatAmountMinor(currency.portfolio_minor || 0, currency.currency)}</dd></div>
                                     <div><dt>Net worth</dt><dd>{formatAmountMinor(currency.net_worth_minor, currency.currency)}</dd></div>
                                 </dl>
                                 <ul className="net-worth-account-list">
@@ -181,6 +182,12 @@ const ReportsPage = () => {
                                         <li key={`manual-${item.asset_id}`}>
                                             <span>{item.name} <small>{item.kind} · {item.as_of} · {item.source}</small></span>
                                             <strong>{formatAmountMinor(item.value_minor, currency.currency)}</strong>
+                                        </li>
+                                    ))}
+                                    {currency.holdings?.map((holding) => (
+                                        <li key={`holding-${holding.holding_id}`}>
+                                            <span>{holding.name}{holding.ticker ? ` (${holding.ticker})` : ''} <small>{holding.asset_class.replace('_', ' ')} · {holding.quantity} units · {holding.as_of} · {holding.source}</small></span>
+                                            <strong>{formatAmountMinor(holding.value_minor, currency.currency)}</strong>
                                         </li>
                                     ))}
                                 </ul>

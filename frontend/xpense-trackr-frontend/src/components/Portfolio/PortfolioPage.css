@@ -1,0 +1,174 @@
+.portfolio-double-count-note {
+    padding: 12px 14px;
+    border-left: 3px solid #d59a2a;
+    border-radius: 6px;
+    background: #fff8e9;
+    color: #66501f;
+}
+
+.portfolio-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+}
+
+.portfolio-summary-grid h3 {
+    margin-top: 0;
+}
+
+.portfolio-total {
+    display: block;
+    margin: 8px 0 16px;
+    font-size: 1.4rem;
+}
+
+.portfolio-summary-grid ul,
+.portfolio-valuation-history {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.portfolio-summary-grid li,
+.portfolio-valuation-history li {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #edf0f5;
+    color: #66748b;
+}
+
+.portfolio-summary-grid li:last-child,
+.portfolio-valuation-history li:last-child {
+    border-bottom: 0;
+}
+
+.portfolio-summary-grid li strong,
+.portfolio-valuation-history li strong {
+    color: #17243b;
+    text-align: right;
+}
+
+.portfolio-form,
+.portfolio-valuation-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    align-items: end;
+    gap: 12px;
+}
+
+.portfolio-form label,
+.portfolio-valuation-form label {
+    display: grid;
+    gap: 6px;
+    color: #44536c;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.portfolio-form input,
+.portfolio-form select,
+.portfolio-valuation-form input {
+    min-height: 42px;
+    padding: 8px 10px;
+    border: 1px solid #cbd5e2;
+    border-radius: 8px;
+    color: #17243b;
+    font: inherit;
+}
+
+.portfolio-holding-list {
+    display: grid;
+    gap: 14px;
+}
+
+.portfolio-holding-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.portfolio-holding-heading h3 {
+    margin: 2px 0 5px;
+}
+
+.portfolio-holding-heading p {
+    margin: 0;
+    color: #66748b;
+    font-size: .9rem;
+}
+
+.portfolio-holding-heading .portfolio-holding-meta {
+    color: #245bd6;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.portfolio-holding-values {
+    display: grid;
+    justify-items: end;
+    gap: 6px;
+}
+
+.portfolio-holding-values strong {
+    font-size: 1.2rem;
+}
+
+.portfolio-holding-values span {
+    color: #66748b;
+    font-size: .88rem;
+}
+
+.portfolio-valuation-form {
+    padding-top: 14px;
+    border-top: 1px solid #edf0f5;
+}
+
+.portfolio-holding-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.portfolio-history-button {
+    padding: 7px 0;
+    border: 0;
+    background: transparent;
+    color: #245bd6;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.portfolio-holding-actions .asset-delete-button {
+    margin-top: 0;
+    padding: 7px 0;
+    border: 0;
+    background: transparent;
+    color: #ad3b3b;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.portfolio-valuation-history {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #edf0f5;
+}
+
+@media (max-width: 600px) {
+    .portfolio-holding-heading {
+        flex-direction: column;
+    }
+
+    .portfolio-holding-values {
+        justify-items: start;
+    }
+}

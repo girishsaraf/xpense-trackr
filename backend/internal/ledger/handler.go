@@ -442,6 +442,88 @@ func CreateAssetValuationHandler(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, valuation)
 }
 
+func GetPortfolioHoldingsHandler(w http.ResponseWriter, _ *http.Request) {
+	holdings, err := GetPortfolioHoldings()
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, holdings)
+}
+
+func CreatePortfolioHoldingHandler(w http.ResponseWriter, r *http.Request) {
+	var request CreatePortfolioHoldingRequest
+	if err := decodeRequest(r, &request); err != nil {
+		http.Error(w, "Invalid portfolio holding payload", http.StatusBadRequest)
+		return
+	}
+	holding, err := CreatePortfolioHolding(request)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusCreated, holding)
+}
+
+func UpdatePortfolioHoldingHandler(w http.ResponseWriter, r *http.Request) {
+	id, ok := transactionID(w, r)
+	if !ok {
+		return
+	}
+	var request UpdatePortfolioHoldingRequest
+	if err := decodeRequest(r, &request); err != nil {
+		http.Error(w, "Invalid portfolio holding payload", http.StatusBadRequest)
+		return
+	}
+	if err := UpdatePortfolioHolding(uint(id), request); err != nil {
+		writeError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func DeletePortfolioHoldingHandler(w http.ResponseWriter, r *http.Request) {
+	id, ok := transactionID(w, r)
+	if !ok {
+		return
+	}
+	if err := DeletePortfolioHolding(uint(id)); err != nil {
+		writeError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func GetHoldingValuationsHandler(w http.ResponseWriter, r *http.Request) {
+	id, ok := transactionID(w, r)
+	if !ok {
+		return
+	}
+	valuations, err := GetHoldingValuations(uint(id))
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, valuations)
+}
+
+func CreateHoldingValuationHandler(w http.ResponseWriter, r *http.Request) {
+	id, ok := transactionID(w, r)
+	if !ok {
+		return
+	}
+	var valuation HoldingValuation
+	if err := decodeRequest(r, &valuation); err != nil {
+		http.Error(w, "Invalid holding valuation payload", http.StatusBadRequest)
+		return
+	}
+	if err := CreateHoldingValuation(uint(id), &valuation); err != nil {
+		writeError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusCreated, valuation)
+}
+
 func ExportTransactionsCSVHandler(w http.ResponseWriter, _ *http.Request) {
 	transactions := make([]Transaction, 0)
 	if err := db.Order("date ASC, id ASC").Find(&transactions).Error; err != nil {
@@ -565,7 +647,7 @@ func writeError(w http.ResponseWriter, err error) {
 	case errors.Is(err, ErrInvalidAccount), errors.Is(err, ErrInvalidTxn),
 		errors.Is(err, ErrInvalidTransfer), errors.Is(err, ErrInvalidTxnTarget),
 		errors.Is(err, ErrInvalidRule), errors.Is(err, ErrInvalidSchedule), errors.Is(err, ErrInvalidCSV),
-		errors.Is(err, ErrInvalidManualAsset):
+		errors.Is(err, ErrInvalidManualAsset), errors.Is(err, ErrInvalidPortfolioHolding):
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		http.Error(w, "Requested finance record not found", http.StatusNotFound)
