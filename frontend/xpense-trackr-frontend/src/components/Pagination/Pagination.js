@@ -9,7 +9,7 @@ const Pagination = ({ currentPage, itemsPerPage, totalItems, paginate }) => {
     }
 
     return (
-        <nav>
+        <nav aria-label="Pagination">
             <ul className="pagination">
                 {pageNumbers.map(number => (
                     <li key={number} className={currentPage === number ? 'active' : ''}>

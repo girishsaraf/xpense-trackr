@@ -23,6 +23,7 @@ function renderExpenseList() {
 beforeEach(() => {
     jest.clearAllMocks();
     window.alert = jest.fn();
+    window.confirm = jest.fn(() => true);
 
     axios.get.mockImplementation((url) => {
         if (url.endsWith('/api/expenses')) {

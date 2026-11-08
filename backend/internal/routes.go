@@ -4,8 +4,10 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/budget"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/category"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/expense"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/goal"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/recurring"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/trends"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/user"
 	"github.com/gorilla/mux"
 )
@@ -41,6 +43,17 @@ func SetRoutes(router *mux.Router) {
 	budgetRouter.HandleFunc("/{id}", budget.GetBudgetByIDHandler).Methods("GET")
 	budgetRouter.HandleFunc("/{id}", budget.UpdateBudgetHandler).Methods("PUT")
 	budgetRouter.HandleFunc("/{id}", budget.DeleteBudgetHandler).Methods("DELETE")
+
+	// Savings Goal Management
+	goalRouter := router.PathPrefix("/api/goals").Subrouter()
+	goalRouter.HandleFunc("", goal.GetAllGoalsHandler).Methods("GET")
+	goalRouter.HandleFunc("", goal.CreateGoalHandler).Methods("POST")
+	goalRouter.HandleFunc("/{id:[0-9]+}", goal.GetGoalByIDHandler).Methods("GET")
+	goalRouter.HandleFunc("/{id:[0-9]+}", goal.UpdateGoalHandler).Methods("PUT")
+	goalRouter.HandleFunc("/{id:[0-9]+}", goal.DeleteGoalHandler).Methods("DELETE")
+
+	// Spending Trends
+	router.HandleFunc("/api/trends/spending", trends.SpendingHandler).Methods("GET")
 
 	// Investment Management
 	investmentRouter := router.PathPrefix("/api/investments").Subrouter()

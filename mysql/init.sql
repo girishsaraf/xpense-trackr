@@ -168,8 +168,8 @@ CREATE TABLE recurring_expense (
     amount DECIMAL(10, 2) NOT NULL,
     frequency VARCHAR(20) NOT NULL,
     start_date DATE NOT NULL,
-    end_date DATE,
-    category_id INT NOT NULL CHECK (category_id BETWEEN 1 AND 5) -- Add category_id column
+    end_date DATE NULL,
+    category_id INT NOT NULL
 );
 
 CREATE TABLE recurring_investment (
@@ -178,8 +178,8 @@ CREATE TABLE recurring_investment (
     amount DECIMAL(10, 2) NOT NULL,
     frequency VARCHAR(20) NOT NULL,
     start_date DATE NOT NULL,
-    end_date DATE,
-    type ENUM('stocks', '401k', 'mutual_funds', 'real_estate', 'savings', 'bonds') NOT NULL -- Add type column
+    end_date DATE NULL,
+    investment_type ENUM('stocks', '401k', 'mutual_funds', 'real_estate', 'savings', 'bonds') NOT NULL
 );
 
 INSERT INTO recurring_expense (description, amount, frequency, start_date, end_date, category_id)
@@ -189,7 +189,7 @@ VALUES
     ('Mobile Phone Plan', 59.99, 'monthly', CURRENT_DATE(), NULL, 3),
     ('Scoop to Work', 6.99, 'daily', CURRENT_DATE(), NULL, 3);
 
-INSERT INTO recurring_investment (description, amount, frequency, start_date, end_date, type)
+INSERT INTO recurring_investment (description, amount, frequency, start_date, end_date, investment_type)
 VALUES
     ('401(k) Contribution', 500.00, 'monthly', CURRENT_DATE(), NULL, '401k'),
     ('Mutual Funds Investment', 1000.00, 'monthly', CURRENT_DATE(), NULL, 'mutual_funds'),

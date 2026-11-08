@@ -114,7 +114,7 @@ const InvestmentGraph = () => {
                 <button onClick={() => handleButtonClick(4)}>4 Months</button>
                 <button onClick={() => handleButtonClick(6)}>6 Months</button>
             </div>
-            <canvas ref={chartRef}></canvas>
+            <canvas ref={chartRef} role="img" aria-label="Cumulative investments by type over time"></canvas>
         </div>
     );
 };

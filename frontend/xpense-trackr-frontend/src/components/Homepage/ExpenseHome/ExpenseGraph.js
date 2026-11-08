@@ -95,7 +95,7 @@ const ExpenseGraph = () => {
                 <button onClick={() => handleButtonClick(4)}>4 Months</button>
                 <button onClick={() => handleButtonClick(6)}>6 Months</button>
             </div>
-            <canvas ref={chartRef}></canvas>
+            <canvas ref={chartRef} role="img" aria-label="Cumulative expenses by category over time"></canvas>
         </div>
     );
 };

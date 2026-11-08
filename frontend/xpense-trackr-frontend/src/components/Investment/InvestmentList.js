@@ -19,6 +19,8 @@ const InvestmentList = () => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [investmentsPerPage] = useState(15); // Number of expenses per page
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState('');
 
     // Calculate the indexes of the expenses to display on the current page
     const indexOfLastInvestment = currentPage * investmentsPerPage;
@@ -33,6 +35,7 @@ const InvestmentList = () => {
     }, []);
 
     const fetchInvestments = async () => {
+        setLoadError('');
         try {
             const response = await axios.get(`${backendUrl}/api/investments`);
 
@@ -41,6 +44,9 @@ const InvestmentList = () => {
             setInvestments(sortedInvestments);
         } catch (error) {
             console.error('Error fetching investments:', error);
+            setLoadError('We couldn’t load your investments. Check your connection and try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -84,6 +90,7 @@ const InvestmentList = () => {
     };
 
     const handleDeleteInvestment = async (investmentId) => {
+        if (!window.confirm('Delete this investment? This action cannot be undone.')) return;
         try {
             await axios.delete(`${backendUrl}/api/investments/${investmentId}`);
             alert('Investment deleted successfully');
@@ -170,6 +177,7 @@ const InvestmentList = () => {
                 </Link>
             </div>
             <table className="investment-list-table">
+                <caption className="sr-only">Your recent investments with type, amount, date, and actions</caption>
                 <thead>
                 <tr>
                     <th>Investment Type</th>
@@ -179,7 +187,13 @@ const InvestmentList = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {currentInvestments.map(investment => (
+                {loading ? (
+                    <tr><td colSpan="5"><span role="status">Loading investments…</span></td></tr>
+                ) : loadError ? (
+                    <tr><td colSpan="5"><span role="alert">{loadError}</span></td></tr>
+                ) : currentInvestments.length === 0 ? (
+                    <tr><td colSpan="5" className="table-empty-state">No investments yet. Add a contribution to start tracking your portfolio.</td></tr>
+                ) : currentInvestments.map(investment => (
                     <tr key={investment.id}>
                         <td>
                             <div className={`type-tag type-${investment.investment_type.toLowerCase()}`}>

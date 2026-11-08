@@ -6,7 +6,9 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/budget"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/category"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/expense"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/goal"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/trends"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"log"
@@ -44,6 +46,11 @@ func main() {
 	expense.SetDB(db)
 	category.SetDB(db)
 	investments.SetDB(db)
+	goal.SetDB(db)
+	trends.SetDB(db)
+	if err := db.AutoMigrate(&goal.Goal{}); err != nil {
+		log.Fatalf("Error migrating savings goals: %v", err)
+	}
 
 	// Creating API routes and starting server on 8080
 	router := mux.NewRouter()

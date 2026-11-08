@@ -9,6 +9,10 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
 )
 
+func datePointer(value time.Time) *time.Time {
+	return &value
+}
+
 func TestRecurringExpenseCRUD(t *testing.T) {
 	database := newRecurringTestDB(t)
 
@@ -17,7 +21,7 @@ func TestRecurringExpenseCRUD(t *testing.T) {
 		Amount:      49.99,
 		Description: "Internet",
 		StartDate:   time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
-		EndDate:     time.Date(2026, 12, 31, 0, 0, 0, 0, time.UTC),
+		EndDate:     datePointer(time.Date(2026, 12, 31, 0, 0, 0, 0, time.UTC)),
 		Frequency:   "monthly",
 	}
 	if err := CreateRecurringExpense(expense); err != nil {
@@ -40,14 +44,17 @@ func TestRecurringExpenseCRUD(t *testing.T) {
 		t.Errorf("GetRecurringExpenseByID() = %+v, want %+v", got, expense)
 	}
 
-	if err := UpdateRecurringExpense(int(expense.ID), &RecurringExpense{Description: "Updated", Amount: 59.99}); err != nil {
+	if err := UpdateRecurringExpense(int(expense.ID), &RecurringExpense{
+		CategoryID: 1, Description: "Updated", Amount: 59.99,
+		StartDate: expense.StartDate, EndDate: nil, Frequency: "monthly",
+	}); err != nil {
 		t.Fatalf("UpdateRecurringExpense() error = %v", err)
 	}
 	got, err = GetRecurringExpenseByID(int(expense.ID))
 	if err != nil {
 		t.Fatalf("GetRecurringExpenseByID() after update error = %v", err)
 	}
-	if got.Description != "Updated" || got.Amount != 59.99 {
+	if got.Description != "Updated" || got.Amount != 59.99 || got.EndDate != nil {
 		t.Errorf("updated recurring expense = %+v", got)
 	}
 
@@ -75,7 +82,7 @@ func TestRecurringInvestmentCRUD(t *testing.T) {
 		InvestmentType: "401k",
 		Description:    "Contribution",
 		StartDate:      time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
-		EndDate:        time.Date(2026, 12, 31, 0, 0, 0, 0, time.UTC),
+		EndDate:        datePointer(time.Date(2026, 12, 31, 0, 0, 0, 0, time.UTC)),
 		Frequency:      "monthly",
 	}
 	if err := CreateRecurringInvestment(investment); err != nil {
@@ -98,14 +105,17 @@ func TestRecurringInvestmentCRUD(t *testing.T) {
 		t.Errorf("GetRecurringInvestmentByID() = %+v, want %+v", got, investment)
 	}
 
-	if err := UpdateRecurringInvestment(int(investment.ID), &RecurringInvestment{Description: "Updated", Amount: 750}); err != nil {
+	if err := UpdateRecurringInvestment(int(investment.ID), &RecurringInvestment{
+		Amount: 750, InvestmentType: investment.InvestmentType, Description: "Updated",
+		StartDate: investment.StartDate, EndDate: nil, Frequency: "monthly",
+	}); err != nil {
 		t.Fatalf("UpdateRecurringInvestment() error = %v", err)
 	}
 	got, err = GetRecurringInvestmentByID(int(investment.ID))
 	if err != nil {
 		t.Fatalf("GetRecurringInvestmentByID() after update error = %v", err)
 	}
-	if got.Description != "Updated" || got.Amount != 750 {
+	if got.Description != "Updated" || got.Amount != 750 || got.EndDate != nil {
 		t.Errorf("updated recurring investment = %+v", got)
 	}
 
@@ -176,7 +186,7 @@ func TestFetchRecurringExpenseInsertsDueExpenses(t *testing.T) {
 		Amount:      12,
 		Description: "Due expense",
 		StartDate:   now.AddDate(0, 0, -2),
-		EndDate:     now.AddDate(1, 0, 0),
+		EndDate:     datePointer(now.AddDate(1, 0, 0)),
 		Frequency:   "daily",
 	}
 	future := &RecurringExpense{
@@ -184,7 +194,7 @@ func TestFetchRecurringExpenseInsertsDueExpenses(t *testing.T) {
 		Amount:      20,
 		Description: "Future expense",
 		StartDate:   now.AddDate(0, 0, 2),
-		EndDate:     now.AddDate(1, 0, 0),
+		EndDate:     datePointer(now.AddDate(1, 0, 0)),
 		Frequency:   "daily",
 	}
 	if err := database.Create(due).Error; err != nil {
@@ -226,7 +236,7 @@ func TestFetchRecurringInvestmentInsertsDueInvestments(t *testing.T) {
 		InvestmentType: "401k",
 		Description:    "Due investment",
 		StartDate:      now.AddDate(0, 0, -2),
-		EndDate:        now.AddDate(1, 0, 0),
+		EndDate:        datePointer(now.AddDate(1, 0, 0)),
 		Frequency:      "daily",
 	}
 	future := &RecurringInvestment{
@@ -234,7 +244,7 @@ func TestFetchRecurringInvestmentInsertsDueInvestments(t *testing.T) {
 		InvestmentType: "stocks",
 		Description:    "Future investment",
 		StartDate:      now.AddDate(0, 0, 2),
-		EndDate:        now.AddDate(1, 0, 0),
+		EndDate:        datePointer(now.AddDate(1, 0, 0)),
 		Frequency:      "daily",
 	}
 	if err := database.Create(due).Error; err != nil {

@@ -53,7 +53,7 @@ func TestRecurringExpenseHandlers(t *testing.T) {
 		t.Fatalf("get status = %d, want %d", got.Code, http.StatusOK)
 	}
 
-	updated := recurringRequest(t, http.MethodPut, path, []byte(`{"description":"Updated","amount":59.99}`))
+	updated := recurringRequest(t, http.MethodPut, path, []byte(`{"category_id":1,"description":"Updated","amount":59.99,"start_date":"2026-01-01T00:00:00Z","end_date":null,"frequency":"monthly"}`))
 	if updated.Code != http.StatusOK {
 		t.Fatalf("update status = %d, want %d", updated.Code, http.StatusOK)
 	}
@@ -61,7 +61,7 @@ func TestRecurringExpenseHandlers(t *testing.T) {
 	if err := json.NewDecoder(updated.Body).Decode(&updatedResponse); err != nil {
 		t.Fatalf("failed to decode update response: %v", err)
 	}
-	if updatedResponse.Description != "Updated" || updatedResponse.Amount != 59.99 {
+	if updatedResponse.Description != "Updated" || updatedResponse.Amount != 59.99 || updatedResponse.EndDate != nil {
 		t.Errorf("updated recurring expense = %+v", updatedResponse)
 	}
 
@@ -129,9 +129,16 @@ func TestRecurringInvestmentHandlers(t *testing.T) {
 		t.Fatalf("get status = %d, want %d", got.Code, http.StatusOK)
 	}
 
-	updated := recurringRequest(t, http.MethodPut, path, []byte(`{"description":"Updated","amount":750}`))
+	updated := recurringRequest(t, http.MethodPut, path, []byte(`{"description":"Updated","amount":750,"investment_type":"401k","start_date":"2026-01-01T00:00:00Z","end_date":null,"frequency":"monthly"}`))
 	if updated.Code != http.StatusOK {
 		t.Fatalf("update status = %d, want %d", updated.Code, http.StatusOK)
+	}
+	var updatedResponse RecurringInvestment
+	if err := json.NewDecoder(updated.Body).Decode(&updatedResponse); err != nil {
+		t.Fatal(err)
+	}
+	if updatedResponse.EndDate != nil {
+		t.Errorf("update end_date = %v, want nil", updatedResponse.EndDate)
 	}
 
 	deleted := recurringRequest(t, http.MethodDelete, path, nil)
@@ -175,7 +182,7 @@ func TestRecurringTimeFieldsRoundTrip(t *testing.T) {
 	database := newRecurringTestDB(t)
 	start := time.Date(2026, 3, 1, 0, 0, 0, 0, time.UTC)
 	end := time.Date(2026, 9, 1, 0, 0, 0, 0, time.UTC)
-	recurringExpense := &RecurringExpense{Description: "Round trip", StartDate: start, EndDate: end, Frequency: "monthly"}
+	recurringExpense := &RecurringExpense{Description: "Round trip", StartDate: start, EndDate: &end, Frequency: "monthly"}
 	if err := database.Create(recurringExpense).Error; err != nil {
 		t.Fatalf("failed to create recurring expense: %v", err)
 	}
@@ -184,7 +191,7 @@ func TestRecurringTimeFieldsRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetRecurringExpenseByID() error = %v", err)
 	}
-	if !got.StartDate.Equal(start) || !got.EndDate.Equal(end) {
+	if got.EndDate == nil || !got.StartDate.Equal(start) || !got.EndDate.Equal(end) {
 		t.Errorf("time fields = %v - %v, want %v - %v", got.StartDate, got.EndDate, start, end)
 	}
 }
