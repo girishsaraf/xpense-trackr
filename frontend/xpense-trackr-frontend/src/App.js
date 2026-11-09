@@ -1,6 +1,6 @@
 // src/App.js
 
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import {BrowserRouter as Router, Routes, Route, NavLink, Link, useLocation} from 'react-router-dom';
 import './App.css';
 import { faHouse, faThumbtack} from "@fortawesome/free-solid-svg-icons";
@@ -74,13 +74,26 @@ const navigationGroups = [
 function MainNavigation() {
     const { pathname } = useLocation();
     const [openGroup, setOpenGroup] = useState(null);
+    const navigationRef = useRef(null);
 
     useEffect(() => {
         setOpenGroup(null);
     }, [pathname]);
 
+    useEffect(() => {
+        if (!openGroup) return undefined;
+
+        const closeOnOutsidePointer = (event) => {
+            const openedMenu = navigationRef.current?.querySelector('details[open]');
+            if (openedMenu && !openedMenu.contains(event.target)) setOpenGroup(null);
+        };
+
+        document.addEventListener('pointerdown', closeOnOutsidePointer);
+        return () => document.removeEventListener('pointerdown', closeOnOutsidePointer);
+    }, [openGroup]);
+
     return (
-        <nav className="app-navigation" aria-label="Main navigation">
+        <nav ref={navigationRef} className="app-navigation" aria-label="Main navigation">
             <NavLink to="/" end className={({ isActive }) => `overview-link${isActive ? ' active-tab' : ''}`}>
                 <FontAwesomeIcon icon={faHouse}/> Overview
             </NavLink>

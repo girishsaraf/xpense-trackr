@@ -50,6 +50,17 @@ describe('App', () => {
         expect(navigation.querySelector('details[open] summary')).toHaveTextContent('Planning');
     });
 
+    test('closes the open navigation menu when clicking outside', () => {
+        render(<App />);
+        const navigation = screen.getByRole('navigation', { name: 'Main navigation' });
+
+        fireEvent.click(screen.getByText('Activity'));
+        expect(navigation.querySelectorAll('details[open]')).toHaveLength(1);
+
+        fireEvent.pointerDown(document.body);
+        expect(navigation.querySelectorAll('details[open]')).toHaveLength(0);
+    });
+
     test('navigates to the investment list', async () => {
         render(<App />);
 

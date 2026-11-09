@@ -2,6 +2,20 @@
 
 A local-first personal finance app for expenses, budgets, goals, recurring transactions, investments, and spending trends. The application stores its data locally by default and does not require a cloud account or separately installed database.
 
+## UI preview
+
+### Dashboard
+
+![Xpense Trackr dashboard](docs/assets/dashboard-overview.png)
+
+### Expenses
+
+![Expense management page](docs/assets/expenses.png)
+
+### Cash-flow forecast
+
+![Cash-flow forecast page](docs/assets/cash-flow-forecast.png)
+
 ## Run locally with Docker
 
 Prerequisite: Docker Desktop (or Docker Engine with the Compose plugin).
@@ -115,4 +129,14 @@ The CSV importer accepts `account_id,type,amount,currency,date,payee,description
 
 - `GET /healthz` reports that the HTTP server is running.
 - `GET /readyz` checks that the database is reachable.
+
+## API reference
+
+See the [backend API reference](docs/api-reference.md) for routes, request and
+response formats, and status codes.
+
+## License
+
+Xpense Trackr is licensed under the [MIT License](LICENSE). Third-party
+dependencies retain their respective licenses.
 
