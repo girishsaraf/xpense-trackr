@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import backendUrl from "../../../config";
-import axios from "axios";
 import './ExpenseHome.css';
+import { listExpenses } from '../../../api/expenseApi';
+import { listCategories } from '../../../api/categoryApi';
 
 const ExpenseOverview = () => {
     const [expenseData, setExpenseData] = useState([]);
@@ -10,8 +10,8 @@ const ExpenseOverview = () => {
         const fetchData = async () => {
             try {
                 const [expensesResponse, categoriesResponse] = await Promise.all([
-                    axios.get(`${backendUrl}/api/expenses`),
-                    axios.get(`${backendUrl}/api/categories`)
+                    listExpenses(),
+                    listCategories()
                 ]);
                 const expenses = expensesResponse.data;
                 const categories = categoriesResponse.data.reduce((acc, category) => {

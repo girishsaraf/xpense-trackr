@@ -1,10 +1,10 @@
 // src/components/Expense/ExpenseForm.js
 
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import backendUrl from "../../config";
 import './ExpenseForm.css';
 import { useNavigate } from 'react-router-dom';
+import { createExpense, createRecurringExpense } from '../../api/expenseApi';
+import { listCategories } from '../../api/categoryApi';
 
 
 const ExpenseForm = () => {
@@ -26,7 +26,7 @@ const ExpenseForm = () => {
     useEffect(() => {
         const loadCategories = async () => {
             try {
-                const response = await axios.get(`${backendUrl}/api/categories`);
+                const response = await listCategories();
                 setCategories(response.data || []);
             } catch (error) {
                 console.error('Error fetching categories:', error);
@@ -44,7 +44,7 @@ const ExpenseForm = () => {
         try
         {
             if(isRecurring){
-                await axios.post(`${backendUrl}/api/recurring/expenses`, {
+                await createRecurringExpense({
                     ...formData,
                     category_id: Number(formData.category_id),
                     amount: Number(formData.amount),
@@ -54,7 +54,7 @@ const ExpenseForm = () => {
                 alert('Expense added successfully');
             }
             else {
-                await axios.post(`${backendUrl}/api/expenses`, formData);
+                await createExpense(formData);
                 alert('Expense added successfully');
             }
             clearFormData();

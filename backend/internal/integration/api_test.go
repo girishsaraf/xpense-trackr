@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/girishsaraf/xpense-trackr/backend/internal"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/app"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/budget"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/category"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/expense"
@@ -23,7 +24,6 @@ import (
 	"github.com/girishsaraf/xpense-trackr/backend/internal/planning"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/receipt"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/recurring"
-	"github.com/girishsaraf/xpense-trackr/backend/internal/trends"
 	"github.com/gorilla/mux"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
@@ -79,16 +79,7 @@ func setupIntegrationDB(t *testing.T) (*gorm.DB, http.Handler) {
 		t.Fatalf("failed to migrate schema: %v", err)
 	}
 
-	budget.SetDB(database)
-	category.SetDB(database)
-	expense.SetDB(database)
-	investments.SetDB(database)
-	ledger.SetDB(database)
-	planning.SetDB(database)
-	recurring.SetDB(database)
-	receipt.SetDB(database)
-	goal.SetDB(database)
-	trends.SetDB(database)
+	app.ConfigureModules(database, t.TempDir())
 
 	router := mux.NewRouter()
 	internal.SetRoutes(router)
