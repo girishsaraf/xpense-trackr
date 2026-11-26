@@ -18,18 +18,10 @@ import (
 
 	"github.com/girishsaraf/xpense-trackr/backend/config"
 	"github.com/girishsaraf/xpense-trackr/backend/internal"
+	"github.com/girishsaraf/xpense-trackr/backend/internal/app"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/backup"
-	"github.com/girishsaraf/xpense-trackr/backend/internal/budget"
-	"github.com/girishsaraf/xpense-trackr/backend/internal/category"
-	"github.com/girishsaraf/xpense-trackr/backend/internal/expense"
-	"github.com/girishsaraf/xpense-trackr/backend/internal/goal"
-	"github.com/girishsaraf/xpense-trackr/backend/internal/investments"
-	"github.com/girishsaraf/xpense-trackr/backend/internal/ledger"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/legacyimport"
-	"github.com/girishsaraf/xpense-trackr/backend/internal/planning"
-	"github.com/girishsaraf/xpense-trackr/backend/internal/receipt"
 	"github.com/girishsaraf/xpense-trackr/backend/internal/recurring"
-	"github.com/girishsaraf/xpense-trackr/backend/internal/trends"
 	"github.com/girishsaraf/xpense-trackr/backend/migrations"
 	"github.com/gorilla/mux"
 	"github.com/robfig/cron/v3"
@@ -179,17 +171,7 @@ func run() error {
 		return fmt.Errorf("seed demo data: %w", err)
 	}
 
-	budget.SetDB(db)
-	expense.SetDB(db)
-	category.SetDB(db)
-	investments.SetDB(db)
-	ledger.SetDB(db)
-	planning.SetDB(db)
-	goal.SetDB(db)
-	recurring.SetDB(db)
-	receipt.SetDB(db)
-	receipt.SetStorageDir(filepath.Join(envOrDefault("APP_DATA_DIR", "./data"), "receipts"))
-	trends.SetDB(db)
+	app.ConfigureModules(db, filepath.Join(envOrDefault("APP_DATA_DIR", "./data"), "receipts"))
 
 	scheduler := cron.New()
 	if _, err := scheduler.AddFunc("@every 12h", recurring.HandleRecurringExpense); err != nil {
