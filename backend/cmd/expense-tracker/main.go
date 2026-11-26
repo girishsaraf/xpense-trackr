@@ -175,6 +175,9 @@ func run() error {
 	if err := migrations.Migrate(db); err != nil {
 		return fmt.Errorf("migrate database schema: %w", err)
 	}
+	if err := seedDemoData(db); err != nil {
+		return fmt.Errorf("seed demo data: %w", err)
+	}
 
 	budget.SetDB(db)
 	expense.SetDB(db)
