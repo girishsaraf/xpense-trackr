@@ -1,13 +1,13 @@
 // src/components/Expense/ExpenseList.js
 
 import React, {useEffect, useState} from 'react';
-import axios from 'axios';
-import backendUrl from "../../config";
 import {Link} from "react-router-dom";
 import './ExpenseList.css';
 import Pagination from "../Pagination/Pagination";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faEdit, faPlus, faTag, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
+import { deleteExpense, getExpense, listExpenses, updateExpense } from '../../api/expenseApi';
+import { listCategories } from '../../api/categoryApi';
 
 
 const ExpenseList = () => {
@@ -40,13 +40,13 @@ const ExpenseList = () => {
     const fetchExpenses = async () => {
         setLoadError('');
         try {
-            const response = await axios.get(`${backendUrl}/api/expenses`);
+            const response = await listExpenses();
 
             // Sort expenses by date parameter in descending order
             const sortedExpenses = response.data.sort((a, b) => new Date(b.date) - new Date(a.date));
             setExpenses(sortedExpenses);
 
-            const responseCategories = await axios.get(`${backendUrl}/api/categories`);
+            const responseCategories = await listCategories();
             setCategories(responseCategories.data);
         } catch (error) {
             console.error('Error fetching expenses:', error);
@@ -66,7 +66,7 @@ const ExpenseList = () => {
         try {
             // Fetch the expense data for the selected expenseId
             const expenseId = currentExpense.id;
-            const response = await axios.get(`${backendUrl}/api/expenses/${expenseId}`);
+            const response = await getExpense(expenseId);
             const expenseData = response.data;
 
             // Update the expense data with edited amount and date
@@ -76,7 +76,7 @@ const ExpenseList = () => {
             expenseData.category_id = editedCategory.toString();
 
             // Call the PUT endpoint to update the expense
-            await axios.put(`${backendUrl}/api/expenses/${expenseId}`, expenseData);
+            await updateExpense(expenseId, expenseData);
             alert('Expense updated successfully');
 
             // Optionally, fetch the list of expenses to update the UI
@@ -105,7 +105,7 @@ const ExpenseList = () => {
     const handleDeleteExpense = async (expenseId) => {
         if (!window.confirm('Delete this expense? This action cannot be undone.')) return;
         try {
-            await axios.delete(`${backendUrl}/api/expenses/${expenseId}`);
+            await deleteExpense(expenseId);
             alert('Expense deleted successfully');
             await fetchExpenses(); // Fetch updated list of expenses after deletion
         } catch (error) {
